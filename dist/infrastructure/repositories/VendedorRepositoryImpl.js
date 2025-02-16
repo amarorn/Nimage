@@ -10,18 +10,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VendedorRepositoryImpl = void 0;
+const VendedorModel_1 = require("../database/models/VendedorModel");
 class VendedorRepositoryImpl {
-    constructor() {
-        this.vendedores = [];
-    }
     criar(vendedor) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.vendedores.push(vendedor);
+            yield VendedorModel_1.VendedorModel.create(vendedor);
         });
     }
     obterPorId(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.vendedores.find(v => v.id === id) || null;
+            return yield VendedorModel_1.VendedorModel.findOne({ id }).lean();
         });
     }
 }

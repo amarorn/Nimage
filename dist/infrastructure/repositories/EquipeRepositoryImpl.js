@@ -10,18 +10,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EquipeRepositoryImpl = void 0;
+const EquipeModel_1 = require("../database/models/EquipeModel");
 class EquipeRepositoryImpl {
-    constructor() {
-        this.equipes = [];
-    }
     criar(equipe) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.equipes.push(equipe);
+            yield EquipeModel_1.EquipeModel.create(equipe);
         });
     }
     obterPorId(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.equipes.find(e => e.id === id) || null;
+            return yield EquipeModel_1.EquipeModel.findOne({ id }).lean();
         });
     }
 }

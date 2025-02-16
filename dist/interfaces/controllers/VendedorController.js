@@ -17,6 +17,7 @@ class VendedorController {
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id, nome, equipe } = req.body;
+            console.log("Recebendo dados no Controller:", req.body);
             const vendedor = yield this.criarVendedor.executar({ id, nome, equipe });
             res.status(201).json(vendedor);
         });

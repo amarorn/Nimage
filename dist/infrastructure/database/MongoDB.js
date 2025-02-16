@@ -8,24 +8,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AtividadeRepositoryImpl = void 0;
-const AtividadeModel_1 = require("../database/models/AtividadeModel");
-class AtividadeRepositoryImpl {
-    criar(atividade) {
+exports.MongoDB = void 0;
+const mongoose_1 = __importDefault(require("mongoose"));
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/nimage";
+class MongoDB {
+    static conectar() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield AtividadeModel_1.AtividadeModel.create(atividade);
-        });
-    }
-    obterPorId(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield AtividadeModel_1.AtividadeModel.findOne({ id }).lean();
-        });
-    }
-    obterPorVendedor(vendedorId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield AtividadeModel_1.AtividadeModel.find({ vendedorId }).lean();
+            try {
+                yield mongoose_1.default.connect(MONGO_URI);
+                console.log("🔥 Conectado ao MongoDB com sucesso!");
+            }
+            catch (error) {
+                console.error("❌ Erro ao conectar ao MongoDB:", error);
+                process.exit(1);
+            }
         });
     }
 }
-exports.AtividadeRepositoryImpl = AtividadeRepositoryImpl;
+exports.MongoDB = MongoDB;

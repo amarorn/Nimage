@@ -10,18 +10,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetaRepositoryImpl = void 0;
+const MetaModel_1 = require("../database/models/MetaModel");
 class MetaRepositoryImpl {
     constructor() {
         this.metas = [];
     }
     criar(meta) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.metas.push(meta);
+            yield MetaModel_1.MetaModel.create(meta);
         });
     }
     obterPorEquipe(equipeId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.metas.find(m => m.equipeId === equipeId) || null;
+            return yield MetaModel_1.MetaModel.findOne({ equipeId }).lean();
         });
     }
 }
