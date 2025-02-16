@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const AtividadeRepositoryImpl_1 = require("../../infrastructure/repositories/AtividadeRepositoryImpl");
+const CriarAtividade_1 = require("../../application/use-cases/CriarAtividade");
+const AtividadeController_1 = require("../controllers/AtividadeController");
+const router = (0, express_1.Router)();
+const atividadeRepo = new AtividadeRepositoryImpl_1.AtividadeRepositoryImpl();
+const criarAtividade = new CriarAtividade_1.CriarAtividade(atividadeRepo);
+const atividadeController = new AtividadeController_1.AtividadeController(criarAtividade);
+router.post("/atividades", (req, res) => atividadeController.criar(req, res));
+exports.default = router;

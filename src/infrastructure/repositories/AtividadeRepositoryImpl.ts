@@ -1,18 +1,18 @@
 import { Atividade } from "../../domain/entities/Atividade";
 import { AtividadeRepository } from "../../domain/repositories/AtividadeRepository";
+import { AtividadeModel } from "../database/models/AtividadeModel";
 
 export class AtividadeRepositoryImpl implements AtividadeRepository {
-    private atividades: Atividade[] = [];
 
     async criar(atividade: Atividade): Promise<void> {
-        this.atividades.push(atividade);
+        await AtividadeModel.create(atividade);
     }
 
     async obterPorId(id: string): Promise<Atividade | null> {
-        return this.atividades.find(a => a.id === id) || null;
+        return await AtividadeModel.findOne({ id }).lean();
     }
 
     async obterPorVendedor(vendedorId: string): Promise<Atividade[]> {
-        return this.atividades.filter(a => a.vendedorId === vendedorId);
+        return await AtividadeModel.find({ vendedorId }).lean();
     }
 }

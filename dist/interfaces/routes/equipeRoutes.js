@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const EquipeRepositoryImpl_1 = require("../../infrastructure/repositories/EquipeRepositoryImpl");
+const CriarEquipe_1 = require("../../application/use-cases/CriarEquipe");
+const EquipeController_1 = require("../controllers/EquipeController");
+const router = (0, express_1.Router)();
+const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
+const criarEquipe = new CriarEquipe_1.CriarEquipe(equipeRepo);
+const equipeController = new EquipeController_1.EquipeController(criarEquipe);
+router.post("/equipes", (req, res) => equipeController.criar(req, res));
+exports.default = router;

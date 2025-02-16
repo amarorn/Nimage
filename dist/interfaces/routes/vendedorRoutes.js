@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const VendedorRepositoryImpl_1 = require("../../infrastructure/repositories/VendedorRepositoryImpl");
+const CriarVendedor_1 = require("../../application/use-cases/CriarVendedor");
+const VendedorController_1 = require("../controllers/VendedorController");
+const router = (0, express_1.Router)();
+const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
+const criarVendedor = new CriarVendedor_1.CriarVendedor(vendedorRepo);
+const vendedorController = new VendedorController_1.VendedorController(criarVendedor);
+router.post("/vendedores", (req, res) => vendedorController.criar(req, res));
+exports.default = router;

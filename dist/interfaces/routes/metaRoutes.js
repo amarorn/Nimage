@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const MetaRepositoryImpl_1 = require("../../infrastructure/repositories/MetaRepositoryImpl");
+const CriarMeta_1 = require("../../application/use-cases/CriarMeta");
+const MetaController_1 = require("../controllers/MetaController");
+const router = (0, express_1.Router)();
+const metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
+const criarMeta = new CriarMeta_1.CriarMeta(metaRepo);
+const metaController = new MetaController_1.MetaController(criarMeta);
+router.post("/metas", (req, res) => metaController.criar(req, res));
+exports.default = router;
