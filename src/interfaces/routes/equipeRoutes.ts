@@ -8,6 +8,9 @@ const equipeRepo = new EquipeRepositoryImpl();
 const criarEquipe = new CriarEquipe(equipeRepo);
 const equipeController = new EquipeController(criarEquipe);
 
-router.post("/equipes", (req, res) => equipeController.criar(req, res));
+router.post("/equipes", async (req, res) => {
+    console.log("📨 Nova requisição POST /equipes");
+    return equipeController.criar(req, res);
+});
 
 export default router;

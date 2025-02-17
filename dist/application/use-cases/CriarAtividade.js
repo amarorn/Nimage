@@ -17,8 +17,17 @@ class CriarAtividade {
     }
     executar(dados) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("📝 Iniciando criação de atividade com dados:", dados);
+            if (!dados.id || !dados.vendedorId || !dados.data || dados.docinhosCoco === undefined) {
+                throw new Error('Dados inválidos para criar atividade');
+            }
+            if (dados.docinhosCoco < 0) {
+                throw new Error('Quantidade de docinhos não pode ser negativa');
+            }
             const atividade = new Atividade_1.Atividade(dados.id, dados.vendedorId, dados.data, dados.docinhosCoco);
+            console.log("🏗️ Atividade instanciada:", atividade);
             yield this.atividadeRepo.criar(atividade);
+            console.log("💾 Atividade persistida no banco");
             return atividade;
         });
     }
