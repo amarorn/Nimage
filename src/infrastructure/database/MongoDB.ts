@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/nimage";
+const MONGO_URI = process.env.MONGO_URI || "mongodb://admin:admin@127.0.0.1:27017/nimage?authSource=admin";
+console.log("MONGO_URI", MONGO_URI);
 
 export class MongoDB {
     static async conectar() {

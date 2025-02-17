@@ -14,9 +14,12 @@ const Vendedor_1 = require("../../domain/entities/Vendedor");
 class CriarVendedor {
     constructor(vendedorRepo) {
         this.vendedorRepo = vendedorRepo;
+        console.log("CriarVendedor construtor");
     }
     executar(dados) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("CriarVendedor caso de uso");
+            console.log("Dados recebidos:", dados);
             const vendedor = new Vendedor_1.Vendedor(dados.id, dados.nome, dados.equipe);
             yield this.vendedorRepo.criar(vendedor);
             return vendedor;

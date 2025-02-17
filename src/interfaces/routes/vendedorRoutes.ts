@@ -8,6 +8,7 @@ const vendedorRepo = new VendedorRepositoryImpl();
 const criarVendedor = new CriarVendedor(vendedorRepo);
 const vendedorController = new VendedorController(criarVendedor);
 
+console.log("🚀vendedorController Routes");
 router.post("/vendedores", (req, res) => vendedorController.criar(req, res));
 
 export default router;
