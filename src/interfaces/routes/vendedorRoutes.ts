@@ -9,6 +9,9 @@ const criarVendedor = new CriarVendedor(vendedorRepo);
 const vendedorController = new VendedorController(criarVendedor);
 
 console.log("🚀vendedorController Routes");
-router.post("/vendedores", (req, res) => vendedorController.criar(req, res));
+router.post("/vendedores", async (req, res) => {
+    console.log("📨 Nova requisição POST /vendedores");
+    return vendedorController.criar(req, res);
+});
 
 export default router;

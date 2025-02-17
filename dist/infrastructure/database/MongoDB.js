@@ -14,10 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MongoDB = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/nimage";
+const MONGO_URI = process.env.MONGO_URI || "mongodb://admin:secret@127.0.0.1:27017/nimage?authSource=admin";
 class MongoDB {
     static conectar() {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("🔥 Conectado ao MongoDB com sucesso!");
             try {
                 yield mongoose_1.default.connect(MONGO_URI);
                 console.log("🔥 Conectado ao MongoDB com sucesso!");

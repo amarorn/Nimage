@@ -6,10 +6,18 @@ export class CriarVendedor {
     }
 
     async executar(dados: { id: string; nome: string; equipe: string }) {
-        console.log("CriarVendedor caso de uso");
+        console.log("📝 Iniciando criação de vendedor com dados:", dados);
+
+        if (!dados.id || !dados.nome || !dados.equipe) {
+            throw new Error('Dados inválidos para criar vendedor');
+        }
+
         const vendedor = new Vendedor(dados.id, dados.nome, dados.equipe);
-        console.log("Vendedor criado:", vendedor);
+        console.log("🏗️ Vendedor instanciado:", vendedor);
+
         await this.vendedorRepo.criar(vendedor);
+        console.log("💾 Vendedor persistido no banco");
+
         return vendedor;
     }
 }
