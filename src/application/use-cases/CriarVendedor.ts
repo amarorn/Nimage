@@ -2,11 +2,22 @@ import { Vendedor } from "../../domain/entities/Vendedor";
 import { VendedorRepository } from "../../domain/repositories/VendedorRepository";
 
 export class CriarVendedor {
-    constructor(private vendedorRepo: VendedorRepository) {}
+    constructor(private vendedorRepo: VendedorRepository) {
+    }
 
     async executar(dados: { id: string; nome: string; equipe: string }) {
+        console.log("📝 Iniciando criação de vendedor com dados:", dados);
+
+        if (!dados.id || !dados.nome || !dados.equipe) {
+            throw new Error('Dados inválidos para criar vendedor');
+        }
+
         const vendedor = new Vendedor(dados.id, dados.nome, dados.equipe);
+        console.log("🏗️ Vendedor instanciado:", vendedor);
+
         await this.vendedorRepo.criar(vendedor);
+        console.log("💾 Vendedor persistido no banco");
+
         return vendedor;
     }
 }

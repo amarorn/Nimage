@@ -8,6 +8,9 @@ const metaRepo = new MetaRepositoryImpl();
 const criarMeta = new CriarMeta(metaRepo);
 const metaController = new MetaController(criarMeta);
 
-router.post("/metas", (req, res) => metaController.criar(req, res));
+router.post("/metas", async (req, res) => {
+    console.log("📨 Nova requisição POST /metas");
+    return metaController.criar(req, res);
+});
 
 export default router;
