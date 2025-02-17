@@ -8,6 +8,9 @@ const atividadeRepo = new AtividadeRepositoryImpl();
 const criarAtividade = new CriarAtividade(atividadeRepo);
 const atividadeController = new AtividadeController(criarAtividade);
 
-router.post("/atividades", (req, res) => atividadeController.criar(req, res));
+router.post("/atividades", async (req, res) => {
+    console.log("📨 Nova requisição POST /atividades");
+    return atividadeController.criar(req, res);
+});
 
 export default router;
