@@ -21,4 +21,9 @@ router.get("/metas/all", async (req, res) => {
     return res.json(metas);
 });
 
+router.get("/metas/:id", async (req, res) => {
+    console.log("📨 Nova requisição GET /metas/:id");
+    return metaController.obterPorId(req, res);
+});
+
 export default router;

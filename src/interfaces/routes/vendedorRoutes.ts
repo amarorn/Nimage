@@ -22,4 +22,9 @@ router.get("/vendedores/all", async (req, res) => {
     return res.json(vendedores);
 });
 
+router.get("/vendedores/:id", async (req, res) => {
+    console.log("📨 Nova requisição GET /vendedores/:id");
+    return vendedorController.obterPorId(req, res);
+});
+
 export default router;

@@ -21,4 +21,9 @@ router.get("/atividades/all", async (req, res) => {
     return res.json(atividades);
 });
 
+router.get("/atividades/:id", async (req, res) => {
+    console.log("📨 Nova requisição GET /atividades/:id");
+    return atividadeController.obterPorId(req, res);
+});
+
 export default router;

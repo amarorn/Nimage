@@ -28,4 +28,8 @@ router.get("/atividades/all", (req, res) => __awaiter(void 0, void 0, void 0, fu
     const atividades = yield atividadeController.obterTodos(req, res);
     return res.json(atividades);
 }));
+router.get("/atividades/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("📨 Nova requisição GET /atividades/:id");
+    return atividadeController.obterPorId(req, res);
+}));
 exports.default = router;

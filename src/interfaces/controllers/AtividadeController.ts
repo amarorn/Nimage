@@ -79,4 +79,24 @@ export class AtividadeController {
             });
         }
     }
+
+    async obterPorId(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+            const atividade = await this.obterAtividades.executarPorId(id);
+            console.log("✅ Atividade obtida com sucesso:", atividade);
+
+            if (!atividade) {
+                return res.status(404).json({ erro: 'Atividade não encontrada' });
+            }
+
+            return res.status(200).json(atividade);
+        } catch (erro) {
+            console.error("❌ Erro ao obter atividade:", erro);
+            return res.status(500).json({ 
+                erro: 'Erro interno ao obter atividade',
+                mensagem: (erro as Error).message 
+            });
+        }
+    }
 }

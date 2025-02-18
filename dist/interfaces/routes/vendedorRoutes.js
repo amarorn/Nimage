@@ -29,4 +29,8 @@ router.get("/vendedores/all", (req, res) => __awaiter(void 0, void 0, void 0, fu
     const vendedores = yield vendedorController.obterTodos(req, res);
     return res.json(vendedores);
 }));
+router.get("/vendedores/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("📨 Nova requisição GET /vendedores/:id");
+    return vendedorController.obterPorId(req, res);
+}));
 exports.default = router;

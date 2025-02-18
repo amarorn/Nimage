@@ -20,5 +20,11 @@ class ObterMeta {
             return yield this.metaRepo.obterTodos(skip, limit);
         });
     }
+    executarPorId(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log("Executando ObterMeta por ID", { id });
+            return yield this.metaRepo.obterPorId(id);
+        });
+    }
 }
 exports.ObterMeta = ObterMeta;

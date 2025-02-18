@@ -58,6 +58,7 @@ export class VendedorController {
                 limite: limit,
                 total: vendedores.length,
                 vendedores: vendedores.map(vendedor => ({
+                    id: vendedor.id,
                     nome: vendedor.nome,
                     equipe: vendedor.equipe
                 }))
@@ -68,6 +69,26 @@ export class VendedorController {
             console.error("❌ Erro ao obter vendedores:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao obter vendedores',
+                mensagem: (erro as Error).message 
+            });
+        }
+    }
+
+    async obterPorId(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+            const vendedor = await this.obterVendedor.executarPorId(id);
+            console.log("✅ Vendedor obtido com sucesso:", vendedor);
+
+            if (!vendedor) {
+                return res.status(404).json({ erro: 'Vendedor não encontrado' });
+            }
+
+            return res.status(200).json(vendedor);
+        } catch (erro) {
+            console.error("❌ Erro ao obter vendedor:", erro);
+            return res.status(500).json({ 
+                erro: 'Erro interno ao obter vendedor',
                 mensagem: (erro as Error).message 
             });
         }
