@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { CriarAtividade } from "../../application/use-cases/CriarAtividade";
+import { ObterAtividades } from "../../application/use-cases/ObterAtividades";
 
 export class AtividadeController {
-    constructor(private criarAtividade: CriarAtividade) {}
+    constructor(private criarAtividade: CriarAtividade, private obterAtividades: ObterAtividades) {}
 
     async criar(req: Request, res: Response) {
         try {
@@ -42,6 +43,38 @@ export class AtividadeController {
             console.error("❌ Erro ao criar atividade:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao criar atividade',
+                mensagem: (erro as Error).message 
+            });
+        }
+    }
+
+    async obterTodos(req: Request, res: Response) {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const skip = (page - 1) * limit;
+
+            const atividades = await this.obterAtividades.executar(skip, limit);
+            console.log("✅ Atividades obtidas com sucesso:", atividades);
+
+            // Criar uma resposta personalizada com paginação
+            const respostaPersonalizada = {
+                pagina: page,
+                limite: limit,
+                total: atividades.length,
+                atividades: atividades.map(atividade => ({
+                    id: atividade.id,
+                    vendedorId: atividade.vendedorId,
+                    data: atividade.data,
+                    docinhosCoco: atividade.docinhosCoco
+                }))
+            };
+
+            return respostaPersonalizada;
+        } catch (erro) {
+            console.error("❌ Erro ao obter atividades:", erro);
+            return res.status(500).json({ 
+                erro: 'Erro interno ao obter atividades',
                 mensagem: (erro as Error).message 
             });
         }

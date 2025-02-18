@@ -22,9 +22,4 @@ router.get("/vendedores/all", async (req, res) => {
     return res.json(vendedores);
 });
 
-router.get("/teste", (req, res) => {
-    console.log("📨 Nova requisição GET /teste");
-    return res.status(200).json("Teste de resposta");
-});
-
 export default router;

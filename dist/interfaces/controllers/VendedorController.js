@@ -57,10 +57,6 @@ class VendedorController {
                 const skip = (page - 1) * limit;
                 const vendedores = yield this.obterVendedor.executar(skip, limit);
                 console.log("✅ Vendedores obtidos com sucesso:", vendedores);
-                let response = {
-                    status: res.status(200),
-                    body: JSON.stringify(vendedores)
-                };
                 // Criar uma resposta personalizada com paginação
                 const respostaPersonalizada = {
                     pagina: page,

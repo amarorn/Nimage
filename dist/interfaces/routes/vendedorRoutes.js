@@ -29,8 +29,4 @@ router.get("/vendedores/all", (req, res) => __awaiter(void 0, void 0, void 0, fu
     const vendedores = yield vendedorController.obterTodos(req, res);
     return res.json(vendedores);
 }));
-router.get("/teste", (req, res) => {
-    console.log("📨 Nova requisição GET /teste");
-    return res.status(200).json("Teste de resposta");
-});
 exports.default = router;

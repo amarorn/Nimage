@@ -12,7 +12,7 @@ export class AtividadeRepositoryImpl implements AtividadeRepository {
         return await AtividadeModel.findOne({ id }).lean();
     }
 
-    async obterPorVendedor(vendedorId: string): Promise<Atividade[]> {
-        return await AtividadeModel.find({ vendedorId }).lean();
+    async obterTodos(skip: number, limit: number): Promise<Atividade[]> {
+        return await AtividadeModel.find().skip(skip).limit(limit).lean();
     }
 }
