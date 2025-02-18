@@ -9,23 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EquipeRepositoryImpl = void 0;
-const EquipeModel_1 = require("../database/models/EquipeModel");
-class EquipeRepositoryImpl {
-    criar(equipe) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield EquipeModel_1.EquipeModel.create(equipe);
-        });
+exports.ObterEquipe = void 0;
+class ObterEquipe {
+    constructor(equipeRepo) {
+        this.equipeRepo = equipeRepo;
     }
-    obterPorId(id) {
+    executar(skip, limit) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield EquipeModel_1.EquipeModel.findOne({ id }).lean();
-        });
-    }
-    obterTodos(skip, limit) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield EquipeModel_1.EquipeModel.find().skip(skip).limit(limit).lean();
+            console.log("Executando ObterEquipe com paginação", { skip, limit });
+            return yield this.equipeRepo.obterTodos(skip, limit);
         });
     }
 }
-exports.EquipeRepositoryImpl = EquipeRepositoryImpl;
+exports.ObterEquipe = ObterEquipe;

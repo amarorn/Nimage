@@ -11,8 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EquipeController = void 0;
 class EquipeController {
-    constructor(criarEquipe) {
+    constructor(criarEquipe, obterEquipe) {
         this.criarEquipe = criarEquipe;
+        this.obterEquipe = obterEquipe;
     }
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -41,6 +42,35 @@ class EquipeController {
                 console.error("❌ Erro ao criar equipe:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao criar equipe',
+                    mensagem: erro.message
+                });
+            }
+        });
+    }
+    obterTodos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const page = parseInt(req.query.page) || 1;
+                const limit = parseInt(req.query.limit) || 10;
+                const skip = (page - 1) * limit;
+                const equipes = yield this.obterEquipe.executar(skip, limit);
+                console.log("✅ Equipes obtidas com sucesso:", equipes);
+                // Criar uma resposta personalizada com paginação
+                const respostaPersonalizada = {
+                    pagina: page,
+                    limite: limit,
+                    total: equipes.length,
+                    equipes: equipes.map(equipe => ({
+                        id: equipe.id,
+                        nome: equipe.nome
+                    }))
+                };
+                return respostaPersonalizada;
+            }
+            catch (erro) {
+                console.error("❌ Erro ao obter equipes:", erro);
+                return res.status(500).json({
+                    erro: 'Erro interno ao obter equipes',
                     mensagem: erro.message
                 });
             }

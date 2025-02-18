@@ -10,4 +10,8 @@ export class EquipeRepositoryImpl implements EquipeRepository {
     async obterPorId(id: string): Promise<Equipe | null> {
         return await EquipeModel.findOne({ id }).lean();
     }
+    
+    async obterTodos(skip: number, limit: number): Promise<Equipe[]> {
+        return await EquipeModel.find().skip(skip).limit(limit).lean();
+    }
 }
