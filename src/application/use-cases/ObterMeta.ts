@@ -4,7 +4,8 @@ import { MetaRepository } from "../../domain/repositories/MetaRepository";
 export class ObterMeta {
     constructor(private metaRepo: MetaRepository) {}
 
-    async executar(equipeId: string): Promise<Meta | null> {
-        return await this.metaRepo.obterPorEquipe(equipeId);
+    async executar(skip: number, limit: number): Promise<Meta[]> {
+        console.log("Executando ObterMeta com paginação", { skip, limit });
+        return await this.metaRepo.obterTodos(skip, limit);
     }
 }

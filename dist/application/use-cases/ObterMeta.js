@@ -14,9 +14,10 @@ class ObterMeta {
     constructor(metaRepo) {
         this.metaRepo = metaRepo;
     }
-    executar(equipeId) {
+    executar(skip, limit) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.metaRepo.obterPorEquipe(equipeId);
+            console.log("Executando ObterMeta com paginação", { skip, limit });
+            return yield this.metaRepo.obterTodos(skip, limit);
         });
     }
 }

@@ -12,4 +12,8 @@ export class MetaRepositoryImpl implements MetaRepository {
     async obterPorEquipe(equipeId: string): Promise<Meta | null> {
         return await MetaModel.findOne({ equipeId }).lean();
     }
+
+    async obterTodos(skip: number, limit: number): Promise<Meta[]> {
+        return await MetaModel.find().skip(skip).limit(limit).lean();
+    }
 }
