@@ -11,8 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetaController = void 0;
 class MetaController {
-    constructor(criarMeta) {
+    constructor(criarMeta, obterMeta) {
         this.criarMeta = criarMeta;
+        this.obterMeta = obterMeta;
     }
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -42,6 +43,36 @@ class MetaController {
                 console.error("❌ Erro ao criar meta:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao criar meta',
+                    mensagem: erro.message
+                });
+            }
+        });
+    }
+    obterTodos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const page = parseInt(req.query.page) || 1;
+                const limit = parseInt(req.query.limit) || 10;
+                const skip = (page - 1) * limit;
+                const metas = yield this.obterMeta.executar(skip, limit);
+                console.log("✅ Metas obtidas com sucesso:", metas);
+                // Criar uma resposta personalizada com paginação
+                const respostaPersonalizada = {
+                    pagina: page,
+                    limite: limit,
+                    total: metas.length,
+                    metas: metas.map(meta => ({
+                        id: meta.id,
+                        equipeId: meta.equipeId,
+                        objetivo: meta.objetivo
+                    }))
+                };
+                return respostaPersonalizada;
+            }
+            catch (erro) {
+                console.error("❌ Erro ao obter metas:", erro);
+                return res.status(500).json({
+                    erro: 'Erro interno ao obter metas',
                     mensagem: erro.message
                 });
             }

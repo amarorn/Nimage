@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { CriarMeta } from "../../application/use-cases/CriarMeta";
+import { ObterMeta } from "../../application/use-cases/ObterMeta";
 
 export class MetaController {
-    constructor(private criarMeta: CriarMeta) {}
+    constructor(private criarMeta: CriarMeta, private obterMeta: ObterMeta) {}
 
     async criar(req: Request, res: Response) {
         try {
@@ -36,6 +37,37 @@ export class MetaController {
             console.error("❌ Erro ao criar meta:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao criar meta',
+                mensagem: (erro as Error).message 
+            });
+        }
+    }
+
+    async obterTodos(req: Request, res: Response) {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const skip = (page - 1) * limit;
+
+            const metas = await this.obterMeta.executar(skip, limit);
+            console.log("✅ Metas obtidas com sucesso:", metas);
+
+            // Criar uma resposta personalizada com paginação
+            const respostaPersonalizada = {
+                pagina: page,
+                limite: limit,
+                total: metas.length,
+                metas: metas.map(meta => ({
+                    id: meta.id,
+                    equipeId: meta.equipeId,
+                    objetivo: meta.objetivo
+                }))
+            };
+
+            return respostaPersonalizada;
+        } catch (erro) {
+            console.error("❌ Erro ao obter metas:", erro);
+            return res.status(500).json({ 
+                erro: 'Erro interno ao obter metas',
                 mensagem: (erro as Error).message 
             });
         }
