@@ -20,5 +20,11 @@ class ObterAtividades {
             return yield this.atividadeRepo.obterTodos(skip, limit);
         });
     }
+    executarPorId(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log("Executando ObterAtividades por ID", { id });
+            return yield this.atividadeRepo.obterPorId(id);
+        });
+    }
 }
 exports.ObterAtividades = ObterAtividades;

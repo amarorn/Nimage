@@ -70,4 +70,24 @@ export class EquipeController {
             });
         }
     }
+
+    async obterPorId(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+            const equipe = await this.obterEquipe.executarPorId(id);
+            console.log("✅ Equipe obtida com sucesso:", equipe);
+
+            if (!equipe) {
+                return res.status(404).json({ erro: 'Equipe não encontrada' });
+            }
+
+            return res.status(200).json(equipe);
+        } catch (erro) {
+            console.error("❌ Erro ao obter equipe:", erro);
+            return res.status(500).json({ 
+                erro: 'Erro interno ao obter equipe',
+                mensagem: (erro as Error).message 
+            });
+        }
+    }
 }

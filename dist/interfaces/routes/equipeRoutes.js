@@ -28,4 +28,8 @@ router.get("/equipes/all", (req, res) => __awaiter(void 0, void 0, void 0, funct
     const equipes = yield equipeController.obterTodos(req, res);
     return res.json(equipes);
 }));
+router.get("/equipes/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("📨 Nova requisição GET /equipes/:id");
+    return equipeController.obterPorId(req, res);
+}));
 exports.default = router;

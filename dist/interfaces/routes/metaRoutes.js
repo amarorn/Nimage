@@ -28,4 +28,8 @@ router.get("/metas/all", (req, res) => __awaiter(void 0, void 0, void 0, functio
     const metas = yield metaController.obterTodos(req, res);
     return res.json(metas);
 }));
+router.get("/metas/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("📨 Nova requisição GET /metas/:id");
+    return metaController.obterPorId(req, res);
+}));
 exports.default = router;

@@ -8,4 +8,9 @@ export class ObterMeta {
         console.log("Executando ObterMeta com paginação", { skip, limit });
         return await this.metaRepo.obterTodos(skip, limit);
     }
+
+    async executarPorId(id: string): Promise<Meta | null> {
+        console.log("Executando ObterMeta por ID", { id });
+        return await this.metaRepo.obterPorId(id);
+    }
 }

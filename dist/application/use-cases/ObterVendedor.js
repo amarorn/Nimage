@@ -20,5 +20,11 @@ class ObterVendedor {
             return yield this.vendedorRepo.obterTodos(skip, limit);
         });
     }
+    executarPorId(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log("Executando ObterVendedor por ID", { id });
+            return yield this.vendedorRepo.obterPorId(id);
+        });
+    }
 }
 exports.ObterVendedor = ObterVendedor;

@@ -72,4 +72,24 @@ export class MetaController {
             });
         }
     }
+
+    async obterPorId(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+            const meta = await this.obterMeta.executarPorId(id);
+            console.log("✅ Meta obtida com sucesso:", meta);
+
+            if (!meta) {
+                return res.status(404).json({ erro: 'Meta não encontrada' });
+            }
+
+            return res.status(200).json(meta);
+        } catch (erro) {
+            console.error("❌ Erro ao obter meta:", erro);
+            return res.status(500).json({ 
+                erro: 'Erro interno ao obter meta',
+                mensagem: (erro as Error).message 
+            });
+        }
+    }
 }

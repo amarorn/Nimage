@@ -20,5 +20,11 @@ class ObterEquipe {
             return yield this.equipeRepo.obterTodos(skip, limit);
         });
     }
+    executarPorId(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log("Executando ObterEquipe por ID", { id });
+            return yield this.equipeRepo.obterPorId(id);
+        });
+    }
 }
 exports.ObterEquipe = ObterEquipe;

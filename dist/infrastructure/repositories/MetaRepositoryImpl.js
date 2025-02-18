@@ -25,6 +25,11 @@ class MetaRepositoryImpl {
             return yield MetaModel_1.MetaModel.findOne({ equipeId }).lean();
         });
     }
+    obterPorId(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield MetaModel_1.MetaModel.findOne({ id }).lean();
+        });
+    }
     obterTodos(skip, limit) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield MetaModel_1.MetaModel.find().skip(skip).limit(limit).lean();
