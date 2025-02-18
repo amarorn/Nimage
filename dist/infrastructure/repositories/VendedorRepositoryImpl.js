@@ -22,5 +22,10 @@ class VendedorRepositoryImpl {
             return yield VendedorModel_1.VendedorModel.findOne({ id }).lean();
         });
     }
+    obterTodos(skip, limit) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield VendedorModel_1.VendedorModel.find().skip(skip).limit(limit).lean();
+        });
+    }
 }
 exports.VendedorRepositoryImpl = VendedorRepositoryImpl;

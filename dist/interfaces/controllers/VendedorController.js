@@ -11,8 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VendedorController = void 0;
 class VendedorController {
-    constructor(criarVendedor) {
+    constructor(criarVendedor, obterVendedor) {
         this.criarVendedor = criarVendedor;
+        this.obterVendedor = obterVendedor;
     }
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -43,6 +44,39 @@ class VendedorController {
                 console.error("❌ Erro ao criar vendedor:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao criar vendedor',
+                    mensagem: erro.message
+                });
+            }
+        });
+    }
+    obterTodos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const page = parseInt(req.query.page) || 1;
+                const limit = parseInt(req.query.limit) || 10;
+                const skip = (page - 1) * limit;
+                const vendedores = yield this.obterVendedor.executar(skip, limit);
+                console.log("✅ Vendedores obtidos com sucesso:", vendedores);
+                let response = {
+                    status: res.status(200),
+                    body: JSON.stringify(vendedores)
+                };
+                // Criar uma resposta personalizada com paginação
+                const respostaPersonalizada = {
+                    pagina: page,
+                    limite: limit,
+                    total: vendedores.length,
+                    vendedores: vendedores.map(vendedor => ({
+                        nome: vendedor.nome,
+                        equipe: vendedor.equipe
+                    }))
+                };
+                return respostaPersonalizada;
+            }
+            catch (erro) {
+                console.error("❌ Erro ao obter vendedores:", erro);
+                return res.status(500).json({
+                    erro: 'Erro interno ao obter vendedores',
                     mensagem: erro.message
                 });
             }
