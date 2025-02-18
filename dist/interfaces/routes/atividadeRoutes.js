@@ -13,12 +13,19 @@ const express_1 = require("express");
 const AtividadeRepositoryImpl_1 = require("../../infrastructure/repositories/AtividadeRepositoryImpl");
 const CriarAtividade_1 = require("../../application/use-cases/CriarAtividade");
 const AtividadeController_1 = require("../controllers/AtividadeController");
+const ObterAtividades_1 = require("../../application/use-cases/ObterAtividades");
 const router = (0, express_1.Router)();
 const atividadeRepo = new AtividadeRepositoryImpl_1.AtividadeRepositoryImpl();
 const criarAtividade = new CriarAtividade_1.CriarAtividade(atividadeRepo);
-const atividadeController = new AtividadeController_1.AtividadeController(criarAtividade);
+const obterAtividade = new ObterAtividades_1.ObterAtividades(atividadeRepo);
+const atividadeController = new AtividadeController_1.AtividadeController(criarAtividade, obterAtividade);
 router.post("/atividades", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("📨 Nova requisição POST /atividades");
     return atividadeController.criar(req, res);
+}));
+router.get("/atividades/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("📨 Nova requisição GET /atividades");
+    const atividades = yield atividadeController.obterTodos(req, res);
+    return res.json(atividades);
 }));
 exports.default = router;

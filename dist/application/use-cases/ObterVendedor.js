@@ -9,29 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CriarVendedor = void 0;
-const Vendedor_1 = require("../../domain/entities/Vendedor");
-class CriarVendedor {
+exports.ObterVendedor = void 0;
+class ObterVendedor {
     constructor(vendedorRepo) {
         this.vendedorRepo = vendedorRepo;
     }
-    executar(dados) {
+    executar(skip, limit) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("📝 Iniciando criação de vendedor com dados:", dados);
-            if (!dados.id || !dados.nome || !dados.equipe) {
-                throw new Error('Dados inválidos para criar vendedor');
-            }
-            const vendedor = new Vendedor_1.Vendedor(dados.id, dados.nome, dados.equipe);
-            console.log("🏗️ Vendedor instanciado:", vendedor);
-            yield this.vendedorRepo.criar(vendedor);
-            console.log("💾 Vendedor persistido no banco");
-            return vendedor;
-        });
-    }
-    obterTodos() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.vendedorRepo.obterTodos(0, Number.MAX_SAFE_INTEGER);
+            console.log("Executando ObterVendedor com paginação", { skip, limit });
+            return yield this.vendedorRepo.obterTodos(skip, limit);
         });
     }
 }
-exports.CriarVendedor = CriarVendedor;
+exports.ObterVendedor = ObterVendedor;

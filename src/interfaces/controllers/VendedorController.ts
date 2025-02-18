@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { CriarVendedor } from "../../application/use-cases/CriarVendedor";
+import { ObterVendedor } from "../../application/use-cases/ObterVendedor";
 
 export class VendedorController {
-    constructor(private criarVendedor: CriarVendedor) {}
+    constructor(private criarVendedor: CriarVendedor, private obterVendedor: ObterVendedor) {}
 
     async criar(req: Request, res: Response) {
         try {
@@ -37,6 +38,36 @@ export class VendedorController {
             console.error("❌ Erro ao criar vendedor:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao criar vendedor',
+                mensagem: (erro as Error).message 
+            });
+        }
+    }
+
+    async obterTodos(req: Request, res: Response) {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const skip = (page - 1) * limit;
+
+            const vendedores = await this.obterVendedor.executar(skip, limit);
+            console.log("✅ Vendedores obtidos com sucesso:", vendedores);
+
+            // Criar uma resposta personalizada com paginação
+            const respostaPersonalizada = {
+                pagina: page,
+                limite: limit,
+                total: vendedores.length,
+                vendedores: vendedores.map(vendedor => ({
+                    nome: vendedor.nome,
+                    equipe: vendedor.equipe
+                }))
+            };
+
+            return respostaPersonalizada
+        } catch (erro) {
+            console.error("❌ Erro ao obter vendedores:", erro);
+            return res.status(500).json({ 
+                erro: 'Erro interno ao obter vendedores',
                 mensagem: (erro as Error).message 
             });
         }

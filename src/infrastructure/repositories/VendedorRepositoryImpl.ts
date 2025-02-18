@@ -10,4 +10,8 @@ export class VendedorRepositoryImpl implements VendedorRepository {
     async obterPorId(id: string): Promise<Vendedor | null> {
         return await VendedorModel.findOne({ id }).lean();
     }
+
+    async obterTodos(skip: number, limit: number): Promise<Vendedor[]> {
+        return await VendedorModel.find().skip(skip).limit(limit).lean();
+    }
 }

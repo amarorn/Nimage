@@ -9,23 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AtividadeRepositoryImpl = void 0;
-const AtividadeModel_1 = require("../database/models/AtividadeModel");
-class AtividadeRepositoryImpl {
-    criar(atividade) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield AtividadeModel_1.AtividadeModel.create(atividade);
-        });
+exports.ObterAtividades = void 0;
+class ObterAtividades {
+    constructor(atividadeRepo) {
+        this.atividadeRepo = atividadeRepo;
     }
-    obterPorId(id) {
+    executar(skip, limit) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield AtividadeModel_1.AtividadeModel.findOne({ id }).lean();
-        });
-    }
-    obterTodos(skip, limit) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield AtividadeModel_1.AtividadeModel.find().skip(skip).limit(limit).lean();
+            console.log("Executando ObterAtividades com paginação", { skip, limit });
+            return yield this.atividadeRepo.obterTodos(skip, limit);
         });
     }
 }
-exports.AtividadeRepositoryImpl = AtividadeRepositoryImpl;
+exports.ObterAtividades = ObterAtividades;

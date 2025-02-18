@@ -20,4 +20,8 @@ export class CriarVendedor {
 
         return vendedor;
     }
+
+    async obterTodos() {
+        return await this.vendedorRepo.obterTodos(0, Number.MAX_SAFE_INTEGER);
+    }
 }
