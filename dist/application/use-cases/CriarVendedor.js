@@ -18,10 +18,10 @@ class CriarVendedor {
     executar(dados) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log("📝 Iniciando criação de vendedor com dados:", dados);
-            if (!dados.id || !dados.nome || !dados.equipe) {
+            if (!dados.id || !dados.nome || !dados.equipe_id) {
                 throw new Error('Dados inválidos para criar vendedor');
             }
-            const vendedor = new Vendedor_1.Vendedor(dados.id, dados.nome, dados.equipe);
+            const vendedor = new Vendedor_1.Vendedor(dados.id, dados.nome, dados.equipe_id);
             console.log("🏗️ Vendedor instanciado:", vendedor);
             yield this.vendedorRepo.criar(vendedor);
             console.log("💾 Vendedor persistido no banco");

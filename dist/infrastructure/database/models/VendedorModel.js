@@ -38,6 +38,6 @@ const mongoose_1 = __importStar(require("mongoose"));
 const VendedorSchema = new mongoose_1.Schema({
     id: { type: String, required: true, unique: true },
     nome: { type: String, required: true },
-    equipe: { type: String, required: true }
+    equipe_id: { type: String, required: true }
 });
 exports.VendedorModel = mongoose_1.default.model("Vendedor", VendedorSchema);
