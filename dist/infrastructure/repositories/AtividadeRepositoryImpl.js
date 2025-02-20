@@ -27,5 +27,10 @@ class AtividadeRepositoryImpl {
             return yield AtividadeModel_1.AtividadeModel.find().skip(skip).limit(limit).lean();
         });
     }
+    obterAtividadesPorEquipe(equipeId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield AtividadeModel_1.AtividadeModel.find({ vendedorId: equipeId }).lean();
+        });
+    }
 }
 exports.AtividadeRepositoryImpl = AtividadeRepositoryImpl;

@@ -15,4 +15,8 @@ export class AtividadeRepositoryImpl implements AtividadeRepository {
     async obterTodos(skip: number, limit: number): Promise<Atividade[]> {
         return await AtividadeModel.find().skip(skip).limit(limit).lean();
     }
+
+    async obterAtividadesPorEquipe(equipeId: string): Promise<Atividade[]> {
+        return await AtividadeModel.find({ vendedorId: equipeId }).lean();
+    }
 }

@@ -1,9 +1,14 @@
 import { Request, Response } from "express";
 import { CriarEquipe } from "../../application/use-cases/CriarEquipe";
 import { ObterEquipe } from "../../application/use-cases/ObterEquipe";
+import { ObterTotaisPorEquipe } from "../../application/use-cases/ObterTotaisPorEquipe";
 
 export class EquipeController {
-    constructor(private criarEquipe: CriarEquipe, private obterEquipe: ObterEquipe) {}
+    constructor(
+        private criarEquipe: CriarEquipe,
+        private obterEquipe: ObterEquipe,
+        private obterTotaisPorEquipe: ObterTotaisPorEquipe
+    ) {}
 
     async criar(req: Request, res: Response) {
         try {
@@ -86,6 +91,20 @@ export class EquipeController {
             console.error("❌ Erro ao obter equipe:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao obter equipe',
+                mensagem: (erro as Error).message 
+            });
+        }
+    }
+
+    async obterTotais(req: Request, res: Response) {
+        try {
+            const { equipeId } = req.params;
+            const totais = await this.obterTotaisPorEquipe.executar(equipeId);
+            return res.status(200).json(totais);
+        } catch (erro) {
+            console.error("❌ Erro ao obter totais por equipe:", erro);
+            return res.status(500).json({ 
+                erro: 'Erro interno ao obter totais por equipe',
                 mensagem: (erro as Error).message 
             });
         }

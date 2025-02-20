@@ -11,9 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EquipeController = void 0;
 class EquipeController {
-    constructor(criarEquipe, obterEquipe) {
+    constructor(criarEquipe, obterEquipe, obterTotaisPorEquipe) {
         this.criarEquipe = criarEquipe;
         this.obterEquipe = obterEquipe;
+        this.obterTotaisPorEquipe = obterTotaisPorEquipe;
     }
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -91,6 +92,22 @@ class EquipeController {
                 console.error("❌ Erro ao obter equipe:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter equipe',
+                    mensagem: erro.message
+                });
+            }
+        });
+    }
+    obterTotais(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { equipeId } = req.params;
+                const totais = yield this.obterTotaisPorEquipe.executar(equipeId);
+                return res.status(200).json(totais);
+            }
+            catch (erro) {
+                console.error("❌ Erro ao obter totais por equipe:", erro);
+                return res.status(500).json({
+                    erro: 'Erro interno ao obter totais por equipe',
                     mensagem: erro.message
                 });
             }
