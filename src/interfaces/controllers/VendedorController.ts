@@ -14,23 +14,23 @@ export class VendedorController {
                 return res.status(400).json({ erro: 'Body da requisição está vazio' });
             }
 
-            const { id, nome, equipe } = req.body;
+            const { id, nome, equipe_id } = req.body;
 
             // Validação dos campos obrigatórios
-            if (!id || !nome || !equipe) {
+            if (!id || !nome || !equipe_id) {
                 return res.status(400).json({
                     erro: 'Dados inválidos',
                     detalhes: {
                         id: id ? 'presente' : 'ausente',
                         nome: nome ? 'presente' : 'ausente',
-                        equipe: equipe ? 'presente' : 'ausente'
+                        equipe_id: equipe_id ? 'presente' : 'ausente'
                     }
                 });
             }
 
-            console.log("✨ Dados extraídos:", { id, nome, equipe });
+            console.log("✨ Dados extraídos:", { id, nome, equipe_id });
 
-            const vendedor = await this.criarVendedor.executar({ id, nome, equipe });
+            const vendedor = await this.criarVendedor.executar({ id, nome, equipe_id });
             console.log("✅ Vendedor criado com sucesso:", vendedor);
             
             return res.status(201).json(vendedor);
@@ -60,11 +60,12 @@ export class VendedorController {
                 vendedores: vendedores.map(vendedor => ({
                     id: vendedor.id,
                     nome: vendedor.nome,
-                    equipe: vendedor.equipe
+                    equipe_id: vendedor.equipe_id,
+                    equipeDetalhes: vendedor.equipeDetalhes
                 }))
             };
 
-            return respostaPersonalizada
+            return respostaPersonalizada;
         } catch (erro) {
             console.error("❌ Erro ao obter vendedores:", erro);
             return res.status(500).json({ 
@@ -84,7 +85,12 @@ export class VendedorController {
                 return res.status(404).json({ erro: 'Vendedor não encontrado' });
             }
 
-            return res.status(200).json(vendedor);
+            return res.status(200).json({
+                id: vendedor.id,
+                nome: vendedor.nome,
+                equipe_id: vendedor.equipe_id,
+                equipeDetalhes: vendedor.equipeDetalhes
+            });
         } catch (erro) {
             console.error("❌ Erro ao obter vendedor:", erro);
             return res.status(500).json({ 
