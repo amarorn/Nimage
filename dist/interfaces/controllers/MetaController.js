@@ -101,9 +101,10 @@ class MetaController {
     obterPorEquipe(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id } = req.params;
-                console.log("🔍 Buscando meta para equipe ID:", id);
-                const meta = yield this.obterMeta.executarPorEquipe(id);
+                console.log("🔍 Recebendo requisição para obter meta por equipe", req.params);
+                const { equipeId } = req.params;
+                console.log("🔍 Buscando meta para equipe ID:", equipeId);
+                const meta = yield this.obterMeta.executarPorEquipe(equipeId);
                 console.log("✅ Meta obtida por equipe com sucesso:", meta);
                 if (!meta) {
                     console.log("⚠️ Nenhuma meta encontrada para a equipe");

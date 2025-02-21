@@ -22,6 +22,7 @@ class MetaRepositoryImpl {
     }
     obterPorEquipe(equipeId) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("🔍 Buscando meta para equipe ID:", equipeId);
             return yield MetaModel_1.MetaModel.findOne({ equipeId }).lean();
         });
     }

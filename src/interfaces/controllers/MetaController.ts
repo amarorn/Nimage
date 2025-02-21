@@ -95,10 +95,11 @@ export class MetaController {
 
     async obterPorEquipe(req: Request, res: Response) {
         try {
-            const { id } = req.params;
-            console.log("🔍 Buscando meta para equipe ID:", id);
+            console.log("🔍 Recebendo requisição para obter meta por equipe", req.params);
+            const { equipeId } = req.params;
+            console.log("🔍 Buscando meta para equipe ID:", equipeId);
             
-            const meta = await this.obterMeta.executarPorEquipe(id);
+            const meta = await this.obterMeta.executarPorEquipe(equipeId);
             console.log("✅ Meta obtida por equipe com sucesso:", meta);
 
             if (!meta) {

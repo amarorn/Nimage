@@ -10,6 +10,7 @@ export class MetaRepositoryImpl implements MetaRepository {
     }
 
     async obterPorEquipe(equipeId: string): Promise<Meta | null> {
+        console.log("🔍 Buscando meta para equipe ID:", equipeId);
         return await MetaModel.findOne({ equipeId }).lean();
     }
 
