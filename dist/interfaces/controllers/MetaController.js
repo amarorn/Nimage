@@ -98,5 +98,36 @@ class MetaController {
             }
         });
     }
+    obterPorEquipe(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log("🔍 Recebendo requisição para obter meta por equipe", req.params);
+                const { equipeId } = req.params;
+                console.log("🔍 Buscando meta para equipe ID:", equipeId);
+                const meta = yield this.obterMeta.executarPorEquipe(equipeId);
+                console.log("✅ Meta obtida por equipe com sucesso:", meta);
+                if (!meta) {
+                    console.log("⚠️ Nenhuma meta encontrada para a equipe");
+                    return res.status(404).json({ erro: 'Meta não encontrada para esta equipe' });
+                }
+                console.log("📤 Retornando meta:", meta);
+                return res.status(200).json({
+                    status: 'success',
+                    data: {
+                        id: meta.id,
+                        equipeId: meta.equipeId,
+                        objetivo: meta.objetivo
+                    }
+                });
+            }
+            catch (erro) {
+                console.error("❌ Erro ao obter meta por equipe:", erro);
+                return res.status(500).json({
+                    erro: 'Erro interno ao obter meta por equipe',
+                    mensagem: erro.message
+                });
+            }
+        });
+    }
 }
 exports.MetaController = MetaController;

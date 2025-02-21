@@ -26,4 +26,10 @@ router.get("/metas/:id", async (req, res) => {
     return metaController.obterPorId(req, res);
 });
 
+router.get("/metas/equipe/:equipeId", async (req, res) => {
+    console.log("📨 Nova requisição GET /metas/equipe/:equipeId");
+    const equipeId = req.params.equipeId;
+    return metaController.obterPorEquipe(req, res);
+});
+
 export default router;

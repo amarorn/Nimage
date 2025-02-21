@@ -26,5 +26,11 @@ class ObterMeta {
             return yield this.metaRepo.obterPorId(id);
         });
     }
+    executarPorEquipe(equipeId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log("Executando ObterMeta por Equipe", { equipeId });
+            return yield this.metaRepo.obterPorEquipe(equipeId);
+        });
+    }
 }
 exports.ObterMeta = ObterMeta;

@@ -32,4 +32,10 @@ router.get("/metas/:id", (req, res) => __awaiter(void 0, void 0, void 0, functio
     console.log("📨 Nova requisição GET /metas/:id");
     return metaController.obterPorId(req, res);
 }));
+router.get("/metas/equipe/:equipeId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("📨 Nova requisição GET /metas/equipe/:equipeId", req.params.equipeId);
+    const equipeId = req.params.equipeId;
+    console.log("📨 Buscando meta para equipe ID:", equipeId);
+    return metaController.obterPorEquipe(req, res);
+}));
 exports.default = router;

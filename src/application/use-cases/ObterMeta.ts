@@ -13,4 +13,9 @@ export class ObterMeta {
         console.log("Executando ObterMeta por ID", { id });
         return await this.metaRepo.obterPorId(id);
     }
+
+    async executarPorEquipe(equipeId: string): Promise<Meta | null> {
+        console.log("Executando ObterMeta por Equipe", { equipeId });
+        return await this.metaRepo.obterPorEquipe(equipeId);
+    }
 }
