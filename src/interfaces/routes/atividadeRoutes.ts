@@ -26,4 +26,9 @@ router.get("/atividades/:id", async (req, res) => {
     return atividadeController.obterPorId(req, res);
 });
 
+router.get("/atividades/:id/detalhes", async (req, res) => {
+    console.log("📨 Nova requisição GET /atividades/:id/detalhes");
+    return atividadeController.obterDetalhes(req, res);
+});
+
 export default router;

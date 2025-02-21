@@ -32,4 +32,8 @@ router.get("/atividades/:id", (req, res) => __awaiter(void 0, void 0, void 0, fu
     console.log("📨 Nova requisição GET /atividades/:id");
     return atividadeController.obterPorId(req, res);
 }));
+router.get("/atividades/:id/detalhes", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("📨 Nova requisição GET /atividades/:id/detalhes");
+    return atividadeController.obterDetalhes(req, res);
+}));
 exports.default = router;
