@@ -1,9 +1,14 @@
 import { Request, Response } from "express";
 import { CriarEquipe } from "../../application/use-cases/CriarEquipe";
 import { ObterEquipe } from "../../application/use-cases/ObterEquipe";
+import { ObterEquipeDadosFull } from "../../application/use-cases/ObterEquipeDadosFull";
 
 export class EquipeController {
-    constructor(private criarEquipe: CriarEquipe, private obterEquipe: ObterEquipe) {}
+    constructor(
+        private criarEquipe: CriarEquipe, 
+        private obterEquipe: ObterEquipe,
+        private obterEquipeDadosFull: ObterEquipeDadosFull
+    ) {}
 
     async criar(req: Request, res: Response) {
         try {
@@ -86,6 +91,27 @@ export class EquipeController {
             console.error("❌ Erro ao obter equipe:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao obter equipe',
+                mensagem: (erro as Error).message 
+            });
+        }
+    }
+
+    async obterDadosFull(req: Request, res: Response) {
+        try {
+            console.log("🔍 Recebendo requisição para obter dados completos da equipe", req.params);
+            const { equipeId } = req.params;
+            
+            const dadosCompletos = await this.obterEquipeDadosFull.executar(equipeId);
+            console.log("✅ Dados completos obtidos com sucesso");
+
+            return res.status(200).json({
+                status: 'success',
+                data: dadosCompletos
+            });
+        } catch (erro) {
+            console.error("❌ Erro ao obter dados completos da equipe:", erro);
+            return res.status(500).json({ 
+                erro: 'Erro interno ao obter dados completos da equipe',
                 mensagem: (erro as Error).message 
             });
         }

@@ -24,4 +24,12 @@ export class VendedorRepositoryImpl implements VendedorRepository {
             return new Vendedor(vendedor.id, vendedor.nome, vendedor.equipe_id, equipe ? { id: equipe.id, nome: equipe.nome } : null);
         }));
     }
+
+    async obterPorEquipeId(equipeId: string): Promise<Vendedor[]> {
+        const vendedores = await VendedorModel.find({ equipe_id: equipeId }).lean();
+        return await Promise.all(vendedores.map(async (vendedor) => {
+            const equipe = await EquipeModel.findOne({ id: vendedor.equipe_id }).lean();
+            return new Vendedor(vendedor.id, vendedor.nome, vendedor.equipe_id, equipe ? { id: equipe.id, nome: equipe.nome } : null);
+        }));
+    }
 }

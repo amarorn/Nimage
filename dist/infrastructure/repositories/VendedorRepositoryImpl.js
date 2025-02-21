@@ -38,5 +38,14 @@ class VendedorRepositoryImpl {
             })));
         });
     }
+    obterPorEquipeId(equipeId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const vendedores = yield VendedorModel_1.VendedorModel.find({ equipe_id: equipeId }).lean();
+            return yield Promise.all(vendedores.map((vendedor) => __awaiter(this, void 0, void 0, function* () {
+                const equipe = yield EquipeModel_1.EquipeModel.findOne({ id: vendedor.equipe_id }).lean();
+                return new Vendedor_1.Vendedor(vendedor.id, vendedor.nome, vendedor.equipe_id, equipe ? { id: equipe.id, nome: equipe.nome } : null);
+            })));
+        });
+    }
 }
 exports.VendedorRepositoryImpl = VendedorRepositoryImpl;
