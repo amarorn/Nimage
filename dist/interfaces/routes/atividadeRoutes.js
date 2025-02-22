@@ -14,11 +14,13 @@ const AtividadeRepositoryImpl_1 = require("../../infrastructure/repositories/Ati
 const CriarAtividade_1 = require("../../application/use-cases/CriarAtividade");
 const AtividadeController_1 = require("../controllers/AtividadeController");
 const ObterAtividades_1 = require("../../application/use-cases/ObterAtividades");
+const AtualizarAtividade_1 = require("../../application/use-cases/AtualizarAtividade");
 const router = (0, express_1.Router)();
 const atividadeRepo = new AtividadeRepositoryImpl_1.AtividadeRepositoryImpl();
 const criarAtividade = new CriarAtividade_1.CriarAtividade(atividadeRepo);
 const obterAtividade = new ObterAtividades_1.ObterAtividades(atividadeRepo);
-const atividadeController = new AtividadeController_1.AtividadeController(criarAtividade, obterAtividade);
+const atualizarAtividade = new AtualizarAtividade_1.AtualizarAtividade(atividadeRepo);
+const atividadeController = new AtividadeController_1.AtividadeController(criarAtividade, obterAtividade, atualizarAtividade);
 router.post("/atividades", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("📨 Nova requisição POST /atividades");
     return atividadeController.criar(req, res);
@@ -35,5 +37,9 @@ router.get("/atividades/:id", (req, res) => __awaiter(void 0, void 0, void 0, fu
 router.get("/atividades/:id/detalhes", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("📨 Nova requisição GET /atividades/:id/detalhes");
     return atividadeController.obterDetalhes(req, res);
+}));
+router.put("/atividades/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("📨 Nova requisição PUT /atividades/:id");
+    return atividadeController.atualizar(req, res);
 }));
 exports.default = router;
