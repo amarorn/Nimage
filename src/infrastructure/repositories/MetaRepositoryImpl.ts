@@ -21,4 +21,17 @@ export class MetaRepositoryImpl implements MetaRepository {
     async obterTodos(skip: number, limit: number): Promise<Meta[]> {
         return await MetaModel.find().skip(skip).limit(limit).lean();
     }
+
+    async atualizar(id: string, dados: { equipeId: string; objetivo: number }): Promise<Meta | null> {
+        const metaAtualizada = await MetaModel.findOneAndUpdate(
+            { id },
+            { equipeId: dados.equipeId, objetivo: dados.objetivo },
+            { new: true }
+        ).lean();
+
+        if (metaAtualizada) {
+            return new Meta(metaAtualizada.id, metaAtualizada.equipeId, metaAtualizada.objetivo);
+        }
+        return null;
+    }
 }

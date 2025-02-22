@@ -11,9 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetaController = void 0;
 class MetaController {
-    constructor(criarMeta, obterMeta) {
+    constructor(criarMeta, obterMeta, atualizarMeta) {
         this.criarMeta = criarMeta;
         this.obterMeta = obterMeta;
+        this.atualizarMeta = atualizarMeta;
     }
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -124,6 +125,35 @@ class MetaController {
                 console.error("❌ Erro ao obter meta por equipe:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter meta por equipe',
+                    mensagem: erro.message
+                });
+            }
+        });
+    }
+    atualizar(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log("📥 Dados recebidos para atualização:", req.body);
+                const { id } = req.params;
+                const { equipeId, objetivo } = req.body;
+                // Validação dos campos obrigatórios
+                if (!equipeId || objetivo === undefined) {
+                    return res.status(400).json({
+                        erro: 'Dados inválidos',
+                        detalhes: {
+                            equipeId: equipeId ? 'presente' : 'ausente',
+                            objetivo: objetivo !== undefined ? 'presente' : 'ausente'
+                        }
+                    });
+                }
+                const metaAtualizada = yield this.atualizarMeta.executar(id, { equipeId, objetivo });
+                console.log("✅ Meta atualizada com sucesso:", metaAtualizada);
+                return res.status(200).json(metaAtualizada);
+            }
+            catch (erro) {
+                console.error("❌ Erro ao atualizar meta:", erro);
+                return res.status(500).json({
+                    erro: 'Erro interno ao atualizar meta',
                     mensagem: erro.message
                 });
             }
