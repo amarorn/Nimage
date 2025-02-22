@@ -19,4 +19,17 @@ export class AtividadeRepositoryImpl implements AtividadeRepository {
     async obterPorVendedorId(vendedorId: string): Promise<Atividade[]> {
         return await AtividadeModel.find({ vendedorId }).lean();
     }
+
+    async atualizar(id: string, dados: { vendedorId: string; data: Date; docinhosCoco: number }): Promise<Atividade | null> {
+        const atividadeAtualizada = await AtividadeModel.findOneAndUpdate(
+            { id },
+            { vendedorId: dados.vendedorId, data: dados.data, docinhosCoco: dados.docinhosCoco },
+            { new: true }
+        ).lean();
+
+        if (atividadeAtualizada) {
+            return new Atividade(atividadeAtualizada.id, atividadeAtualizada.vendedorId, atividadeAtualizada.data, atividadeAtualizada.docinhosCoco);
+        }
+        return null;
+    }
 }

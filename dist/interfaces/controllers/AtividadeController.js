@@ -14,9 +14,10 @@ const VendedorRepositoryImpl_1 = require("../../infrastructure/repositories/Vend
 const EquipeRepositoryImpl_1 = require("../../infrastructure/repositories/EquipeRepositoryImpl");
 const MetaRepositoryImpl_1 = require("../../infrastructure/repositories/MetaRepositoryImpl");
 class AtividadeController {
-    constructor(criarAtividade, obterAtividades) {
+    constructor(criarAtividade, obterAtividades, atualizarAtividade) {
         this.criarAtividade = criarAtividade;
         this.obterAtividades = obterAtividades;
+        this.atualizarAtividade = atualizarAtividade;
     }
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -160,6 +161,36 @@ class AtividadeController {
                 console.error("❌ Erro ao obter detalhes da atividade:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter detalhes da atividade',
+                    mensagem: erro.message
+                });
+            }
+        });
+    }
+    atualizar(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log("📥 Dados recebidos para atualização:", req.body);
+                const { id } = req.params;
+                const { vendedorId, data, docinhosCoco } = req.body;
+                // Validação dos campos obrigatórios
+                if (!vendedorId || !data || docinhosCoco === undefined) {
+                    return res.status(400).json({
+                        erro: 'Dados inválidos',
+                        detalhes: {
+                            vendedorId: vendedorId ? 'presente' : 'ausente',
+                            data: data ? 'presente' : 'ausente',
+                            docinhosCoco: docinhosCoco !== undefined ? 'presente' : 'ausente'
+                        }
+                    });
+                }
+                const atividadeAtualizada = yield this.atualizarAtividade.executar(id, { vendedorId, data: new Date(data), docinhosCoco });
+                console.log("✅ Atividade atualizada com sucesso:", atividadeAtualizada);
+                return res.status(200).json(atividadeAtualizada);
+            }
+            catch (erro) {
+                console.error("❌ Erro ao atualizar atividade:", erro);
+                return res.status(500).json({
+                    erro: 'Erro interno ao atualizar atividade',
                     mensagem: erro.message
                 });
             }

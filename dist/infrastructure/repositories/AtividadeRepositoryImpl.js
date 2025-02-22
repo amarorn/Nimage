@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AtividadeRepositoryImpl = void 0;
+const Atividade_1 = require("../../domain/entities/Atividade");
 const AtividadeModel_1 = require("../database/models/AtividadeModel");
 class AtividadeRepositoryImpl {
     criar(atividade) {
@@ -30,6 +31,15 @@ class AtividadeRepositoryImpl {
     obterPorVendedorId(vendedorId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield AtividadeModel_1.AtividadeModel.find({ vendedorId }).lean();
+        });
+    }
+    atualizar(id, dados) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const atividadeAtualizada = yield AtividadeModel_1.AtividadeModel.findOneAndUpdate({ id }, { vendedorId: dados.vendedorId, data: dados.data, docinhosCoco: dados.docinhosCoco }, { new: true }).lean();
+            if (atividadeAtualizada) {
+                return new Atividade_1.Atividade(atividadeAtualizada.id, atividadeAtualizada.vendedorId, atividadeAtualizada.data, atividadeAtualizada.docinhosCoco);
+            }
+            return null;
         });
     }
 }
