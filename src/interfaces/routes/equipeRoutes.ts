@@ -8,6 +8,7 @@ import { EquipeController } from "../controllers/EquipeController";
 import { ObterEquipe } from "../../application/use-cases/ObterEquipe";
 import { ObterEquipeDadosFull } from "../../application/use-cases/ObterEquipeDadosFull";
 import { EquipeMetaService } from "../../application/services/EquipeMetaService";
+import { AtualizarEquipe } from "../../application/use-cases/AtualizarEquipe";
 
 const router = Router();
 const equipeRepo = new EquipeRepositoryImpl();
@@ -17,9 +18,10 @@ const metaRepo = new MetaRepositoryImpl();
 
 const criarEquipe = new CriarEquipe(equipeRepo);
 const obterEquipe = new ObterEquipe(equipeRepo);
+const atualizar = new AtualizarEquipe(equipeRepo);
 const obterEquipeDadosFull = new ObterEquipeDadosFull(equipeRepo, vendedorRepo, atividadeRepo, metaRepo);
 const equipeMetaService = new EquipeMetaService(obterEquipeDadosFull);
-const equipeController = new EquipeController(criarEquipe, obterEquipe, obterEquipeDadosFull, equipeMetaService);
+const equipeController = new EquipeController(criarEquipe, obterEquipe, obterEquipeDadosFull, equipeMetaService, atualizar);
 
 router.post("/equipes", async (req, res) => {
     console.log("📨 Nova requisição POST /equipes");
@@ -46,6 +48,11 @@ router.get("/equipes/:equipeId/dados-full", async (req, res) => {
 router.get("/equipes/:equipeId/calcular-meta", async (req, res) => {
     console.log("📨 Nova requisição GET /equipes/:equipeId/calcular-meta");
     return equipeController.calcularMeta(req, res);
+});
+
+router.put("/equipes/:id", async (req, res) => {
+    console.log("📨 Nova requisição PUT /equipes/:id");
+    return equipeController.atualizar(req, res);
 });
 
 export default router;

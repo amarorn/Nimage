@@ -11,11 +11,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EquipeController = void 0;
 class EquipeController {
-    constructor(criarEquipe, obterEquipe, obterEquipeDadosFull, equipeMetaService) {
+    constructor(criarEquipe, obterEquipe, obterEquipeDadosFull, equipeMetaService, atualizarEquipe) {
         this.criarEquipe = criarEquipe;
         this.obterEquipe = obterEquipe;
         this.obterEquipeDadosFull = obterEquipeDadosFull;
         this.equipeMetaService = equipeMetaService;
+        this.atualizarEquipe = atualizarEquipe;
     }
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -135,6 +136,34 @@ class EquipeController {
                 console.error("❌ Erro ao calcular meta:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao calcular meta',
+                    mensagem: erro.message
+                });
+            }
+        });
+    }
+    atualizar(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log("📥 Dados recebidos para atualização:", req.body);
+                const { id } = req.params;
+                const { nome } = req.body;
+                // Validação dos campos obrigatórios
+                if (!nome) {
+                    return res.status(400).json({
+                        erro: 'Dados inválidos',
+                        detalhes: {
+                            nome: nome ? 'presente' : 'ausente'
+                        }
+                    });
+                }
+                const equipeAtualizada = yield this.atualizarEquipe.executar(id, { nome });
+                console.log("✅ Equipe atualizada com sucesso:", equipeAtualizada);
+                return res.status(200).json(equipeAtualizada);
+            }
+            catch (erro) {
+                console.error("❌ Erro ao atualizar equipe:", erro);
+                return res.status(500).json({
+                    erro: 'Erro interno ao atualizar equipe',
                     mensagem: erro.message
                 });
             }

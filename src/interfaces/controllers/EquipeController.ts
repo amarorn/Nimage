@@ -3,13 +3,15 @@ import { CriarEquipe } from "../../application/use-cases/CriarEquipe";
 import { ObterEquipe } from "../../application/use-cases/ObterEquipe";
 import { ObterEquipeDadosFull } from "../../application/use-cases/ObterEquipeDadosFull";
 import { EquipeMetaService } from "../../application/services/EquipeMetaService";
+import { AtualizarEquipe } from "../../application/use-cases/AtualizarEquipe";
 
 export class EquipeController {
     constructor(
         private criarEquipe: CriarEquipe, 
         private obterEquipe: ObterEquipe,
         private obterEquipeDadosFull: ObterEquipeDadosFull,
-        private equipeMetaService: EquipeMetaService
+        private equipeMetaService: EquipeMetaService,
+        private atualizarEquipe: AtualizarEquipe
     ) {}
 
     async criar(req: Request, res: Response) {
@@ -135,6 +137,35 @@ export class EquipeController {
             console.error("❌ Erro ao calcular meta:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao calcular meta',
+                mensagem: (erro as Error).message 
+            });
+        }
+    }
+
+    async atualizar(req: Request, res: Response) {
+        try {
+            console.log("📥 Dados recebidos para atualização:", req.body);
+            const { id } = req.params;
+            const { nome } = req.body;
+
+            // Validação dos campos obrigatórios
+            if (!nome) {
+                return res.status(400).json({
+                    erro: 'Dados inválidos',
+                    detalhes: {
+                        nome: nome ? 'presente' : 'ausente'
+                    }
+                });
+            }
+
+            const equipeAtualizada = await this.atualizarEquipe.executar(id, { nome });
+            console.log("✅ Equipe atualizada com sucesso:", equipeAtualizada);
+
+            return res.status(200).json(equipeAtualizada);
+        } catch (erro) {
+            console.error("❌ Erro ao atualizar equipe:", erro);
+            return res.status(500).json({ 
+                erro: 'Erro interno ao atualizar equipe',
                 mensagem: (erro as Error).message 
             });
         }

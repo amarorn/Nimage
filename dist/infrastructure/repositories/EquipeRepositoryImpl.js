@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EquipeRepositoryImpl = void 0;
+const Equipe_1 = require("../../domain/entities/Equipe");
 const EquipeModel_1 = require("../database/models/EquipeModel");
 class EquipeRepositoryImpl {
     criar(equipe) {
@@ -25,6 +26,15 @@ class EquipeRepositoryImpl {
     obterTodos(skip, limit) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield EquipeModel_1.EquipeModel.find().skip(skip).limit(limit).lean();
+        });
+    }
+    atualizar(id, dados) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const equipeAtualizada = yield EquipeModel_1.EquipeModel.findOneAndUpdate({ id }, { nome: dados.nome }, { new: true }).lean();
+            if (equipeAtualizada) {
+                return new Equipe_1.Equipe(equipeAtualizada.id, equipeAtualizada.nome);
+            }
+            return null;
         });
     }
 }
