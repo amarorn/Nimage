@@ -11,9 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VendedorController = void 0;
 class VendedorController {
-    constructor(criarVendedor, obterVendedor) {
+    constructor(criarVendedor, obterVendedor, atualizarVendedor) {
         this.criarVendedor = criarVendedor;
         this.obterVendedor = obterVendedor;
+        this.atualizarVendedor = atualizarVendedor;
     }
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -100,6 +101,35 @@ class VendedorController {
                 console.error("❌ Erro ao obter vendedor:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter vendedor',
+                    mensagem: erro.message
+                });
+            }
+        });
+    }
+    atualizar(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log("📥 Dados recebidos para atualização:", req.body);
+                const { id } = req.params;
+                const { nome, equipe_id } = req.body;
+                // Validação dos campos obrigatórios
+                if (!nome || !equipe_id) {
+                    return res.status(400).json({
+                        erro: 'Dados inválidos',
+                        detalhes: {
+                            nome: nome ? 'presente' : 'ausente',
+                            equipe_id: equipe_id ? 'presente' : 'ausente'
+                        }
+                    });
+                }
+                const vendedorAtualizado = yield this.atualizarVendedor.executar(id, { nome, equipe_id });
+                console.log("✅ Vendedor atualizado com sucesso:", vendedorAtualizado);
+                return res.status(200).json(vendedorAtualizado);
+            }
+            catch (erro) {
+                console.error("❌ Erro ao atualizar vendedor:", erro);
+                return res.status(500).json({
+                    erro: 'Erro interno ao atualizar vendedor',
                     mensagem: erro.message
                 });
             }
