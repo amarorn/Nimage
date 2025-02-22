@@ -3,12 +3,14 @@ import { MetaRepositoryImpl } from "../../infrastructure/repositories/MetaReposi
 import { CriarMeta } from "../../application/use-cases/CriarMeta";
 import { MetaController } from "../controllers/MetaController";
 import { ObterMeta } from "../../application/use-cases/ObterMeta";
+import { AtualizarMeta } from "../../application/use-cases/AtualizarMeta";
 
 const router = Router();
 const metaRepo = new MetaRepositoryImpl();
 const criarMeta = new CriarMeta(metaRepo);
 const obterMeta = new ObterMeta(metaRepo);
-const metaController = new MetaController(criarMeta, obterMeta);
+const atualizarMeta = new AtualizarMeta(metaRepo);
+const metaController = new MetaController(criarMeta, obterMeta, atualizarMeta);
 
 router.post("/metas", async (req, res) => {
     console.log("📨 Nova requisição POST /metas");
@@ -30,6 +32,11 @@ router.get("/metas/equipe/:equipeId", async (req, res) => {
     console.log("📨 Nova requisição GET /metas/equipe/:equipeId");
     const equipeId = req.params.equipeId;
     return metaController.obterPorEquipe(req, res);
+});
+
+router.put("/metas/:id", async (req, res) => {
+    console.log("📨 Nova requisição PUT /metas/:id");
+    return metaController.atualizar(req, res);
 });
 
 export default router;

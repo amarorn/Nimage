@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { CriarMeta } from "../../application/use-cases/CriarMeta";
 import { ObterMeta } from "../../application/use-cases/ObterMeta";
+import { AtualizarMeta } from "../../application/use-cases/AtualizarMeta";
 
 export class MetaController {
-    constructor(private criarMeta: CriarMeta, private obterMeta: ObterMeta) {}
+    constructor(private criarMeta: CriarMeta, private obterMeta: ObterMeta, private atualizarMeta: AtualizarMeta) {}
 
     async criar(req: Request, res: Response) {
         try {
@@ -120,6 +121,36 @@ export class MetaController {
             console.error("❌ Erro ao obter meta por equipe:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao obter meta por equipe',
+                mensagem: (erro as Error).message 
+            });
+        }
+    }
+
+    async atualizar(req: Request, res: Response) {
+        try {
+            console.log("📥 Dados recebidos para atualização:", req.body);
+            const { id } = req.params;
+            const { equipeId, objetivo } = req.body;
+
+            // Validação dos campos obrigatórios
+            if (!equipeId || objetivo === undefined) {
+                return res.status(400).json({
+                    erro: 'Dados inválidos',
+                    detalhes: {
+                        equipeId: equipeId ? 'presente' : 'ausente',
+                        objetivo: objetivo !== undefined ? 'presente' : 'ausente'
+                    }
+                });
+            }
+
+            const metaAtualizada = await this.atualizarMeta.executar(id, { equipeId, objetivo });
+            console.log("✅ Meta atualizada com sucesso:", metaAtualizada);
+
+            return res.status(200).json(metaAtualizada);
+        } catch (erro) {
+            console.error("❌ Erro ao atualizar meta:", erro);
+            return res.status(500).json({ 
+                erro: 'Erro interno ao atualizar meta',
                 mensagem: (erro as Error).message 
             });
         }
