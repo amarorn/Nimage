@@ -2,12 +2,14 @@ import { Request, Response } from "express";
 import { CriarEquipe } from "../../application/use-cases/CriarEquipe";
 import { ObterEquipe } from "../../application/use-cases/ObterEquipe";
 import { ObterEquipeDadosFull } from "../../application/use-cases/ObterEquipeDadosFull";
+import { EquipeMetaService } from "../../application/services/EquipeMetaService";
 
 export class EquipeController {
     constructor(
         private criarEquipe: CriarEquipe, 
         private obterEquipe: ObterEquipe,
-        private obterEquipeDadosFull: ObterEquipeDadosFull
+        private obterEquipeDadosFull: ObterEquipeDadosFull,
+        private equipeMetaService: EquipeMetaService
     ) {}
 
     async criar(req: Request, res: Response) {
@@ -112,6 +114,27 @@ export class EquipeController {
             console.error("❌ Erro ao obter dados completos da equipe:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao obter dados completos da equipe',
+                mensagem: (erro as Error).message 
+            });
+        }
+    }
+
+    async calcularMeta(req: Request, res: Response) {
+        try {
+            const { equipeId } = req.params;
+            console.log("🔍 Calculando meta para equipe ID:", equipeId);
+
+            const resultado = await this.equipeMetaService.calcularMeta(equipeId);
+            console.log("✅ Resultado do cálculo de meta:", resultado);
+
+            return res.status(200).json({
+                status: 'success',
+                data: resultado
+            });
+        } catch (erro) {
+            console.error("❌ Erro ao calcular meta:", erro);
+            return res.status(500).json({ 
+                erro: 'Erro interno ao calcular meta',
                 mensagem: (erro as Error).message 
             });
         }

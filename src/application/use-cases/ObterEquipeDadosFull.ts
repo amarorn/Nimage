@@ -37,11 +37,13 @@ export class ObterEquipeDadosFull {
                     atividades: atividades.map(atividade => ({
                         id: atividade.id,
                         data: atividade.data,
-                        docinhosCoco: atividade.docinhosCoco
+                        docinhosCoco: atividade.docinhosCoco,
+                        total_docinhos: atividade.docinhosCoco
                     }))
                 };
             })
         );
+        console.log("🔍 Dados completos da equipe:", vendedoresComAtividades);
 
         return {
             equipe: {

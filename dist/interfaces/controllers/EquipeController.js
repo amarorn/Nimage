@@ -11,10 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EquipeController = void 0;
 class EquipeController {
-    constructor(criarEquipe, obterEquipe, obterEquipeDadosFull) {
+    constructor(criarEquipe, obterEquipe, obterEquipeDadosFull, equipeMetaService) {
         this.criarEquipe = criarEquipe;
         this.obterEquipe = obterEquipe;
         this.obterEquipeDadosFull = obterEquipeDadosFull;
+        this.equipeMetaService = equipeMetaService;
     }
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -113,6 +114,27 @@ class EquipeController {
                 console.error("❌ Erro ao obter dados completos da equipe:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter dados completos da equipe',
+                    mensagem: erro.message
+                });
+            }
+        });
+    }
+    calcularMeta(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { equipeId } = req.params;
+                console.log("🔍 Calculando meta para equipe ID:", equipeId);
+                const resultado = yield this.equipeMetaService.calcularMeta(equipeId);
+                console.log("✅ Resultado do cálculo de meta:", resultado);
+                return res.status(200).json({
+                    status: 'success',
+                    data: resultado
+                });
+            }
+            catch (erro) {
+                console.error("❌ Erro ao calcular meta:", erro);
+                return res.status(500).json({
+                    erro: 'Erro interno ao calcular meta',
                     mensagem: erro.message
                 });
             }
