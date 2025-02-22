@@ -1,4 +1,4 @@
-
+```markdown
 ![Docker Image Version](https://img.shields.io/docker/v/angellorn/nimage)
 ![Docker Pulls](https://img.shields.io/docker/pulls/angellorn/nimage)
 ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/angellorn/nimage/api-1.0.1)
@@ -7,8 +7,8 @@
 ![MyGet Downloads](https://img.shields.io/badge/-MongoDB-4DB33D?style=flat&logo=mongodb&logoColor=FFFFFF)
 ![MyGet Downloads](https://img.shields.io/badge/Clean_Architecture-0A0A0A?style=flat&logo=microservices&logoColor=white)
 ![GitHub last commit](https://shields.io/badge/TypeScript-3178C6?style=flat&logo=TypeScript&logoColor=FFF&style=flat-square)
+```
 
-```markdown
 # Nimage
 
 Nimage é uma API em Node.js construída com TypeScript, seguindo os princípios da Arquitetura Limpa. Ela oferece um framework robusto para gerenciar equipes, vendedores, atividades e métricas de desempenho.
