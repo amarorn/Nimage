@@ -14,4 +14,17 @@ export class EquipeRepositoryImpl implements EquipeRepository {
     async obterTodos(skip: number, limit: number): Promise<Equipe[]> {
         return await EquipeModel.find().skip(skip).limit(limit).lean();
     }
+
+    async atualizar(id: string, dados: { nome: string }): Promise<Equipe | null> {
+        const equipeAtualizada = await EquipeModel.findOneAndUpdate(
+            { id },
+            { nome: dados.nome },
+            { new: true }
+        ).lean();
+
+        if (equipeAtualizada) {
+            return new Equipe(equipeAtualizada.id, equipeAtualizada.nome);
+        }
+        return null;
+    }
 }
