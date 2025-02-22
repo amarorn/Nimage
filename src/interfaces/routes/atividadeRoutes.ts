@@ -13,28 +13,28 @@ const atualizarAtividade = new AtualizarAtividade(atividadeRepo);
 const atividadeController = new AtividadeController(criarAtividade, obterAtividade, atualizarAtividade);
 
 router.post("/atividades", async (req, res) => {
-    console.log("📨 Nova requisição POST /atividades");
+    //console.log("📨 Nova requisição POST /atividades");
     return atividadeController.criar(req, res);
 });
 
 router.get("/atividades/all", async (req, res) => {
-    console.log("📨 Nova requisição GET /atividades");
+    //console.log("📨 Nova requisição GET /atividades");
     const atividades = await atividadeController.obterTodos(req, res);
     return res.json(atividades);
 });
 
 router.get("/atividades/:id", async (req, res) => {
-    console.log("📨 Nova requisição GET /atividades/:id");
+    //console.log("📨 Nova requisição GET /atividades/:id");
     return atividadeController.obterPorId(req, res);
 });
 
 router.get("/atividades/:id/detalhes", async (req, res) => {
-    console.log("📨 Nova requisição GET /atividades/:id/detalhes");
+    //console.log("📨 Nova requisição GET /atividades/:id/detalhes");
     return atividadeController.obterDetalhes(req, res);
 });
 
 router.put("/atividades/:id", async (req, res) => {
-    console.log("📨 Nova requisição PUT /atividades/:id");
+    //console.log("📨 Nova requisição PUT /atividades/:id");
     return atividadeController.atualizar(req, res);
 });
 

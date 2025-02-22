@@ -6,10 +6,10 @@ const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://root:VTTgLMuwxpgCbjRw@
 
 export class MongoDB {
     static async conectar() {
-        console.log("🔥 Conectado ao MongoDB com sucesso!")
+        //console.log("🔥 Conectado ao MongoDB com sucesso!")
         try {
             await mongoose.connect(MONGO_URI);
-            console.log("🔥 Conectado ao MongoDB com sucesso!");
+            //console.log("🔥 Conectado ao MongoDB com sucesso!");
         } catch (error) {
             console.error("❌ Erro ao conectar ao MongoDB:", error);
             process.exit(1);

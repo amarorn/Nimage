@@ -5,6 +5,6 @@ const PORT = process.env.PORT || 3000;
 
 MongoDB.conectar().then(() => {
     app.listen(PORT, () => {
-        console.log(`🚀 Servidor rodando na porta ${PORT}`);
+        //console.log(`🚀 Servidor rodando na porta ${PORT}`);
     });
 });

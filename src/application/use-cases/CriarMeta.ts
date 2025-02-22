@@ -5,7 +5,7 @@ export class CriarMeta {
     constructor(private metaRepo: MetaRepository) {}
 
     async executar(dados: { id: string; equipeId: string; objetivo: number }) {
-        console.log("📝 Iniciando criação de meta com dados:", dados);
+        //console.log("📝 Iniciando criação de meta com dados:", dados);
 
         if (!dados.id || !dados.equipeId || dados.objetivo === undefined) {
             throw new Error('Dados inválidos para criar meta');
@@ -16,10 +16,10 @@ export class CriarMeta {
         }
 
         const meta = new Meta(dados.id, dados.equipeId, dados.objetivo);
-        console.log("🏗️ Meta instanciada:", meta);
+        //console.log("🏗️ Meta instanciada:", meta);
 
         await this.metaRepo.criar(meta);
-        console.log("💾 Meta persistida no banco");
+        //console.log("💾 Meta persistida no banco");
 
         return meta;
     }

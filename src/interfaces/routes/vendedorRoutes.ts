@@ -12,25 +12,25 @@ const obterVendedor = new ObterVendedor(vendedorRepo);
 const atualizarVendedor = new AtualizarVendedor(vendedorRepo);
 const vendedorController = new VendedorController(criarVendedor, obterVendedor, atualizarVendedor);
 
-console.log("🚀vendedorController Routes");
+//console.log("🚀vendedorController Routes");
 router.post("/vendedores", async (req, res) => {
-    console.log("📨 Nova requisição POST /vendedores");
+    //console.log("📨 Nova requisição POST /vendedores");
     return vendedorController.criar(req, res);
 });
 
 router.get("/vendedores/all", async (req, res) => {
-    console.log("📨 Nova requisição GET /vendedores");
+    //console.log("📨 Nova requisição GET /vendedores");
     const vendedores = await vendedorController.obterTodos(req, res);
     return res.json(vendedores);
 });
 
 router.get("/vendedores/:id", async (req, res) => {
-    console.log("📨 Nova requisição GET /vendedores/:id");
+    //console.log("📨 Nova requisição GET /vendedores/:id");
     return vendedorController.obterPorId(req, res);
 });
 
 router.put("/vendedores/:id", async (req, res) => {
-    console.log("📨 Nova requisição PUT /vendedores/:id");
+    //console.log("📨 Nova requisição PUT /vendedores/:id");
     return vendedorController.atualizar(req, res);
 });
 

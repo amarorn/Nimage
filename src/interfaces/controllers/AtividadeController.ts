@@ -15,7 +15,7 @@ export class AtividadeController {
 
     async criar(req: Request, res: Response) {
         try {
-            console.log("📥 Dados recebidos no body:", req.body);
+            // //console.log("📥 Dados recebidos no body:", req.body);
             
             if (!req.body) {
                 return res.status(400).json({ erro: 'Body da requisição está vazio' });
@@ -36,7 +36,7 @@ export class AtividadeController {
                 });
             }
 
-            console.log("✨ Dados extraídos:", { id, vendedorId, data, docinhosCoco });
+            // //console.log("✨ Dados extraídos:", { id, vendedorId, data, docinhosCoco });
 
             const atividade = await this.criarAtividade.executar({ 
                 id, 
@@ -45,10 +45,10 @@ export class AtividadeController {
                 docinhosCoco 
             });
             
-            console.log("✅ Atividade criada com sucesso:", atividade);
+            // //console.log("✅ Atividade criada com sucesso:", atividade);
             return res.status(201).json(atividade);
         } catch (erro) {
-            console.error("❌ Erro ao criar atividade:", erro);
+            // console.error("❌ Erro ao criar atividade:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao criar atividade',
                 mensagem: (erro as Error).message 
@@ -63,7 +63,7 @@ export class AtividadeController {
             const skip = (page - 1) * limit;
 
             const atividades = await this.obterAtividades.executar(skip, limit);
-            console.log("✅ Atividades obtidas com sucesso:", atividades);
+            // //console.log("✅ Atividades obtidas com sucesso:", atividades);
 
             // Criar uma resposta personalizada com paginação
             const respostaPersonalizada = {
@@ -80,7 +80,7 @@ export class AtividadeController {
 
             return respostaPersonalizada;
         } catch (erro) {
-            console.error("❌ Erro ao obter atividades:", erro);
+            // console.error("❌ Erro ao obter atividades:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao obter atividades',
                 mensagem: (erro as Error).message 
@@ -92,7 +92,7 @@ export class AtividadeController {
         try {
             const { id } = req.params;
             const atividade = await this.obterAtividades.executarPorId(id);
-            console.log("✅ Atividade obtida com sucesso:", atividade);
+            // //console.log("✅ Atividade obtida com sucesso:", atividade);
 
             if (!atividade) {
                 return res.status(404).json({ erro: 'Atividade não encontrada' });
@@ -100,7 +100,7 @@ export class AtividadeController {
 
             return res.status(200).json(atividade);
         } catch (erro) {
-            console.error("❌ Erro ao obter atividade:", erro);
+            // console.error("❌ Erro ao obter atividade:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao obter atividade',
                 mensagem: (erro as Error).message 
@@ -111,32 +111,32 @@ export class AtividadeController {
     async obterDetalhes(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            console.log("🔍 Buscando detalhes para atividade ID:", id);
+            // //console.log("🔍 Buscando detalhes para atividade ID:", id);
 
             const atividade = await this.obterAtividades.executarPorId(id);
             if (!atividade) {
-                console.log("⚠️ Atividade não encontrada");
+                // //console.log("⚠️ Atividade não encontrada");
                 return res.status(404).json({ erro: 'Atividade não encontrada' });
             }
 
             const vendedorRepo = new VendedorRepositoryImpl();
             const vendedor = await vendedorRepo.obterPorId(atividade.vendedorId);
             if (!vendedor) {
-                console.log("⚠️ Vendedor não encontrado");
+                // //console.log("⚠️ Vendedor não encontrado");
                 return res.status(404).json({ erro: 'Vendedor não encontrado' });
             }
 
             const equipeRepo = new EquipeRepositoryImpl();
             const equipe = await equipeRepo.obterPorId(vendedor.equipe_id);
             if (!equipe) {
-                console.log("⚠️ Equipe não encontrada");
+                // //console.log("⚠️ Equipe não encontrada");
                 return res.status(404).json({ erro: 'Equipe não encontrada' });
             }
 
             const metaRepo = new MetaRepositoryImpl();
             const metas = await metaRepo.obterPorEquipe(equipe.id);
 
-            console.log("✅ Detalhes obtidos com sucesso:", { atividade, vendedor, equipe, metas });
+            // //console.log("✅ Detalhes obtidos com sucesso:", { atividade, vendedor, equipe, metas });
 
             return res.status(200).json({
                 atividade: {
@@ -161,7 +161,7 @@ export class AtividadeController {
                 } : null
             });
         } catch (erro) {
-            console.error("❌ Erro ao obter detalhes da atividade:", erro);
+            // console.error("❌ Erro ao obter detalhes da atividade:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao obter detalhes da atividade',
                 mensagem: (erro as Error).message 
@@ -171,7 +171,7 @@ export class AtividadeController {
 
     async atualizar(req: Request, res: Response) {
         try {
-            console.log("📥 Dados recebidos para atualização:", req.body);
+            // //console.log("📥 Dados recebidos para atualização:", req.body);
             const { id } = req.params;
             const { vendedorId, data, docinhosCoco } = req.body;
 
@@ -188,11 +188,11 @@ export class AtividadeController {
             }
 
             const atividadeAtualizada = await this.atualizarAtividade.executar(id, { vendedorId, data: new Date(data), docinhosCoco });
-            console.log("✅ Atividade atualizada com sucesso:", atividadeAtualizada);
+            // //console.log("✅ Atividade atualizada com sucesso:", atividadeAtualizada);
 
             return res.status(200).json(atividadeAtualizada);
         } catch (erro) {
-            console.error("❌ Erro ao atualizar atividade:", erro);
+            // console.error("❌ Erro ao atualizar atividade:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao atualizar atividade',
                 mensagem: (erro as Error).message 

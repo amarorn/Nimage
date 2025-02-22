@@ -12,7 +12,7 @@ export class ObterEquipeDadosFull {
     ) {}
 
     async executar(equipeId: string) {
-        console.log("🔍 Buscando dados completos da equipe:", equipeId);
+        //console.log("🔍 Buscando dados completos da equipe:", equipeId);
 
         // Busca a equipe
         const equipe = await this.equipeRepo.obterPorId(equipeId);
@@ -43,7 +43,7 @@ export class ObterEquipeDadosFull {
                 };
             })
         );
-        console.log("🔍 Dados completos da equipe:", vendedoresComAtividades);
+        //console.log("🔍 Dados completos da equipe:", vendedoresComAtividades);
 
         return {
             equipe: {

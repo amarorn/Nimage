@@ -5,7 +5,7 @@ export class CriarAtividade {
     constructor(private atividadeRepo: AtividadeRepository) {}
 
     async executar(dados: { id: string; vendedorId: string; data: Date; docinhosCoco: number }) {
-        console.log("📝 Iniciando criação de atividade com dados:", dados);
+        //console.log("📝 Iniciando criação de atividade com dados:", dados);
 
         if (!dados.id || !dados.vendedorId || !dados.data || dados.docinhosCoco === undefined) {
             throw new Error('Dados inválidos para criar atividade');
@@ -22,10 +22,10 @@ export class CriarAtividade {
             dados.docinhosCoco
         );
         
-        console.log("🏗️ Atividade instanciada:", atividade);
+        //console.log("🏗️ Atividade instanciada:", atividade);
 
         await this.atividadeRepo.criar(atividade);
-        console.log("💾 Atividade persistida no banco");
+        //console.log("💾 Atividade persistida no banco");
 
         return atividade;
     }
