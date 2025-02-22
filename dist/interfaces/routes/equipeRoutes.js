@@ -18,6 +18,7 @@ const CriarEquipe_1 = require("../../application/use-cases/CriarEquipe");
 const EquipeController_1 = require("../controllers/EquipeController");
 const ObterEquipe_1 = require("../../application/use-cases/ObterEquipe");
 const ObterEquipeDadosFull_1 = require("../../application/use-cases/ObterEquipeDadosFull");
+const EquipeMetaService_1 = require("../../application/services/EquipeMetaService");
 const router = (0, express_1.Router)();
 const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
 const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
@@ -26,7 +27,8 @@ const metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
 const criarEquipe = new CriarEquipe_1.CriarEquipe(equipeRepo);
 const obterEquipe = new ObterEquipe_1.ObterEquipe(equipeRepo);
 const obterEquipeDadosFull = new ObterEquipeDadosFull_1.ObterEquipeDadosFull(equipeRepo, vendedorRepo, atividadeRepo, metaRepo);
-const equipeController = new EquipeController_1.EquipeController(criarEquipe, obterEquipe, obterEquipeDadosFull);
+const equipeMetaService = new EquipeMetaService_1.EquipeMetaService(obterEquipeDadosFull);
+const equipeController = new EquipeController_1.EquipeController(criarEquipe, obterEquipe, obterEquipeDadosFull, equipeMetaService);
 router.post("/equipes", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("📨 Nova requisição POST /equipes");
     return equipeController.criar(req, res);
@@ -43,5 +45,10 @@ router.get("/equipes/:id", (req, res) => __awaiter(void 0, void 0, void 0, funct
 router.get("/equipes/:equipeId/dados-full", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("📨 Nova requisição GET /equipes/:equipeId/dados-full");
     return equipeController.obterDadosFull(req, res);
+}));
+// Nova rota para calcular a meta
+router.get("/equipes/:equipeId/calcular-meta", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("📨 Nova requisição GET /equipes/:equipeId/calcular-meta");
+    return equipeController.calcularMeta(req, res);
 }));
 exports.default = router;

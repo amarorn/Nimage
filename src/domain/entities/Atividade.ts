@@ -3,6 +3,7 @@ export class Atividade {
         public readonly id: string,
         public vendedorId: string,
         public data: Date,
-        public docinhosCoco: number
+        public docinhosCoco: number,
+        public total_docinhos?: number
     ) {}
 }
