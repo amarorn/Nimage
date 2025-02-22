@@ -47,5 +47,15 @@ class VendedorRepositoryImpl {
             })));
         });
     }
+    atualizar(id, dados) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const vendedorAtualizado = yield VendedorModel_1.VendedorModel.findOneAndUpdate({ id }, { nome: dados.nome, equipe_id: dados.equipe_id }, { new: true }).lean();
+            if (vendedorAtualizado) {
+                const equipe = yield EquipeModel_1.EquipeModel.findOne({ id: vendedorAtualizado.equipe_id }).lean();
+                return new Vendedor_1.Vendedor(vendedorAtualizado.id, vendedorAtualizado.nome, vendedorAtualizado.equipe_id, equipe ? { id: equipe.id, nome: equipe.nome } : null);
+            }
+            return null;
+        });
+    }
 }
 exports.VendedorRepositoryImpl = VendedorRepositoryImpl;

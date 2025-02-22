@@ -14,11 +14,13 @@ const VendedorRepositoryImpl_1 = require("../../infrastructure/repositories/Vend
 const CriarVendedor_1 = require("../../application/use-cases/CriarVendedor");
 const ObterVendedor_1 = require("../../application/use-cases/ObterVendedor");
 const VendedorController_1 = require("../controllers/VendedorController");
+const AtualizarVendedor_1 = require("../../application/use-cases/AtualizarVendedor");
 const router = (0, express_1.Router)();
 const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
 const criarVendedor = new CriarVendedor_1.CriarVendedor(vendedorRepo);
 const obterVendedor = new ObterVendedor_1.ObterVendedor(vendedorRepo);
-const vendedorController = new VendedorController_1.VendedorController(criarVendedor, obterVendedor);
+const atualizarVendedor = new AtualizarVendedor_1.AtualizarVendedor(vendedorRepo);
+const vendedorController = new VendedorController_1.VendedorController(criarVendedor, obterVendedor, atualizarVendedor);
 console.log("🚀vendedorController Routes");
 router.post("/vendedores", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("📨 Nova requisição POST /vendedores");
@@ -32,5 +34,9 @@ router.get("/vendedores/all", (req, res) => __awaiter(void 0, void 0, void 0, fu
 router.get("/vendedores/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("📨 Nova requisição GET /vendedores/:id");
     return vendedorController.obterPorId(req, res);
+}));
+router.put("/vendedores/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("📨 Nova requisição PUT /vendedores/:id");
+    return vendedorController.atualizar(req, res);
 }));
 exports.default = router;

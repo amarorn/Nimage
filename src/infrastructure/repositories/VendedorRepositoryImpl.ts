@@ -32,4 +32,18 @@ export class VendedorRepositoryImpl implements VendedorRepository {
             return new Vendedor(vendedor.id, vendedor.nome, vendedor.equipe_id, equipe ? { id: equipe.id, nome: equipe.nome } : null);
         }));
     }
+
+    async atualizar(id: string, dados: { nome: string; equipe_id: string }): Promise<Vendedor | null> {
+        const vendedorAtualizado = await VendedorModel.findOneAndUpdate(
+            { id },
+            { nome: dados.nome, equipe_id: dados.equipe_id },
+            { new: true }
+        ).lean();
+
+        if (vendedorAtualizado) {
+            const equipe = await EquipeModel.findOne({ id: vendedorAtualizado.equipe_id }).lean();
+            return new Vendedor(vendedorAtualizado.id, vendedorAtualizado.nome, vendedorAtualizado.equipe_id, equipe ? { id: equipe.id, nome: equipe.nome } : null);
+        }
+        return null;
+    }
 }
