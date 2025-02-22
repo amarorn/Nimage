@@ -1,5 +1,7 @@
 ```markdown
 # Nimage
+https://img.shields.io/docker/automated/:user/:repo
+
 
 Nimage é uma API em Node.js construída com TypeScript, seguindo os princípios da Arquitetura Limpa. Ela oferece um framework robusto para gerenciar equipes, vendedores, atividades e métricas de desempenho.
 
@@ -19,6 +21,8 @@ Nimage é uma API em Node.js construída com TypeScript, seguindo os princípios
 - **Express.js**: Framework web rápido e minimalista para Node.js.
 - **MongoDB**: Integração com banco de dados NoSQL para persistência de dados.
 - **Performance Metrics**: Calcular e rastrear métricas de desempenho diárias e totais para membros da equipe.
+- **CRUD Operations**: Criar, ler, atualizar e deletar operações para equipes, vendedores e atividades.
+
 
 ## Instalação
 
@@ -61,22 +65,25 @@ Aqui estão alguns dos principais endpoints da API disponíveis:
   - `POST /api/equipes` - Cria uma nova equipe.
   - `GET /api/equipes/all` - Recupera todas as equipes.
   - `GET /api/equipes/:id` - Obtém detalhes de uma equipe específica.
+  - `PUT /api/equipes/:id` - Atualiza uma equipe específica.
   - `GET /api/equipes/:equipeId/calcular-meta` - Calcula métricas de desempenho para uma equipe.
 
 - **Vendedores**:
   - `POST /api/vendedores` - Cria um novo vendedor.
   - `GET /api/vendedores/all` - Recupera todos os vendedores.
+  - `GET /api/vendedores/:id` - Obtém detalhes de um vendedor específico.
+  - `PUT /api/vendedores/:id` - Atualiza um vendedor específico.
 
 - **Atividades**:
   - `POST /api/atividades` - Registra uma nova atividade.
   - `GET /api/atividades/all` - Recupera todas as atividades.
+  - `GET /api/atividades/:id` - Obtém detalhes de uma atividade específica.
+  - `PUT /api/atividades/:id` - Atualiza uma atividade específica.
 
-## Contribuição
-
-Contribuições são bem-vindas! Por favor, leia o arquivo [CONTRIBUTING.md](CONTRIBUTING.md) para orientações sobre como contribuir para este projeto.
-
-## Licença
-
-Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+- **Metas**:
+  - `POST /api/metas` - Cria uma nova meta.
+  - `GET /api/metas/all` - Recupera todas as metas.
+  - `GET /api/metas/:id` - Obtém detalhes de uma meta específica.
+  - `PUT /api/metas/:id` - Atualiza uma meta específica.
 
 ```
