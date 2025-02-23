@@ -14,18 +14,18 @@ const vendedorController = new VendedorController(criarVendedor, obterVendedor, 
 
 //console.log("🚀vendedorController Routes");
 router.post("/vendedores", async (req, res) => {
-    //console.log("📨 Nova requisição POST /vendedores");
+    console.log("📨 Nova requisição POST /vendedores");
     return vendedorController.criar(req, res);
 });
 
 router.get("/vendedores/all", async (req, res) => {
-    //console.log("📨 Nova requisição GET /vendedores");
+    console.log("📨 Nova requisição GET /vendedores");
     const vendedores = await vendedorController.obterTodos(req, res);
     return res.json(vendedores);
 });
 
 router.get("/vendedores/:id", async (req, res) => {
-    //console.log("📨 Nova requisição GET /vendedores/:id");
+    console.log("📨 Nova requisição GET /vendedores/:id");
     return vendedorController.obterPorId(req, res);
 });
 
