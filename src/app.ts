@@ -11,8 +11,8 @@ app.use(express.json());
 // Use o middleware CORS
 app.use(cors({
     origin: '*', // Permitir todos os domínios. Ajuste conforme necessário.
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    //methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    //allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Adicionando o endpoint de health check
