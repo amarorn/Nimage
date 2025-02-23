@@ -10,7 +10,7 @@ app.use(express.json());
 
 // Use o middleware CORS
 app.use(cors({
-    origin: '*', // Permitir todos os domínios. Ajuste conforme necessário.
+    origin: '*'
     //methods: ['GET', 'POST', 'PUT', 'DELETE'],
     //allowedHeaders: ['Content-Type', 'Authorization']
 }));
