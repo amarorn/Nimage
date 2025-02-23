@@ -4,12 +4,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
 const vendedorRoutes_1 = __importDefault(require("./interfaces/routes/vendedorRoutes"));
 const atividadeRoutes_1 = __importDefault(require("./interfaces/routes/atividadeRoutes"));
 const equipeRoutes_1 = __importDefault(require("./interfaces/routes/equipeRoutes"));
 const metaRoutes_1 = __importDefault(require("./interfaces/routes/metaRoutes"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
+// Use o middleware CORS
+app.use((0, cors_1.default)({
+    origin: '*'
+    //methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    //allowedHeaders: ['Content-Type', 'Authorization']
+}));
 // Adicionando o endpoint de health check
 app.get("/health", (req, res) => {
     res.status(200).json({ status: "UP", message: "Service is running smoothly" });
