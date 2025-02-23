@@ -8,6 +8,6 @@ const MongoDB_1 = require("./infrastructure/database/MongoDB");
 const PORT = process.env.PORT || 3000;
 MongoDB_1.MongoDB.conectar().then(() => {
     app_1.default.listen(PORT, () => {
-        console.log(`🚀 Servidor rodando na porta ${PORT}`);
+        //console.log(`🚀 Servidor rodando na porta ${PORT}`);
     });
 });

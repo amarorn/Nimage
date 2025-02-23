@@ -17,7 +17,7 @@ class CriarEquipe {
     }
     executar(dados) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("📝 Iniciando criação de equipe com dados:", dados);
+            //console.log("📝 Iniciando criação de equipe com dados:", dados);
             if (!dados.id || !dados.nome) {
                 throw new Error('Dados inválidos para criar equipe');
             }
@@ -25,9 +25,9 @@ class CriarEquipe {
                 throw new Error('Nome da equipe não pode estar vazio');
             }
             const equipe = new Equipe_1.Equipe(dados.id, dados.nome);
-            console.log("🏗️ Equipe instanciada:", equipe);
+            //console.log("🏗️ Equipe instanciada:", equipe);
             yield this.equipeRepo.criar(equipe);
-            console.log("💾 Equipe persistida no banco");
+            //console.log("💾 Equipe persistida no banco");
             return equipe;
         });
     }

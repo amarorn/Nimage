@@ -19,7 +19,7 @@ class VendedorController {
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("📥 Dados recebidos no body:", req.body);
+                // //console.log("📥 Dados recebidos no body:", req.body);
                 // Validação dos dados de entrada
                 if (!req.body) {
                     return res.status(400).json({ erro: 'Body da requisição está vazio' });
@@ -36,13 +36,13 @@ class VendedorController {
                         }
                     });
                 }
-                console.log("✨ Dados extraídos:", { id, nome, equipe_id });
+                // //console.log("✨ Dados extraídos:", { id, nome, equipe_id });
                 const vendedor = yield this.criarVendedor.executar({ id, nome, equipe_id });
-                console.log("✅ Vendedor criado com sucesso:", vendedor);
+                // //console.log("✅ Vendedor criado com sucesso:", vendedor);
                 return res.status(201).json(vendedor);
             }
             catch (erro) {
-                console.error("❌ Erro ao criar vendedor:", erro);
+                // console.error("❌ Erro ao criar vendedor:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao criar vendedor',
                     mensagem: erro.message
@@ -57,7 +57,7 @@ class VendedorController {
                 const limit = parseInt(req.query.limit) || 10;
                 const skip = (page - 1) * limit;
                 const vendedores = yield this.obterVendedor.executar(skip, limit);
-                console.log("✅ Vendedores obtidos com sucesso:", vendedores);
+                // //console.log("✅ Vendedores obtidos com sucesso:", vendedores);
                 // Criar uma resposta personalizada com paginação
                 const respostaPersonalizada = {
                     pagina: page,
@@ -73,7 +73,7 @@ class VendedorController {
                 return respostaPersonalizada;
             }
             catch (erro) {
-                console.error("❌ Erro ao obter vendedores:", erro);
+                // console.error("❌ Erro ao obter vendedores:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter vendedores',
                     mensagem: erro.message
@@ -86,7 +86,7 @@ class VendedorController {
             try {
                 const { id } = req.params;
                 const vendedor = yield this.obterVendedor.executarPorId(id);
-                console.log("✅ Vendedor obtido com sucesso:", vendedor);
+                // //console.log("✅ Vendedor obtido com sucesso:", vendedor);
                 if (!vendedor) {
                     return res.status(404).json({ erro: 'Vendedor não encontrado' });
                 }
@@ -98,7 +98,7 @@ class VendedorController {
                 });
             }
             catch (erro) {
-                console.error("❌ Erro ao obter vendedor:", erro);
+                // console.error("❌ Erro ao obter vendedor:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter vendedor',
                     mensagem: erro.message
@@ -109,7 +109,7 @@ class VendedorController {
     atualizar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("📥 Dados recebidos para atualização:", req.body);
+                // //console.log("📥 Dados recebidos para atualização:", req.body);
                 const { id } = req.params;
                 const { nome, equipe_id } = req.body;
                 // Validação dos campos obrigatórios
@@ -123,11 +123,11 @@ class VendedorController {
                     });
                 }
                 const vendedorAtualizado = yield this.atualizarVendedor.executar(id, { nome, equipe_id });
-                console.log("✅ Vendedor atualizado com sucesso:", vendedorAtualizado);
+                // //console.log("✅ Vendedor atualizado com sucesso:", vendedorAtualizado);
                 return res.status(200).json(vendedorAtualizado);
             }
             catch (erro) {
-                console.error("❌ Erro ao atualizar vendedor:", erro);
+                // console.error("❌ Erro ao atualizar vendedor:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao atualizar vendedor',
                     mensagem: erro.message

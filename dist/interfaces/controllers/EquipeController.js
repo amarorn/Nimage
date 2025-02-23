@@ -21,7 +21,7 @@ class EquipeController {
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("📥 Dados recebidos no body:", req.body);
+                // //console.log("📥 Dados recebidos no body:", req.body);
                 if (!req.body) {
                     return res.status(400).json({ erro: 'Body da requisição está vazio' });
                 }
@@ -36,13 +36,13 @@ class EquipeController {
                         }
                     });
                 }
-                console.log("✨ Dados extraídos:", { id, nome });
+                // //console.log("✨ Dados extraídos:", { id, nome });
                 const equipe = yield this.criarEquipe.executar({ id, nome });
-                console.log("✅ Equipe criada com sucesso:", equipe);
+                // //console.log("✅ Equipe criada com sucesso:", equipe);
                 return res.status(201).json(equipe);
             }
             catch (erro) {
-                console.error("❌ Erro ao criar equipe:", erro);
+                // console.error("❌ Erro ao criar equipe:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao criar equipe',
                     mensagem: erro.message
@@ -57,7 +57,7 @@ class EquipeController {
                 const limit = parseInt(req.query.limit) || 10;
                 const skip = (page - 1) * limit;
                 const equipes = yield this.obterEquipe.executar(skip, limit);
-                console.log("✅ Equipes obtidas com sucesso:", equipes);
+                // //console.log("✅ Equipes obtidas com sucesso:", equipes);
                 // Criar uma resposta personalizada com paginação
                 const respostaPersonalizada = {
                     pagina: page,
@@ -71,7 +71,7 @@ class EquipeController {
                 return respostaPersonalizada;
             }
             catch (erro) {
-                console.error("❌ Erro ao obter equipes:", erro);
+                // console.error("❌ Erro ao obter equipes:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter equipes',
                     mensagem: erro.message
@@ -84,14 +84,14 @@ class EquipeController {
             try {
                 const { id } = req.params;
                 const equipe = yield this.obterEquipe.executarPorId(id);
-                console.log("✅ Equipe obtida com sucesso:", equipe);
+                // //console.log("✅ Equipe obtida com sucesso:", equipe);
                 if (!equipe) {
                     return res.status(404).json({ erro: 'Equipe não encontrada' });
                 }
                 return res.status(200).json(equipe);
             }
             catch (erro) {
-                console.error("❌ Erro ao obter equipe:", erro);
+                // console.error("❌ Erro ao obter equipe:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter equipe',
                     mensagem: erro.message
@@ -102,17 +102,17 @@ class EquipeController {
     obterDadosFull(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("🔍 Recebendo requisição para obter dados completos da equipe", req.params);
+                // //console.log("🔍 Recebendo requisição para obter dados completos da equipe", req.params);
                 const { equipeId } = req.params;
                 const dadosCompletos = yield this.obterEquipeDadosFull.executar(equipeId);
-                console.log("✅ Dados completos obtidos com sucesso");
+                // //console.log("✅ Dados completos obtidos com sucesso");
                 return res.status(200).json({
                     status: 'success',
                     data: dadosCompletos
                 });
             }
             catch (erro) {
-                console.error("❌ Erro ao obter dados completos da equipe:", erro);
+                // console.error("❌ Erro ao obter dados completos da equipe:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter dados completos da equipe',
                     mensagem: erro.message
@@ -124,16 +124,16 @@ class EquipeController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { equipeId } = req.params;
-                console.log("🔍 Calculando meta para equipe ID:", equipeId);
+                // //console.log("🔍 Calculando meta para equipe ID:", equipeId);
                 const resultado = yield this.equipeMetaService.calcularMeta(equipeId);
-                console.log("✅ Resultado do cálculo de meta:", resultado);
+                // //console.log("✅ Resultado do cálculo de meta:", resultado);
                 return res.status(200).json({
                     status: 'success',
                     data: resultado
                 });
             }
             catch (erro) {
-                console.error("❌ Erro ao calcular meta:", erro);
+                // console.error("❌ Erro ao calcular meta:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao calcular meta',
                     mensagem: erro.message
@@ -144,7 +144,7 @@ class EquipeController {
     atualizar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("📥 Dados recebidos para atualização:", req.body);
+                // //console.log("📥 Dados recebidos para atualização:", req.body);
                 const { id } = req.params;
                 const { nome } = req.body;
                 // Validação dos campos obrigatórios
@@ -157,11 +157,11 @@ class EquipeController {
                     });
                 }
                 const equipeAtualizada = yield this.atualizarEquipe.executar(id, { nome });
-                console.log("✅ Equipe atualizada com sucesso:", equipeAtualizada);
+                // //console.log("✅ Equipe atualizada com sucesso:", equipeAtualizada);
                 return res.status(200).json(equipeAtualizada);
             }
             catch (erro) {
-                console.error("❌ Erro ao atualizar equipe:", erro);
+                // console.error("❌ Erro ao atualizar equipe:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao atualizar equipe',
                     mensagem: erro.message

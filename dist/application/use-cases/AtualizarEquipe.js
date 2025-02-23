@@ -16,12 +16,12 @@ class AtualizarEquipe {
     }
     executar(id, dados) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("📝 Iniciando atualização de equipe com dados:", dados);
+            //console.log("📝 Iniciando atualização de equipe com dados:", dados);
             if (!dados.nome) {
                 throw new Error('Dados inválidos para atualizar equipe');
             }
             const equipeAtualizada = yield this.equipeRepo.atualizar(id, dados);
-            console.log("💾 Equipe atualizada no banco:", equipeAtualizada);
+            //console.log("💾 Equipe atualizada no banco:", equipeAtualizada);
             return equipeAtualizada;
         });
     }

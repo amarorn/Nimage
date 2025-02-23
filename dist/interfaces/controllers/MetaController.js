@@ -19,7 +19,7 @@ class MetaController {
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("📥 Dados recebidos no body:", req.body);
+                // //console.log("📥 Dados recebidos no body:", req.body);
                 if (!req.body) {
                     return res.status(400).json({ erro: 'Body da requisição está vazio' });
                 }
@@ -35,13 +35,13 @@ class MetaController {
                         }
                     });
                 }
-                console.log("✨ Dados extraídos:", { id, equipeId, objetivo });
+                // //console.log("✨ Dados extraídos:", { id, equipeId, objetivo });
                 const meta = yield this.criarMeta.executar({ id, equipeId, objetivo });
-                console.log("✅ Meta criada com sucesso:", meta);
+                // //console.log("✅ Meta criada com sucesso:", meta);
                 return res.status(201).json(meta);
             }
             catch (erro) {
-                console.error("❌ Erro ao criar meta:", erro);
+                // console.error("❌ Erro ao criar meta:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao criar meta',
                     mensagem: erro.message
@@ -56,10 +56,11 @@ class MetaController {
                 const limit = parseInt(req.query.limit) || 10;
                 const skip = (page - 1) * limit;
                 const metas = yield this.obterMeta.executar(skip, limit);
-                console.log("✅ Metas obtidas com sucesso:", metas);
+                // //console.log("✅ Metas obtidas com sucesso:", metas);
                 // Criar uma resposta personalizada com paginação
                 const respostaPersonalizada = {
                     pagina: page,
+                    statuscode: 200,
                     limite: limit,
                     total: metas.length,
                     metas: metas.map(meta => ({
@@ -71,7 +72,7 @@ class MetaController {
                 return respostaPersonalizada;
             }
             catch (erro) {
-                console.error("❌ Erro ao obter metas:", erro);
+                // console.error("❌ Erro ao obter metas:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter metas',
                     mensagem: erro.message
@@ -84,14 +85,14 @@ class MetaController {
             try {
                 const { id } = req.params;
                 const meta = yield this.obterMeta.executarPorId(id);
-                console.log("✅ Meta obtida com sucesso:", meta);
+                // //console.log("✅ Meta obtida com sucesso:", meta);
                 if (!meta) {
                     return res.status(404).json({ erro: 'Meta não encontrada' });
                 }
                 return res.status(200).json(meta);
             }
             catch (erro) {
-                console.error("❌ Erro ao obter meta:", erro);
+                // console.error("❌ Erro ao obter meta:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter meta',
                     mensagem: erro.message
@@ -102,16 +103,16 @@ class MetaController {
     obterPorEquipe(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("🔍 Recebendo requisição para obter meta por equipe", req.params);
+                // //console.log("🔍 Recebendo requisição para obter meta por equipe", req.params);
                 const { equipeId } = req.params;
-                console.log("🔍 Buscando meta para equipe ID:", equipeId);
+                // //console.log("🔍 Buscando meta para equipe ID:", equipeId);
                 const meta = yield this.obterMeta.executarPorEquipe(equipeId);
-                console.log("✅ Meta obtida por equipe com sucesso:", meta);
+                // //console.log("✅ Meta obtida por equipe com sucesso:", meta);
                 if (!meta) {
-                    console.log("⚠️ Nenhuma meta encontrada para a equipe");
+                    // //console.log("⚠️ Nenhuma meta encontrada para a equipe");
                     return res.status(404).json({ erro: 'Meta não encontrada para esta equipe' });
                 }
-                console.log("📤 Retornando meta:", meta);
+                // //console.log("📤 Retornando meta:", meta);
                 return res.status(200).json({
                     status: 'success',
                     data: {
@@ -122,7 +123,7 @@ class MetaController {
                 });
             }
             catch (erro) {
-                console.error("❌ Erro ao obter meta por equipe:", erro);
+                // console.error("❌ Erro ao obter meta por equipe:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter meta por equipe',
                     mensagem: erro.message
@@ -133,7 +134,7 @@ class MetaController {
     atualizar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("📥 Dados recebidos para atualização:", req.body);
+                // //console.log("📥 Dados recebidos para atualização:", req.body);
                 const { id } = req.params;
                 const { equipeId, objetivo } = req.body;
                 // Validação dos campos obrigatórios
@@ -147,11 +148,11 @@ class MetaController {
                     });
                 }
                 const metaAtualizada = yield this.atualizarMeta.executar(id, { equipeId, objetivo });
-                console.log("✅ Meta atualizada com sucesso:", metaAtualizada);
+                // //console.log("✅ Meta atualizada com sucesso:", metaAtualizada);
                 return res.status(200).json(metaAtualizada);
             }
             catch (erro) {
-                console.error("❌ Erro ao atualizar meta:", erro);
+                // console.error("❌ Erro ao atualizar meta:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao atualizar meta',
                     mensagem: erro.message
