@@ -12,8 +12,8 @@ jest.mock('../../../infrastructure/repositories/MetaRepositoryImpl', () => {
       return {
         criar: jest.fn().mockResolvedValue({ id: '1', equipeId: 'equipe1', objetivo: 1 }),
         obterTodos: jest.fn().mockResolvedValue([
-          { id: '1', descricao: 'Meta Teste 1', equipeId: 'equipe1', objetivo: 1 },
-          { id: '2', descricao: 'Meta Teste 2', equipeId: 'equipe2', objetivo: 2 },
+          { id: '1', equipeId: 'equipe1', objetivo: 1 },
+          { id: '2', equipeId: 'equipe2', objetivo: 2 },
         ]),
         obterPorId: jest.fn().mockResolvedValue(null),
         obterPorEquipe: jest.fn().mockResolvedValue({ id: '1', equipeId: 'equipe1', objetivo: 1 }),
@@ -35,23 +35,25 @@ describe('MetaController', () => {
   let res: Partial<Response>;
 
   beforeEach(() => {
-    req = {};
+    req = {
+      body: { id: '3', equipeId: 'equipe3', objetivo: 3 },
+    };
     res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     };
   });
 
-  it('should retrieve all metas', async () => {
-    const mockMetas = [
-      { id: '1', descricao: 'Meta Teste 1', equipeId: 'equipe1', objetivo: 1 },
-      { id: '2', descricao: 'Meta Teste 2', equipeId: 'equipe2', objetivo: 2 },
-    ];
-    jest.spyOn(metaRepo, 'obterTodos').mockResolvedValue(mockMetas);
+  it('should create a new meta', async () => {
+    jest.spyOn(metaRepo, 'criar').mockResolvedValue();
 
-    await metaController.obterTodos(req as Request, res as Response);
+    await metaController.criar(req as Request, res as Response);
 
-    expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(mockMetas);
+    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.json).toHaveBeenCalledWith({
+      id: '3',
+      equipeId: 'equipe3',
+      objetivo: 3
+    });
   });
 });

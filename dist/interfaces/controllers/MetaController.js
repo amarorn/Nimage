@@ -60,6 +60,7 @@ class MetaController {
                 // Criar uma resposta personalizada com paginação
                 const respostaPersonalizada = {
                     pagina: page,
+                    statuscode: 200,
                     limite: limit,
                     total: metas.length,
                     metas: metas.map(meta => ({
