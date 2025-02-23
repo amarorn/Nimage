@@ -7,6 +7,7 @@
 ![MyGet Downloads](https://img.shields.io/badge/Clean_Architecture-0A0A0A?style=flat&logo=microservices&logoColor=white)
 ![GitHub last commit](https://shields.io/badge/TypeScript-3178C6?style=flat&logo=TypeScript&logoColor=FFF&style=flat-square)
 ![Scrutinizer coverage (GitHub/Bitbucket) with branch](https://img.shields.io/scrutinizer/coverage/g/amarorn/Nimage/master)
+[![.github/workflows/main.yml](https://github.com/amarorn/Nimage/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/amarorn/Nimage/actions/workflows/main.yml)
 
 
 
