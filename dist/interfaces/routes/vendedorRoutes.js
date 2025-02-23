@@ -21,22 +21,22 @@ const criarVendedor = new CriarVendedor_1.CriarVendedor(vendedorRepo);
 const obterVendedor = new ObterVendedor_1.ObterVendedor(vendedorRepo);
 const atualizarVendedor = new AtualizarVendedor_1.AtualizarVendedor(vendedorRepo);
 const vendedorController = new VendedorController_1.VendedorController(criarVendedor, obterVendedor, atualizarVendedor);
-console.log("🚀vendedorController Routes");
+//console.log("🚀vendedorController Routes");
 router.post("/vendedores", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição POST /vendedores");
+    //console.log("📨 Nova requisição POST /vendedores");
     return vendedorController.criar(req, res);
 }));
 router.get("/vendedores/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição GET /vendedores");
+    //console.log("📨 Nova requisição GET /vendedores");
     const vendedores = yield vendedorController.obterTodos(req, res);
     return res.json(vendedores);
 }));
 router.get("/vendedores/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição GET /vendedores/:id");
+    //console.log("📨 Nova requisição GET /vendedores/:id");
     return vendedorController.obterPorId(req, res);
 }));
 router.put("/vendedores/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição PUT /vendedores/:id");
+    //console.log("📨 Nova requisição PUT /vendedores/:id");
     return vendedorController.atualizar(req, res);
 }));
 exports.default = router;

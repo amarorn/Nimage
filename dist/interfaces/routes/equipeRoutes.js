@@ -32,29 +32,29 @@ const obterEquipeDadosFull = new ObterEquipeDadosFull_1.ObterEquipeDadosFull(equ
 const equipeMetaService = new EquipeMetaService_1.EquipeMetaService(obterEquipeDadosFull);
 const equipeController = new EquipeController_1.EquipeController(criarEquipe, obterEquipe, obterEquipeDadosFull, equipeMetaService, atualizar);
 router.post("/equipes", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição POST /equipes");
+    //console.log("📨 Nova requisição POST /equipes");
     return equipeController.criar(req, res);
 }));
 router.get("/equipes/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição GET /equipes");
+    //console.log("📨 Nova requisição GET /equipes");
     const equipes = yield equipeController.obterTodos(req, res);
     return res.json(equipes);
 }));
 router.get("/equipes/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição GET /equipes/:id");
+    //console.log("📨 Nova requisição GET /equipes/:id");
     return equipeController.obterPorId(req, res);
 }));
 router.get("/equipes/:equipeId/dados-full", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição GET /equipes/:equipeId/dados-full");
+    //console.log("📨 Nova requisição GET /equipes/:equipeId/dados-full");
     return equipeController.obterDadosFull(req, res);
 }));
 // Nova rota para calcular a meta
 router.get("/equipes/:equipeId/calcular-meta", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição GET /equipes/:equipeId/calcular-meta");
+    //console.log("📨 Nova requisição GET /equipes/:equipeId/calcular-meta");
     return equipeController.calcularMeta(req, res);
 }));
 router.put("/equipes/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição PUT /equipes/:id");
+    //console.log("📨 Nova requisição PUT /equipes/:id");
     return equipeController.atualizar(req, res);
 }));
 exports.default = router;

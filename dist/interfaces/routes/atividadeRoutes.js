@@ -22,24 +22,24 @@ const obterAtividade = new ObterAtividades_1.ObterAtividades(atividadeRepo);
 const atualizarAtividade = new AtualizarAtividade_1.AtualizarAtividade(atividadeRepo);
 const atividadeController = new AtividadeController_1.AtividadeController(criarAtividade, obterAtividade, atualizarAtividade);
 router.post("/atividades", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição POST /atividades");
+    //console.log("📨 Nova requisição POST /atividades");
     return atividadeController.criar(req, res);
 }));
 router.get("/atividades/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição GET /atividades");
+    //console.log("📨 Nova requisição GET /atividades");
     const atividades = yield atividadeController.obterTodos(req, res);
     return res.json(atividades);
 }));
 router.get("/atividades/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição GET /atividades/:id");
+    //console.log("📨 Nova requisição GET /atividades/:id");
     return atividadeController.obterPorId(req, res);
 }));
 router.get("/atividades/:id/detalhes", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição GET /atividades/:id/detalhes");
+    //console.log("📨 Nova requisição GET /atividades/:id/detalhes");
     return atividadeController.obterDetalhes(req, res);
 }));
 router.put("/atividades/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição PUT /atividades/:id");
+    //console.log("📨 Nova requisição PUT /atividades/:id");
     return atividadeController.atualizar(req, res);
 }));
 exports.default = router;

@@ -16,12 +16,12 @@ class AtualizarVendedor {
     }
     executar(id, dados) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("📝 Iniciando atualização de vendedor com dados:", dados);
+            //console.log("📝 Iniciando atualização de vendedor com dados:", dados);
             if (!dados.nome || !dados.equipe_id) {
                 throw new Error('Dados inválidos para atualizar vendedor');
             }
             const vendedorAtualizado = yield this.vendedorRepo.atualizar(id, dados);
-            console.log("💾 Vendedor atualizado no banco:", vendedorAtualizado);
+            //console.log("💾 Vendedor atualizado no banco:", vendedorAtualizado);
             return vendedorAtualizado;
         });
     }

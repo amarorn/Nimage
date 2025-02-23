@@ -16,13 +16,13 @@ class ObterEquipe {
     }
     executar(skip, limit) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("Executando ObterEquipe com paginação", { skip, limit });
+            //console.log("Executando ObterEquipe com paginação", { skip, limit });
             return yield this.equipeRepo.obterTodos(skip, limit);
         });
     }
     executarPorId(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("Executando ObterEquipe por ID", { id });
+            //console.log("Executando ObterEquipe por ID", { id });
             return yield this.equipeRepo.obterPorId(id);
         });
     }

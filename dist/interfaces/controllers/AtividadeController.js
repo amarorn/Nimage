@@ -22,7 +22,7 @@ class AtividadeController {
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("📥 Dados recebidos no body:", req.body);
+                // //console.log("📥 Dados recebidos no body:", req.body);
                 if (!req.body) {
                     return res.status(400).json({ erro: 'Body da requisição está vazio' });
                 }
@@ -39,18 +39,18 @@ class AtividadeController {
                         }
                     });
                 }
-                console.log("✨ Dados extraídos:", { id, vendedorId, data, docinhosCoco });
+                // //console.log("✨ Dados extraídos:", { id, vendedorId, data, docinhosCoco });
                 const atividade = yield this.criarAtividade.executar({
                     id,
                     vendedorId,
                     data: new Date(data),
                     docinhosCoco
                 });
-                console.log("✅ Atividade criada com sucesso:", atividade);
+                // //console.log("✅ Atividade criada com sucesso:", atividade);
                 return res.status(201).json(atividade);
             }
             catch (erro) {
-                console.error("❌ Erro ao criar atividade:", erro);
+                // console.error("❌ Erro ao criar atividade:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao criar atividade',
                     mensagem: erro.message
@@ -65,7 +65,7 @@ class AtividadeController {
                 const limit = parseInt(req.query.limit) || 10;
                 const skip = (page - 1) * limit;
                 const atividades = yield this.obterAtividades.executar(skip, limit);
-                console.log("✅ Atividades obtidas com sucesso:", atividades);
+                // //console.log("✅ Atividades obtidas com sucesso:", atividades);
                 // Criar uma resposta personalizada com paginação
                 const respostaPersonalizada = {
                     pagina: page,
@@ -81,7 +81,7 @@ class AtividadeController {
                 return respostaPersonalizada;
             }
             catch (erro) {
-                console.error("❌ Erro ao obter atividades:", erro);
+                // console.error("❌ Erro ao obter atividades:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter atividades',
                     mensagem: erro.message
@@ -94,14 +94,14 @@ class AtividadeController {
             try {
                 const { id } = req.params;
                 const atividade = yield this.obterAtividades.executarPorId(id);
-                console.log("✅ Atividade obtida com sucesso:", atividade);
+                // //console.log("✅ Atividade obtida com sucesso:", atividade);
                 if (!atividade) {
                     return res.status(404).json({ erro: 'Atividade não encontrada' });
                 }
                 return res.status(200).json(atividade);
             }
             catch (erro) {
-                console.error("❌ Erro ao obter atividade:", erro);
+                // console.error("❌ Erro ao obter atividade:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter atividade',
                     mensagem: erro.message
@@ -113,27 +113,27 @@ class AtividadeController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id } = req.params;
-                console.log("🔍 Buscando detalhes para atividade ID:", id);
+                // //console.log("🔍 Buscando detalhes para atividade ID:", id);
                 const atividade = yield this.obterAtividades.executarPorId(id);
                 if (!atividade) {
-                    console.log("⚠️ Atividade não encontrada");
+                    // //console.log("⚠️ Atividade não encontrada");
                     return res.status(404).json({ erro: 'Atividade não encontrada' });
                 }
                 const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
                 const vendedor = yield vendedorRepo.obterPorId(atividade.vendedorId);
                 if (!vendedor) {
-                    console.log("⚠️ Vendedor não encontrado");
+                    // //console.log("⚠️ Vendedor não encontrado");
                     return res.status(404).json({ erro: 'Vendedor não encontrado' });
                 }
                 const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
                 const equipe = yield equipeRepo.obterPorId(vendedor.equipe_id);
                 if (!equipe) {
-                    console.log("⚠️ Equipe não encontrada");
+                    // //console.log("⚠️ Equipe não encontrada");
                     return res.status(404).json({ erro: 'Equipe não encontrada' });
                 }
                 const metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
                 const metas = yield metaRepo.obterPorEquipe(equipe.id);
-                console.log("✅ Detalhes obtidos com sucesso:", { atividade, vendedor, equipe, metas });
+                // //console.log("✅ Detalhes obtidos com sucesso:", { atividade, vendedor, equipe, metas });
                 return res.status(200).json({
                     atividade: {
                         id: atividade.id,
@@ -158,7 +158,7 @@ class AtividadeController {
                 });
             }
             catch (erro) {
-                console.error("❌ Erro ao obter detalhes da atividade:", erro);
+                // console.error("❌ Erro ao obter detalhes da atividade:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter detalhes da atividade',
                     mensagem: erro.message
@@ -169,7 +169,7 @@ class AtividadeController {
     atualizar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("📥 Dados recebidos para atualização:", req.body);
+                // //console.log("📥 Dados recebidos para atualização:", req.body);
                 const { id } = req.params;
                 const { vendedorId, data, docinhosCoco } = req.body;
                 // Validação dos campos obrigatórios
@@ -184,11 +184,11 @@ class AtividadeController {
                     });
                 }
                 const atividadeAtualizada = yield this.atualizarAtividade.executar(id, { vendedorId, data: new Date(data), docinhosCoco });
-                console.log("✅ Atividade atualizada com sucesso:", atividadeAtualizada);
+                // //console.log("✅ Atividade atualizada com sucesso:", atividadeAtualizada);
                 return res.status(200).json(atividadeAtualizada);
             }
             catch (erro) {
-                console.error("❌ Erro ao atualizar atividade:", erro);
+                // console.error("❌ Erro ao atualizar atividade:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao atualizar atividade',
                     mensagem: erro.message

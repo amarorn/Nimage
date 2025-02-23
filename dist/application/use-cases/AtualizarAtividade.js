@@ -16,12 +16,12 @@ class AtualizarAtividade {
     }
     executar(id, dados) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("📝 Iniciando atualização de atividade com dados:", dados);
+            //console.log("📝 Iniciando atualização de atividade com dados:", dados);
             if (!dados.vendedorId || !dados.data || dados.docinhosCoco === undefined) {
                 throw new Error('Dados inválidos para atualizar atividade');
             }
             const atividadeAtualizada = yield this.atividadeRepo.atualizar(id, dados);
-            console.log("💾 Atividade atualizada no banco:", atividadeAtualizada);
+            //console.log("💾 Atividade atualizada no banco:", atividadeAtualizada);
             return atividadeAtualizada;
         });
     }

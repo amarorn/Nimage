@@ -22,25 +22,25 @@ const obterMeta = new ObterMeta_1.ObterMeta(metaRepo);
 const atualizarMeta = new AtualizarMeta_1.AtualizarMeta(metaRepo);
 const metaController = new MetaController_1.MetaController(criarMeta, obterMeta, atualizarMeta);
 router.post("/metas", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição POST /metas");
+    //console.log("📨 Nova requisição POST /metas");
     return metaController.criar(req, res);
 }));
 router.get("/metas/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição GET /metas");
+    //console.log("📨 Nova requisição GET /metas");
     const metas = yield metaController.obterTodos(req, res);
     return res.json(metas);
 }));
 router.get("/metas/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição GET /metas/:id");
+    //console.log("📨 Nova requisição GET /metas/:id");
     return metaController.obterPorId(req, res);
 }));
 router.get("/metas/equipe/:equipeId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição GET /metas/equipe/:equipeId");
+    //console.log("📨 Nova requisição GET /metas/equipe/:equipeId");
     const equipeId = req.params.equipeId;
     return metaController.obterPorEquipe(req, res);
 }));
 router.put("/metas/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("📨 Nova requisição PUT /metas/:id");
+    //console.log("📨 Nova requisição PUT /metas/:id");
     return metaController.atualizar(req, res);
 }));
 exports.default = router;

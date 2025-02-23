@@ -19,7 +19,7 @@ class ObterEquipeDadosFull {
     }
     executar(equipeId) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("🔍 Buscando dados completos da equipe:", equipeId);
+            //console.log("🔍 Buscando dados completos da equipe:", equipeId);
             // Busca a equipe
             const equipe = yield this.equipeRepo.obterPorId(equipeId);
             if (!equipe) {
@@ -44,7 +44,7 @@ class ObterEquipeDadosFull {
                     }))
                 };
             })));
-            console.log("🔍 Dados completos da equipe:", vendedoresComAtividades);
+            //console.log("🔍 Dados completos da equipe:", vendedoresComAtividades);
             return {
                 equipe: {
                     id: equipe.id,

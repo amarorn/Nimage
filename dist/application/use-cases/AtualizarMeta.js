@@ -16,12 +16,12 @@ class AtualizarMeta {
     }
     executar(id, dados) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("📝 Iniciando atualização de meta com dados:", dados);
+            //console.log("📝 Iniciando atualização de meta com dados:", dados);
             if (!dados.equipeId || dados.objetivo === undefined) {
                 throw new Error('Dados inválidos para atualizar meta');
             }
             const metaAtualizada = yield this.metaRepo.atualizar(id, dados);
-            console.log("💾 Meta atualizada no banco:", metaAtualizada);
+            //console.log("💾 Meta atualizada no banco:", metaAtualizada);
             return metaAtualizada;
         });
     }
