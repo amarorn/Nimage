@@ -4,13 +4,17 @@ import { CriarAtividade } from "../../application/use-cases/CriarAtividade";
 import { AtividadeController } from "../controllers/AtividadeController";
 import { ObterAtividades } from "../../application/use-cases/ObterAtividades";
 import { AtualizarAtividade } from "../../application/use-cases/AtualizarAtividade";
+import { AtividadeService } from "../../application/services/AtividadeService";
+import { ObterAtividadesPorVendedorEData } from "../../application/use-cases/ObterAtividadesPorVendedorEData";
 
 const router = Router();
 const atividadeRepo = new AtividadeRepositoryImpl();
 const criarAtividade = new CriarAtividade(atividadeRepo);
 const obterAtividade  = new ObterAtividades(atividadeRepo);
 const atualizarAtividade = new AtualizarAtividade(atividadeRepo);
-const atividadeController = new AtividadeController(criarAtividade, obterAtividade, atualizarAtividade);
+const atividadeService = new AtividadeService(atividadeRepo);
+const obterAtividadesPorVendedorEData = new ObterAtividadesPorVendedorEData(atividadeService);
+const atividadeController = new AtividadeController(criarAtividade, obterAtividade, atualizarAtividade, atividadeService, obterAtividadesPorVendedorEData);
 
 router.post("/atividades", async (req, res) => {
     //console.log("📨 Nova requisição POST /atividades");

@@ -6,4 +6,5 @@ export interface AtividadeRepository {
     obterPorId(id: string): Promise<Atividade | null>;
     obterTodos(skip: number, limit: number): Promise<Atividade[]>;
     obterPorVendedorId(vendedorId: string): Promise<Atividade[]>;
+    obterPorVendedorEData(vendedorId: string, dataInicio: Date, dataFim: Date): Promise<Atividade[]>;
 }

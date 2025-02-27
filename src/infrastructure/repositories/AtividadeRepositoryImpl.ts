@@ -32,4 +32,11 @@ export class AtividadeRepositoryImpl implements AtividadeRepository {
         }
         return null;
     }
+
+    async obterPorVendedorEData(vendedorId: string, dataInicio: Date, dataFim: Date): Promise<Atividade[]> {
+        return await AtividadeModel.find({
+            vendedorId,
+            data: { $gte: dataInicio, $lte: dataFim }
+        }).lean();
+    }
 }

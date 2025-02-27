@@ -5,12 +5,16 @@ import { VendedorRepositoryImpl } from "../../infrastructure/repositories/Vended
 import { EquipeRepositoryImpl } from "../../infrastructure/repositories/EquipeRepositoryImpl";
 import { MetaRepositoryImpl } from "../../infrastructure/repositories/MetaRepositoryImpl";
 import { AtualizarAtividade } from "../../application/use-cases/AtualizarAtividade";
+import { AtividadeService } from "../../application/services/AtividadeService";
+import { ObterAtividadesPorVendedorEData } from "../../application/use-cases/ObterAtividadesPorVendedorEData";
 
 export class AtividadeController {
     constructor(
         private criarAtividade: CriarAtividade,
         private obterAtividades: ObterAtividades,
-        private atualizarAtividade: AtualizarAtividade
+        private atualizarAtividade: AtualizarAtividade,
+        private atividadeService: AtividadeService,
+        private obterAtividadesPorVendedorEData: ObterAtividadesPorVendedorEData
     ) {}
 
     async criar(req: Request, res: Response) {
@@ -195,6 +199,20 @@ export class AtividadeController {
             // console.error("❌ Erro ao atualizar atividade:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao atualizar atividade',
+                mensagem: (erro as Error).message 
+            });
+        }
+    }
+
+    async getAtividadesByVendedorAndDate(req: Request, res: Response) {
+        try {
+            const { vendedorId } = req.params;
+            const { dataInicio, dataFim } = req.query;
+            const atividades = await this.obterAtividadesPorVendedorEData.executar(vendedorId, new Date(dataInicio as string), new Date(dataFim as string));
+            return res.status(200).json(atividades);
+        } catch (erro) {
+            return res.status(500).json({ 
+                erro: 'Erro interno ao obter atividades',
                 mensagem: (erro as Error).message 
             });
         }
