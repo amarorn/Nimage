@@ -44,10 +44,22 @@ class AtividadeRepositoryImpl {
     }
     obterPorVendedorEData(vendedorId, dataInicio, dataFim) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield AtividadeModel_1.AtividadeModel.find({
+            console.log('Debug - Repository - Query params:', {
                 vendedorId,
-                data: { $gte: dataInicio, $lte: dataFim }
-            }).lean();
+                dataInicio,
+                dataFim
+            });
+            const query = {
+                vendedorId,
+                data: {
+                    $gte: dataInicio.setHours(0, 0, 0, 0),
+                    $lte: dataFim.setHours(23, 59, 59, 999)
+                }
+            };
+            console.log('Debug - Repository - MongoDB query:', query);
+            const resultado = yield AtividadeModel_1.AtividadeModel.find(query).lean();
+            console.log('Debug - Repository - Resultado encontrado:', resultado);
+            return resultado;
         });
     }
 }

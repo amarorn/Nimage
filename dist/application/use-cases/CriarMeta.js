@@ -18,13 +18,13 @@ class CriarMeta {
     executar(dados) {
         return __awaiter(this, void 0, void 0, function* () {
             //console.log("📝 Iniciando criação de meta com dados:", dados);
-            if (!dados.id || !dados.equipeId || dados.objetivo === undefined) {
+            if (!dados.id || !dados.equipeId || dados.objetivo === undefined || !dados.data) {
                 throw new Error('Dados inválidos para criar meta');
             }
-            if (dados.objetivo <= 0) {
-                throw new Error('Objetivo da meta deve ser maior que zero');
+            if (dados.objetivo < 0) {
+                throw new Error('Objetivo não pode ser negativo');
             }
-            const meta = new Meta_1.Meta(dados.id, dados.equipeId, dados.objetivo);
+            const meta = new Meta_1.Meta(dados.id, dados.equipeId, dados.objetivo, dados.data);
             //console.log("🏗️ Meta instanciada:", meta);
             yield this.metaRepo.criar(meta);
             //console.log("💾 Meta persistida no banco");

@@ -21,9 +21,13 @@ class VendedorRepositoryImpl {
     }
     obterPorId(id) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log('Debug - Repository - Buscando vendedor no banco com ID:', id);
             const vendedor = yield VendedorModel_1.VendedorModel.findOne({ id }).lean();
+            console.log('Debug - Repository - Resultado da busca no banco:', vendedor);
             if (vendedor) {
+                console.log('Debug - Repository - Vendedor encontrado, buscando equipe com ID:', vendedor.equipe_id);
                 const equipe = yield EquipeModel_1.EquipeModel.findOne({ id: vendedor.equipe_id }).lean();
+                console.log('Debug - Repository - Resultado da busca da equipe:', equipe);
                 return new Vendedor_1.Vendedor(vendedor.id, vendedor.nome, vendedor.equipe_id, equipe ? { id: equipe.id, nome: equipe.nome } : null);
             }
             return null;

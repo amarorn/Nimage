@@ -203,10 +203,34 @@ class AtividadeController {
             try {
                 const { vendedorId } = req.params;
                 const { dataInicio, dataFim } = req.query;
-                const atividades = yield this.obterAtividadesPorVendedorEData.executar(vendedorId, new Date(dataInicio), new Date(dataFim));
-                return res.status(200).json(atividades);
+                console.log('Debug - Parâmetros recebidos:', {
+                    vendedorId,
+                    dataInicio,
+                    dataFim
+                });
+                if (!dataInicio || !dataFim) {
+                    return res.status(400).json({
+                        erro: 'Datas não fornecidas',
+                        detalhes: { dataInicio, dataFim }
+                    });
+                }
+                const dataInicioObj = new Date(dataInicio);
+                const dataFimObj = new Date(dataFim);
+                console.log('Debug - Datas convertidas:', {
+                    dataInicioObj,
+                    dataFimObj
+                });
+                const resultado = yield this.obterAtividadesPorVendedorEData.executar(vendedorId, dataInicioObj, dataFimObj);
+                console.log('Debug - Resultado obtido:', resultado);
+                // Calcula o progresso em relação à meta
+                let progresso = null;
+                if (resultado.meta && resultado.meta.objetivo > 0) {
+                    progresso = (resultado.valorTotal / resultado.meta.objetivo) * 100;
+                }
+                return res.status(200).json(Object.assign(Object.assign({}, resultado), { progresso: progresso ? `${progresso.toFixed(2)}%` : null }));
             }
             catch (erro) {
+                console.error('Debug - Erro:', erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter atividades',
                     mensagem: erro.message

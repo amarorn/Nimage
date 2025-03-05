@@ -17,8 +17,11 @@ class AtualizarMeta {
     executar(id, dados) {
         return __awaiter(this, void 0, void 0, function* () {
             //console.log("📝 Iniciando atualização de meta com dados:", dados);
-            if (!dados.equipeId || dados.objetivo === undefined) {
+            if (!dados.equipeId || dados.objetivo === undefined || !dados.data) {
                 throw new Error('Dados inválidos para atualizar meta');
+            }
+            if (dados.objetivo < 0) {
+                throw new Error('Objetivo não pode ser negativo');
             }
             const metaAtualizada = yield this.metaRepo.atualizar(id, dados);
             //console.log("💾 Meta atualizada no banco:", metaAtualizada);

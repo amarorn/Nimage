@@ -32,6 +32,14 @@ class MetaRepositoryImpl {
             return yield MetaModel_1.MetaModel.findOne({ id }).lean();
         });
     }
+    obterPorEquipeEData(equipeId, dataInicio, dataFim) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield MetaModel_1.MetaModel.findOne({
+                equipeId,
+                data: { $gte: dataInicio, $lte: dataFim }
+            }).lean();
+        });
+    }
     obterTodos(skip, limit) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield MetaModel_1.MetaModel.find().skip(skip).limit(limit).lean();
@@ -39,9 +47,9 @@ class MetaRepositoryImpl {
     }
     atualizar(id, dados) {
         return __awaiter(this, void 0, void 0, function* () {
-            const metaAtualizada = yield MetaModel_1.MetaModel.findOneAndUpdate({ id }, { equipeId: dados.equipeId, objetivo: dados.objetivo }, { new: true }).lean();
+            const metaAtualizada = yield MetaModel_1.MetaModel.findOneAndUpdate({ id }, { equipeId: dados.equipeId, objetivo: dados.objetivo, data: dados.data }, { new: true }).lean();
             if (metaAtualizada) {
-                return new Meta_1.Meta(metaAtualizada.id, metaAtualizada.equipeId, metaAtualizada.objetivo);
+                return new Meta_1.Meta(metaAtualizada.id, metaAtualizada.equipeId, metaAtualizada.objetivo, metaAtualizada.data);
             }
             return null;
         });

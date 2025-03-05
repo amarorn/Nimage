@@ -2,8 +2,9 @@ import { Meta } from "../entities/Meta";
 
 export interface MetaRepository {
     criar(meta: Meta): Promise<void>;
-    atualizar(id: string, dados: { equipeId: string; objetivo: number }): Promise<Meta | null>;
+    atualizar(id: string, dados: { equipeId: string; objetivo: number; data: Date }): Promise<Meta | null>;
     obterPorEquipe(equipeId: string): Promise<Meta | null>;
     obterPorId(id: string): Promise<Meta | null>;
     obterTodos(skip: number, limit: number): Promise<Meta[]>;
+    obterPorEquipeEData(equipeId: string, dataInicio: Date, dataFim: Date): Promise<Meta | null>;
 }

@@ -42,4 +42,9 @@ router.put("/atividades/:id", async (req, res) => {
     return atividadeController.atualizar(req, res);
 });
 
+router.get("/atividades/vendedor/:vendedorId", async (req, res) => {
+    //console.log("📨 Nova requisição GET /atividades/vendedor/:vendedorId");
+    return atividadeController.getAtividadesByVendedorAndDate(req, res);
+});
+
 export default router;

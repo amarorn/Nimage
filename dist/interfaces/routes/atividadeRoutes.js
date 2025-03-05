@@ -46,4 +46,8 @@ router.put("/atividades/:id", (req, res) => __awaiter(void 0, void 0, void 0, fu
     //console.log("📨 Nova requisição PUT /atividades/:id");
     return atividadeController.atualizar(req, res);
 }));
+router.get("/atividades/vendedor/:vendedorId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    //console.log("📨 Nova requisição GET /atividades/vendedor/:vendedorId");
+    return atividadeController.getAtividadesByVendedorAndDate(req, res);
+}));
 exports.default = router;
