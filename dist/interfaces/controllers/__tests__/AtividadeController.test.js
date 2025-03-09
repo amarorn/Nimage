@@ -14,6 +14,8 @@ const CriarAtividade_1 = require("../../../application/use-cases/CriarAtividade"
 const ObterAtividades_1 = require("../../../application/use-cases/ObterAtividades");
 const AtualizarAtividade_1 = require("../../../application/use-cases/AtualizarAtividade");
 const AtividadeRepositoryImpl_1 = require("../../../infrastructure/repositories/AtividadeRepositoryImpl");
+const AtividadeService_1 = require("../../../application/services/AtividadeService");
+const ObterAtividadesPorVendedorEData_1 = require("../../../application/use-cases/ObterAtividadesPorVendedorEData");
 // Mocking the repository and use cases
 jest.mock('../../../infrastructure/repositories/AtividadeRepositoryImpl', () => {
     return {
@@ -29,7 +31,9 @@ const atividadeRepo = new AtividadeRepositoryImpl_1.AtividadeRepositoryImpl();
 const criarAtividade = new CriarAtividade_1.CriarAtividade(atividadeRepo);
 const obterAtividades = new ObterAtividades_1.ObterAtividades(atividadeRepo);
 const atualizarAtividade = new AtualizarAtividade_1.AtualizarAtividade(atividadeRepo);
-const atividadeController = new AtividadeController_1.AtividadeController(criarAtividade, obterAtividades, atualizarAtividade);
+const atividadeService = new AtividadeService_1.AtividadeService(atividadeRepo);
+const obterAtividadesPorVendedorEData = new ObterAtividadesPorVendedorEData_1.ObterAtividadesPorVendedorEData(atividadeService);
+const atividadeController = new AtividadeController_1.AtividadeController(criarAtividade, obterAtividades, atualizarAtividade, atividadeService, obterAtividadesPorVendedorEData);
 describe('AtividadeController', () => {
     let req;
     let res;

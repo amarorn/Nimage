@@ -9,6 +9,7 @@ const vendedorRoutes_1 = __importDefault(require("./interfaces/routes/vendedorRo
 const atividadeRoutes_1 = __importDefault(require("./interfaces/routes/atividadeRoutes"));
 const equipeRoutes_1 = __importDefault(require("./interfaces/routes/equipeRoutes"));
 const metaRoutes_1 = __importDefault(require("./interfaces/routes/metaRoutes"));
+const desempenhoIdealRoutes_1 = __importDefault(require("./interfaces/routes/desempenhoIdealRoutes"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 // Use o middleware CORS
@@ -25,4 +26,5 @@ app.use("/api", vendedorRoutes_1.default);
 app.use("/api", atividadeRoutes_1.default);
 app.use("/api", equipeRoutes_1.default);
 app.use("/api", metaRoutes_1.default);
+app.use("/api", desempenhoIdealRoutes_1.default);
 exports.default = app;

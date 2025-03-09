@@ -4,13 +4,17 @@ import { CriarMeta } from "../../application/use-cases/CriarMeta";
 import { MetaController } from "../controllers/MetaController";
 import { ObterMeta } from "../../application/use-cases/ObterMeta";
 import { AtualizarMeta } from "../../application/use-cases/AtualizarMeta";
+import { EquipeRepositoryImpl } from "../../infrastructure/repositories/EquipeRepositoryImpl";
+import { ObterEquipePorId } from "../../application/use-cases/ObterEquipePorId";
 
 const router = Router();
 const metaRepo = new MetaRepositoryImpl();
 const criarMeta = new CriarMeta(metaRepo);
 const obterMeta = new ObterMeta(metaRepo);
 const atualizarMeta = new AtualizarMeta(metaRepo);
-const metaController = new MetaController(criarMeta, obterMeta, atualizarMeta);
+const equipeRepo = new EquipeRepositoryImpl();
+const obterEquipePorId = new ObterEquipePorId(equipeRepo);
+const metaController = new MetaController(criarMeta, obterMeta, atualizarMeta, obterEquipePorId);
 
 router.post("/metas", async (req, res) => {
     //console.log("📨 Nova requisição POST /metas");

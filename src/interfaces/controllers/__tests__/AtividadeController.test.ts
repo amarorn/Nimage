@@ -4,6 +4,8 @@ import { CriarAtividade } from '../../../application/use-cases/CriarAtividade';
 import { ObterAtividades } from '../../../application/use-cases/ObterAtividades';
 import { AtualizarAtividade } from '../../../application/use-cases/AtualizarAtividade';
 import { AtividadeRepositoryImpl } from '../../../infrastructure/repositories/AtividadeRepositoryImpl';
+import { AtividadeService } from '../../../application/services/AtividadeService';
+import { ObterAtividadesPorVendedorEData } from '../../../application/use-cases/ObterAtividadesPorVendedorEData';
 
 // Mocking the repository and use cases
 jest.mock('../../../infrastructure/repositories/AtividadeRepositoryImpl', () => {
@@ -22,7 +24,10 @@ const criarAtividade = new CriarAtividade(atividadeRepo);
 const obterAtividades = new ObterAtividades(atividadeRepo);
 const atualizarAtividade = new AtualizarAtividade(atividadeRepo);
 
-const atividadeController = new AtividadeController(criarAtividade, obterAtividades, atualizarAtividade);
+const atividadeService = new AtividadeService(atividadeRepo);
+const obterAtividadesPorVendedorEData = new ObterAtividadesPorVendedorEData(atividadeService);
+
+const atividadeController = new AtividadeController(criarAtividade, obterAtividades, atualizarAtividade, atividadeService, obterAtividadesPorVendedorEData);
 
 describe('AtividadeController', () => {
   let req: Partial<Request>;

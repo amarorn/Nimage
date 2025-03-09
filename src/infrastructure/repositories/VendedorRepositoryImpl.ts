@@ -9,9 +9,14 @@ export class VendedorRepositoryImpl implements VendedorRepository {
     }
 
     async obterPorId(id: string): Promise<Vendedor | null> {
+        console.log('Debug - Repository - Buscando vendedor no banco com ID:', id);
         const vendedor = await VendedorModel.findOne({ id }).lean();
+        console.log('Debug - Repository - Resultado da busca no banco:', vendedor);
+        
         if (vendedor) {
+            console.log('Debug - Repository - Vendedor encontrado, buscando equipe com ID:', vendedor.equipe_id);
             const equipe = await EquipeModel.findOne({ id: vendedor.equipe_id }).lean();
+            console.log('Debug - Repository - Resultado da busca da equipe:', equipe);
             return new Vendedor(vendedor.id, vendedor.nome, vendedor.equipe_id, equipe ? { id: equipe.id, nome: equipe.nome } : null);
         }
         return null;

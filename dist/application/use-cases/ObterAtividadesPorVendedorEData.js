@@ -9,24 +9,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AtualizarMeta = void 0;
-class AtualizarMeta {
-    constructor(metaRepo) {
-        this.metaRepo = metaRepo;
+exports.ObterAtividadesPorVendedorEData = void 0;
+class ObterAtividadesPorVendedorEData {
+    constructor(atividadeService) {
+        this.atividadeService = atividadeService;
     }
-    executar(id, dados) {
+    executar(vendedorId, dataInicio, dataFim) {
         return __awaiter(this, void 0, void 0, function* () {
-            //console.log("📝 Iniciando atualização de meta com dados:", dados);
-            if (!dados.equipeId || dados.objetivo === undefined || !dados.data) {
-                throw new Error('Dados inválidos para atualizar meta');
-            }
-            if (dados.objetivo < 0) {
-                throw new Error('Objetivo não pode ser negativo');
-            }
-            const metaAtualizada = yield this.metaRepo.atualizar(id, dados);
-            //console.log("💾 Meta atualizada no banco:", metaAtualizada);
-            return metaAtualizada;
+            return yield this.atividadeService.obterAtividadesPorVendedorEData(vendedorId, dataInicio, dataFim);
         });
     }
 }
-exports.AtualizarMeta = AtualizarMeta;
+exports.ObterAtividadesPorVendedorEData = ObterAtividadesPorVendedorEData;

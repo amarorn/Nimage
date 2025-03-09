@@ -4,18 +4,28 @@ import { MetaRepository } from "../../domain/repositories/MetaRepository";
 export class CriarMeta {
     constructor(private metaRepo: MetaRepository) {}
 
-    async executar(dados: { id: string; equipeId: string; objetivo: number }) {
+    async executar(dados: { 
+        id: string; 
+        equipeId: string; 
+        objetivo: number;
+        data: Date;
+    }) {
         //console.log("📝 Iniciando criação de meta com dados:", dados);
 
-        if (!dados.id || !dados.equipeId || dados.objetivo === undefined) {
+        if (!dados.id || !dados.equipeId || dados.objetivo === undefined || !dados.data) {
             throw new Error('Dados inválidos para criar meta');
         }
 
-        if (dados.objetivo <= 0) {
-            throw new Error('Objetivo da meta deve ser maior que zero');
+        if (dados.objetivo < 0) {
+            throw new Error('Objetivo não pode ser negativo');
         }
 
-        const meta = new Meta(dados.id, dados.equipeId, dados.objetivo);
+        const meta = new Meta(
+            dados.id,
+            dados.equipeId,
+            dados.objetivo,
+            dados.data
+        );
         //console.log("🏗️ Meta instanciada:", meta);
 
         await this.metaRepo.criar(meta);
