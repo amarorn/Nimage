@@ -11,10 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetaController = void 0;
 class MetaController {
-    constructor(criarMeta, obterMeta, atualizarMeta) {
+    constructor(criarMeta, obterMeta, atualizarMeta, obterEquipePorId) {
         this.criarMeta = criarMeta;
         this.obterMeta = obterMeta;
         this.atualizarMeta = atualizarMeta;
+        this.obterEquipePorId = obterEquipePorId;
     }
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -70,19 +71,24 @@ class MetaController {
                 const limit = parseInt(req.query.limit) || 10;
                 const skip = (page - 1) * limit;
                 const metas = yield this.obterMeta.executar(skip, limit);
+                const metasComEquipe = yield Promise.all(metas.map((meta) => __awaiter(this, void 0, void 0, function* () {
+                    const equipe = yield this.obterEquipePorId.executar(meta.equipeId);
+                    return {
+                        id: meta.id,
+                        equipeId: meta.equipeId,
+                        equipeNome: equipe ? equipe.nome : 'Nome não encontrado',
+                        objetivo: meta.objetivo,
+                        data: meta.data,
+                        mes: meta.data.getMonth() + 1,
+                        ano: meta.data.getFullYear()
+                    };
+                })));
                 const respostaPersonalizada = {
                     pagina: page,
                     statuscode: 200,
                     limite: limit,
                     total: metas.length,
-                    metas: metas.map(meta => ({
-                        id: meta.id,
-                        equipeId: meta.equipeId,
-                        objetivo: meta.objetivo,
-                        data: meta.data,
-                        mes: meta.data.getMonth() + 1,
-                        ano: meta.data.getFullYear()
-                    }))
+                    metas: metasComEquipe
                 };
                 return respostaPersonalizada;
             }

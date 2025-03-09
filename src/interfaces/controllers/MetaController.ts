@@ -2,9 +2,11 @@ import { Request, Response } from "express";
 import { CriarMeta } from "../../application/use-cases/CriarMeta";
 import { ObterMeta } from "../../application/use-cases/ObterMeta";
 import { AtualizarMeta } from "../../application/use-cases/AtualizarMeta";
+import { ObterEquipePorId } from "../../application/use-cases/ObterEquipePorId";
+import { EquipeRepositoryImpl } from "../../infrastructure/repositories/EquipeRepositoryImpl";
 
 export class MetaController {
-    constructor(private criarMeta: CriarMeta, private obterMeta: ObterMeta, private atualizarMeta: AtualizarMeta) {}
+    constructor(private criarMeta: CriarMeta, private obterMeta: ObterMeta, private atualizarMeta: AtualizarMeta, private obterEquipePorId: ObterEquipePorId) {}
 
     async criar(req: Request, res: Response) {
         try {
@@ -66,19 +68,25 @@ export class MetaController {
 
             const metas = await this.obterMeta.executar(skip, limit);
 
+            const metasComEquipe = await Promise.all(metas.map(async meta => {
+                const equipe = await this.obterEquipePorId.executar(meta.equipeId);
+                return {
+                    id: meta.id,
+                    equipeId: meta.equipeId,
+                    equipeNome: equipe ? equipe.nome : 'Nome não encontrado',
+                    objetivo: meta.objetivo,
+                    data: meta.data,
+                    mes: meta.data.getMonth() + 1,
+                    ano: meta.data.getFullYear()
+                };
+            }));
+
             const respostaPersonalizada = {
                 pagina: page,
                 statuscode: 200,
                 limite: limit,
                 total: metas.length,
-                metas: metas.map(meta => ({
-                    id: meta.id,
-                    equipeId: meta.equipeId,
-                    objetivo: meta.objetivo,
-                    data: meta.data,
-                    mes: meta.data.getMonth() + 1,
-                    ano: meta.data.getFullYear()
-                }))
+                metas: metasComEquipe
             };
 
             return respostaPersonalizada;

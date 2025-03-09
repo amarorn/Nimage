@@ -14,6 +14,8 @@ const CriarMeta_1 = require("../../../application/use-cases/CriarMeta");
 const ObterMeta_1 = require("../../../application/use-cases/ObterMeta");
 const AtualizarMeta_1 = require("../../../application/use-cases/AtualizarMeta");
 const MetaRepositoryImpl_1 = require("../../../infrastructure/repositories/MetaRepositoryImpl");
+const EquipeRepositoryImpl_1 = require("../../../infrastructure/repositories/EquipeRepositoryImpl");
+const ObterEquipePorId_1 = require("../../../application/use-cases/ObterEquipePorId");
 // Mocking the repository and use cases
 jest.mock('../../../infrastructure/repositories/MetaRepositoryImpl', () => {
     return {
@@ -35,7 +37,9 @@ const metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
 const criarMeta = new CriarMeta_1.CriarMeta(metaRepo);
 const obterMeta = new ObterMeta_1.ObterMeta(metaRepo);
 const atualizarMeta = new AtualizarMeta_1.AtualizarMeta(metaRepo);
-const metaController = new MetaController_1.MetaController(criarMeta, obterMeta, atualizarMeta);
+const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
+const obterEquipePorId = new ObterEquipePorId_1.ObterEquipePorId(equipeRepo);
+const metaController = new MetaController_1.MetaController(criarMeta, obterMeta, atualizarMeta, obterEquipePorId);
 describe('MetaController', () => {
     let req;
     let res;
