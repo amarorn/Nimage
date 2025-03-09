@@ -75,7 +75,9 @@ export class MetaController {
                     id: meta.id,
                     equipeId: meta.equipeId,
                     objetivo: meta.objetivo,
-                    data: meta.data
+                    data: meta.data,
+                    mes: meta.data.getMonth() + 1,
+                    ano: meta.data.getFullYear()
                 }))
             };
 
