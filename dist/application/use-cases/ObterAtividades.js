@@ -9,24 +9,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AtualizarMeta = void 0;
-class AtualizarMeta {
-    constructor(metaRepo) {
-        this.metaRepo = metaRepo;
+exports.ObterAtividades = void 0;
+class ObterAtividades {
+    constructor(atividadeRepo) {
+        this.atividadeRepo = atividadeRepo;
     }
-    executar(id, dados) {
+    executar(skip, limit) {
         return __awaiter(this, void 0, void 0, function* () {
-            //console.log("📝 Iniciando atualização de meta com dados:", dados);
-            if (!dados.equipeId || dados.objetivo === undefined || !dados.data) {
-                throw new Error('Dados inválidos para atualizar meta');
-            }
-            if (dados.objetivo < 0) {
-                throw new Error('Objetivo não pode ser negativo');
-            }
-            const metaAtualizada = yield this.metaRepo.atualizar(id, dados);
-            //console.log("💾 Meta atualizada no banco:", metaAtualizada);
-            return metaAtualizada;
+            //console.log("Executando ObterAtividades com paginação", { skip, limit });
+            return yield this.atividadeRepo.obterTodos(skip, limit);
+        });
+    }
+    executarPorId(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            //console.log("Executando ObterAtividades por ID", { id });
+            return yield this.atividadeRepo.obterPorId(id);
         });
     }
 }
-exports.AtualizarMeta = AtualizarMeta;
+exports.ObterAtividades = ObterAtividades;

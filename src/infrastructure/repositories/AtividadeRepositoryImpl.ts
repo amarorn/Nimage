@@ -32,4 +32,28 @@ export class AtividadeRepositoryImpl implements AtividadeRepository {
         }
         return null;
     }
+
+    async obterPorVendedorEData(vendedorId: string, dataInicio: Date, dataFim: Date): Promise<Atividade[]> {
+        console.log('Debug - Repository - Query params:', {
+            vendedorId,
+            dataInicio,
+            dataFim
+        });
+
+        const query = {
+            vendedorId,
+            data: { 
+                $gte: dataInicio.setHours(0, 0, 0, 0), 
+                $lte: dataFim.setHours(23, 59, 59, 999) 
+            }
+        };
+
+        console.log('Debug - Repository - MongoDB query:', query);
+
+        const resultado = await AtividadeModel.find(query).lean();
+        
+        console.log('Debug - Repository - Resultado encontrado:', resultado);
+        
+        return resultado;
+    }
 }

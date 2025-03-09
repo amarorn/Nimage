@@ -5,12 +5,17 @@ import { VendedorRepositoryImpl } from "../../infrastructure/repositories/Vended
 import { EquipeRepositoryImpl } from "../../infrastructure/repositories/EquipeRepositoryImpl";
 import { MetaRepositoryImpl } from "../../infrastructure/repositories/MetaRepositoryImpl";
 import { AtualizarAtividade } from "../../application/use-cases/AtualizarAtividade";
+import { AtividadeService } from "../../application/services/AtividadeService";
+import { ObterAtividadesPorVendedorEData } from "../../application/use-cases/ObterAtividadesPorVendedorEData";
+import { AtividadesPorVendedorResult } from "../../application/services/AtividadeService";
 
 export class AtividadeController {
     constructor(
         private criarAtividade: CriarAtividade,
         private obterAtividades: ObterAtividades,
-        private atualizarAtividade: AtualizarAtividade
+        private atualizarAtividade: AtualizarAtividade,
+        private atividadeService: AtividadeService,
+        private obterAtividadesPorVendedorEData: ObterAtividadesPorVendedorEData
     ) {}
 
     async criar(req: Request, res: Response) {
@@ -195,6 +200,59 @@ export class AtividadeController {
             // console.error("❌ Erro ao atualizar atividade:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao atualizar atividade',
+                mensagem: (erro as Error).message 
+            });
+        }
+    }
+
+    async getAtividadesByVendedorAndDate(req: Request, res: Response) {
+        try {
+            const { vendedorId } = req.params;
+            const { dataInicio, dataFim } = req.query;
+            
+            console.log('Debug - Parâmetros recebidos:', {
+                vendedorId,
+                dataInicio,
+                dataFim
+            });
+
+            if (!dataInicio || !dataFim) {
+                return res.status(400).json({
+                    erro: 'Datas não fornecidas',
+                    detalhes: { dataInicio, dataFim }
+                });
+            }
+
+            const dataInicioObj = new Date(dataInicio as string);
+            const dataFimObj = new Date(dataFim as string);
+
+            console.log('Debug - Datas convertidas:', {
+                dataInicioObj,
+                dataFimObj
+            });
+
+            const resultado = await this.obterAtividadesPorVendedorEData.executar(
+                vendedorId, 
+                dataInicioObj, 
+                dataFimObj
+            );
+
+            console.log('Debug - Resultado obtido:', resultado);
+
+            // Calcula o progresso em relação à meta
+            let progresso = null;
+            if (resultado.meta && resultado.meta.objetivo > 0) {
+                progresso = (resultado.valorTotal / resultado.meta.objetivo) * 100;
+            }
+
+            return res.status(200).json({
+                ...resultado,
+                progresso: progresso ? `${progresso.toFixed(2)}%` : null
+            });
+        } catch (erro) {
+            console.error('Debug - Erro:', erro);
+            return res.status(500).json({ 
+                erro: 'Erro interno ao obter atividades',
                 mensagem: (erro as Error).message 
             });
         }

@@ -14,10 +14,12 @@ const VendedorRepositoryImpl_1 = require("../../infrastructure/repositories/Vend
 const EquipeRepositoryImpl_1 = require("../../infrastructure/repositories/EquipeRepositoryImpl");
 const MetaRepositoryImpl_1 = require("../../infrastructure/repositories/MetaRepositoryImpl");
 class AtividadeController {
-    constructor(criarAtividade, obterAtividades, atualizarAtividade) {
+    constructor(criarAtividade, obterAtividades, atualizarAtividade, atividadeService, obterAtividadesPorVendedorEData) {
         this.criarAtividade = criarAtividade;
         this.obterAtividades = obterAtividades;
         this.atualizarAtividade = atualizarAtividade;
+        this.atividadeService = atividadeService;
+        this.obterAtividadesPorVendedorEData = obterAtividadesPorVendedorEData;
     }
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -191,6 +193,46 @@ class AtividadeController {
                 // console.error("❌ Erro ao atualizar atividade:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao atualizar atividade',
+                    mensagem: erro.message
+                });
+            }
+        });
+    }
+    getAtividadesByVendedorAndDate(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { vendedorId } = req.params;
+                const { dataInicio, dataFim } = req.query;
+                console.log('Debug - Parâmetros recebidos:', {
+                    vendedorId,
+                    dataInicio,
+                    dataFim
+                });
+                if (!dataInicio || !dataFim) {
+                    return res.status(400).json({
+                        erro: 'Datas não fornecidas',
+                        detalhes: { dataInicio, dataFim }
+                    });
+                }
+                const dataInicioObj = new Date(dataInicio);
+                const dataFimObj = new Date(dataFim);
+                console.log('Debug - Datas convertidas:', {
+                    dataInicioObj,
+                    dataFimObj
+                });
+                const resultado = yield this.obterAtividadesPorVendedorEData.executar(vendedorId, dataInicioObj, dataFimObj);
+                console.log('Debug - Resultado obtido:', resultado);
+                // Calcula o progresso em relação à meta
+                let progresso = null;
+                if (resultado.meta && resultado.meta.objetivo > 0) {
+                    progresso = (resultado.valorTotal / resultado.meta.objetivo) * 100;
+                }
+                return res.status(200).json(Object.assign(Object.assign({}, resultado), { progresso: progresso ? `${progresso.toFixed(2)}%` : null }));
+            }
+            catch (erro) {
+                console.error('Debug - Erro:', erro);
+                return res.status(500).json({
+                    erro: 'Erro interno ao obter atividades',
                     mensagem: erro.message
                 });
             }

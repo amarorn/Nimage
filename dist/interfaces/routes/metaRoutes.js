@@ -15,12 +15,16 @@ const CriarMeta_1 = require("../../application/use-cases/CriarMeta");
 const MetaController_1 = require("../controllers/MetaController");
 const ObterMeta_1 = require("../../application/use-cases/ObterMeta");
 const AtualizarMeta_1 = require("../../application/use-cases/AtualizarMeta");
+const EquipeRepositoryImpl_1 = require("../../infrastructure/repositories/EquipeRepositoryImpl");
+const ObterEquipePorId_1 = require("../../application/use-cases/ObterEquipePorId");
 const router = (0, express_1.Router)();
 const metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
 const criarMeta = new CriarMeta_1.CriarMeta(metaRepo);
 const obterMeta = new ObterMeta_1.ObterMeta(metaRepo);
 const atualizarMeta = new AtualizarMeta_1.AtualizarMeta(metaRepo);
-const metaController = new MetaController_1.MetaController(criarMeta, obterMeta, atualizarMeta);
+const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
+const obterEquipePorId = new ObterEquipePorId_1.ObterEquipePorId(equipeRepo);
+const metaController = new MetaController_1.MetaController(criarMeta, obterMeta, atualizarMeta, obterEquipePorId);
 router.post("/metas", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //console.log("📨 Nova requisição POST /metas");
     return metaController.criar(req, res);

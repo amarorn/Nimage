@@ -38,6 +38,7 @@ const mongoose_1 = __importStar(require("mongoose"));
 const MetaSchema = new mongoose_1.Schema({
     id: { type: String, required: true, unique: true },
     equipeId: { type: String, required: true },
-    objetivo: { type: Number, required: true }
+    objetivo: { type: Number, required: true },
+    data: { type: Date, required: true }
 });
 exports.MetaModel = mongoose_1.default.model("Meta", MetaSchema);

@@ -9,25 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ObterMeta = void 0;
-class ObterMeta {
-    constructor(metaRepo) {
-        this.metaRepo = metaRepo;
-    }
-    executar(skip, limit) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.metaRepo.obterTodos(skip, limit);
-        });
-    }
-    executarPorId(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.metaRepo.obterPorId(id);
-        });
-    }
-    executarPorEquipe(equipeId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.metaRepo.obterPorEquipe(equipeId);
-        });
-    }
-}
-exports.ObterMeta = ObterMeta;
+const express_1 = require("express");
+const DesempenhoIdealService_1 = require("../../application/services/DesempenhoIdealService");
+const DesempenhoIdealController_1 = require("../controllers/DesempenhoIdealController");
+const router = (0, express_1.Router)();
+const desempenhoIdealService = new DesempenhoIdealService_1.DesempenhoIdealService();
+const desempenhoIdealController = new DesempenhoIdealController_1.DesempenhoIdealController(desempenhoIdealService);
+router.get("/equipes/:equipeId/desempenho-ideal", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    return desempenhoIdealController.calcularDesempenhoIdeal(req, res);
+}));
+exports.default = router;
