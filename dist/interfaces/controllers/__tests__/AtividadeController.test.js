@@ -16,6 +16,11 @@ const AtualizarAtividade_1 = require("../../../application/use-cases/AtualizarAt
 const AtividadeRepositoryImpl_1 = require("../../../infrastructure/repositories/AtividadeRepositoryImpl");
 const AtividadeService_1 = require("../../../application/services/AtividadeService");
 const ObterAtividadesPorVendedorEData_1 = require("../../../application/use-cases/ObterAtividadesPorVendedorEData");
+const FrequenciaVendasService_1 = require("../../../application/services/FrequenciaVendasService");
+const ObterEquipeDadosFull_1 = require("../../../application/use-cases/ObterEquipeDadosFull");
+const EquipeRepositoryImpl_1 = require("../../../infrastructure/repositories/EquipeRepositoryImpl");
+const VendedorRepositoryImpl_1 = require("../../../infrastructure/repositories/VendedorRepositoryImpl");
+const MetaRepositoryImpl_1 = require("../../../infrastructure/repositories/MetaRepositoryImpl");
 // Mocking the repository and use cases
 jest.mock('../../../infrastructure/repositories/AtividadeRepositoryImpl', () => {
     return {
@@ -33,7 +38,13 @@ const obterAtividades = new ObterAtividades_1.ObterAtividades(atividadeRepo);
 const atualizarAtividade = new AtualizarAtividade_1.AtualizarAtividade(atividadeRepo);
 const atividadeService = new AtividadeService_1.AtividadeService(atividadeRepo);
 const obterAtividadesPorVendedorEData = new ObterAtividadesPorVendedorEData_1.ObterAtividadesPorVendedorEData(atividadeService);
-const atividadeController = new AtividadeController_1.AtividadeController(criarAtividade, obterAtividades, atualizarAtividade, atividadeService, obterAtividadesPorVendedorEData);
+// Instantiate the necessary dependencies for FrequenciaVendasService
+const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
+const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
+const metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
+const obterEquipeDadosFull = new ObterEquipeDadosFull_1.ObterEquipeDadosFull(equipeRepo, vendedorRepo, atividadeRepo, metaRepo);
+const frequenciaVendasService = new FrequenciaVendasService_1.FrequenciaVendasService(obterEquipeDadosFull);
+const atividadeController = new AtividadeController_1.AtividadeController(criarAtividade, obterAtividades, atualizarAtividade, atividadeService, obterAtividadesPorVendedorEData, frequenciaVendasService);
 describe('AtividadeController', () => {
     let req;
     let res;

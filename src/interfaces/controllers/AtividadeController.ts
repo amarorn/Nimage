@@ -8,6 +8,7 @@ import { AtualizarAtividade } from "../../application/use-cases/AtualizarAtivida
 import { AtividadeService } from "../../application/services/AtividadeService";
 import { ObterAtividadesPorVendedorEData } from "../../application/use-cases/ObterAtividadesPorVendedorEData";
 import { AtividadesPorVendedorResult } from "../../application/services/AtividadeService";
+import { FrequenciaVendasService } from "../../application/services/FrequenciaVendasService";
 
 export class AtividadeController {
     constructor(
@@ -15,7 +16,8 @@ export class AtividadeController {
         private obterAtividades: ObterAtividades,
         private atualizarAtividade: AtualizarAtividade,
         private atividadeService: AtividadeService,
-        private obterAtividadesPorVendedorEData: ObterAtividadesPorVendedorEData
+        private obterAtividadesPorVendedorEData: ObterAtividadesPorVendedorEData,
+        private frequenciaVendasService: FrequenciaVendasService
     ) {}
 
     async criar(req: Request, res: Response) {
@@ -253,6 +255,31 @@ export class AtividadeController {
             console.error('Debug - Erro:', erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao obter atividades',
+                mensagem: (erro as Error).message 
+            });
+        }
+    }
+
+    async calcularFrequenciaVendas(req: Request, res: Response) {
+        try {
+            const { equipeId } = req.params;
+            const { dataInicio, dataFim } = req.query;
+
+            if (!dataInicio || !dataFim) {
+                return res.status(400).json({
+                    erro: 'Datas não fornecidas',
+                    detalhes: { dataInicio, dataFim }
+                });
+            }
+
+            const dataInicioObj = new Date(dataInicio as string);
+            const dataFimObj = new Date(dataFim as string);
+
+            const resultado = await this.frequenciaVendasService.calcularFrequencia(equipeId, dataInicioObj, dataFimObj);
+            return res.status(200).json(resultado);
+        } catch (erro) {
+            return res.status(500).json({ 
+                erro: 'Erro interno ao calcular frequência de vendas',
                 mensagem: (erro as Error).message 
             });
         }
