@@ -6,6 +6,11 @@ import { AtualizarAtividade } from '../../../application/use-cases/AtualizarAtiv
 import { AtividadeRepositoryImpl } from '../../../infrastructure/repositories/AtividadeRepositoryImpl';
 import { AtividadeService } from '../../../application/services/AtividadeService';
 import { ObterAtividadesPorVendedorEData } from '../../../application/use-cases/ObterAtividadesPorVendedorEData';
+import { FrequenciaVendasService } from '../../../application/services/FrequenciaVendasService';
+import { ObterEquipeDadosFull } from '../../../application/use-cases/ObterEquipeDadosFull';
+import { EquipeRepositoryImpl } from '../../../infrastructure/repositories/EquipeRepositoryImpl';
+import { VendedorRepositoryImpl } from '../../../infrastructure/repositories/VendedorRepositoryImpl';
+import { MetaRepositoryImpl } from '../../../infrastructure/repositories/MetaRepositoryImpl';
 
 // Mocking the repository and use cases
 jest.mock('../../../infrastructure/repositories/AtividadeRepositoryImpl', () => {
@@ -27,7 +32,14 @@ const atualizarAtividade = new AtualizarAtividade(atividadeRepo);
 const atividadeService = new AtividadeService(atividadeRepo);
 const obterAtividadesPorVendedorEData = new ObterAtividadesPorVendedorEData(atividadeService);
 
-const atividadeController = new AtividadeController(criarAtividade, obterAtividades, atualizarAtividade, atividadeService, obterAtividadesPorVendedorEData);
+// Instantiate the necessary dependencies for FrequenciaVendasService
+const equipeRepo = new EquipeRepositoryImpl();
+const vendedorRepo = new VendedorRepositoryImpl();
+const metaRepo = new MetaRepositoryImpl();
+const obterEquipeDadosFull = new ObterEquipeDadosFull(equipeRepo, vendedorRepo, atividadeRepo, metaRepo);
+const frequenciaVendasService = new FrequenciaVendasService(obterEquipeDadosFull);
+
+const atividadeController = new AtividadeController(criarAtividade, obterAtividades, atualizarAtividade, atividadeService, obterAtividadesPorVendedorEData, frequenciaVendasService);
 
 describe('AtividadeController', () => {
   let req: Partial<Request>;

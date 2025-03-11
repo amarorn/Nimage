@@ -14,12 +14,13 @@ const VendedorRepositoryImpl_1 = require("../../infrastructure/repositories/Vend
 const EquipeRepositoryImpl_1 = require("../../infrastructure/repositories/EquipeRepositoryImpl");
 const MetaRepositoryImpl_1 = require("../../infrastructure/repositories/MetaRepositoryImpl");
 class AtividadeController {
-    constructor(criarAtividade, obterAtividades, atualizarAtividade, atividadeService, obterAtividadesPorVendedorEData) {
+    constructor(criarAtividade, obterAtividades, atualizarAtividade, atividadeService, obterAtividadesPorVendedorEData, frequenciaVendasService) {
         this.criarAtividade = criarAtividade;
         this.obterAtividades = obterAtividades;
         this.atualizarAtividade = atualizarAtividade;
         this.atividadeService = atividadeService;
         this.obterAtividadesPorVendedorEData = obterAtividadesPorVendedorEData;
+        this.frequenciaVendasService = frequenciaVendasService;
     }
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -233,6 +234,30 @@ class AtividadeController {
                 console.error('Debug - Erro:', erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao obter atividades',
+                    mensagem: erro.message
+                });
+            }
+        });
+    }
+    calcularFrequenciaVendas(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { equipeId } = req.params;
+                const { dataInicio, dataFim } = req.query;
+                if (!dataInicio || !dataFim) {
+                    return res.status(400).json({
+                        erro: 'Datas não fornecidas',
+                        detalhes: { dataInicio, dataFim }
+                    });
+                }
+                const dataInicioObj = new Date(dataInicio);
+                const dataFimObj = new Date(dataFim);
+                const resultado = yield this.frequenciaVendasService.calcularFrequencia(equipeId, dataInicioObj, dataFimObj);
+                return res.status(200).json(resultado);
+            }
+            catch (erro) {
+                return res.status(500).json({
+                    erro: 'Erro interno ao calcular frequência de vendas',
                     mensagem: erro.message
                 });
             }
