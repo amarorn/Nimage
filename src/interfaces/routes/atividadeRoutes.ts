@@ -12,6 +12,7 @@ import { EquipeRepositoryImpl } from "../../infrastructure/repositories/EquipeRe
 import { VendedorRepositoryImpl } from "../../infrastructure/repositories/VendedorRepositoryImpl";
 import { MetaRepositoryImpl } from "../../infrastructure/repositories/MetaRepositoryImpl";
 
+
 const router = Router();
 const atividadeRepo = new AtividadeRepositoryImpl();
 const criarAtividade = new CriarAtividade(atividadeRepo);
