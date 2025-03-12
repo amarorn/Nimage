@@ -253,7 +253,10 @@ class AtividadeController {
                 const dataInicioObj = new Date(dataInicio);
                 const dataFimObj = new Date(dataFim);
                 const resultado = yield this.frequenciaVendasService.calcularFrequencia(equipeId, dataInicioObj, dataFimObj);
-                return res.status(200).json(resultado);
+                const fea = yield this.atividadeService.calcularFEA(equipeId, resultado.totalDiasDisponiveis, resultado.diasComAtividade);
+                return res.status(200).json({
+                    resultado
+                });
             }
             catch (erro) {
                 return res.status(500).json({

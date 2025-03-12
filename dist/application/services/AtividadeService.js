@@ -61,5 +61,14 @@ class AtividadeService {
             };
         });
     }
+    calcularFEA(equipeId, totalDiasDisponiveis, diasComAtividade) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (diasComAtividade === 0) {
+                return 0;
+            }
+            const fea = ((totalDiasDisponiveis - diasComAtividade) / diasComAtividade) * 100;
+            return fea;
+        });
+    }
 }
 exports.AtividadeService = AtividadeService;
