@@ -86,4 +86,12 @@ export class AtividadeService {
             } : null
         };
     }
+
+    async calcularFEA(equipeId: string, totalDiasDisponiveis: number, diasComAtividade: number): Promise<number> {
+        if (diasComAtividade === 0) {
+            return 0;
+        }
+        const fea = ((totalDiasDisponiveis - diasComAtividade) / diasComAtividade) * 100;
+        return fea;
+    }
 }

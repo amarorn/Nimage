@@ -26,12 +26,25 @@ class FrequenciaVendasService {
                     .filter(atividade => atividade.data >= dataInicio && atividade.data <= dataFim)
                     .reduce((total, atividade) => total + atividade.docinhosCoco, 0);
                 const mediaAtividadePorDia = numeroDiasComAtividade > 0 ? somaDocinhos / numeroDiasComAtividade : 0;
+                const totalDiasDisponiveis = Math.ceil((dataFim.getTime() - dataInicio.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                console.log("🚀 ~ FrequenciaVendasService ~ calcularFrequencia ~ diasComAtividade:", numeroDiasComAtividade);
+                console.log("🚀 ~ FrequenciaVendasService ~ calcularFrequencia ~ totalDiasDisponiveis:", totalDiasDisponiveis);
+                const subtrair = totalDiasDisponiveis - numeroDiasComAtividade;
+                console.log("🚀 ~ FrequenciaVendasService ~ calcularFrequencia ~ totalDiasDisponiveis:", subtrair);
+                const dividir = subtrair / numeroDiasComAtividade;
+                console.log("🚀 ~ FrequenciaVendasService ~ calcularFrequencia ~ dividir:", dividir);
+                const fea = ((totalDiasDisponiveis - numeroDiasComAtividade) / numeroDiasComAtividade) * 100;
+                const diasPotenciaisVendedor = (numeroDiasComAtividade * fea / 100) + 1;
+                const iapVendedor = mediaAtividadePorDia * (diasPotenciaisVendedor - numeroDiasComAtividade);
                 return {
                     vendedorId: vendedor.id,
                     vendedorNome: vendedor.nome,
                     numeroDiasComAtividade,
                     somaDocinhos,
-                    mediaAtividadePorDia
+                    mediaAtividadePorDia,
+                    feaVendedor: fea,
+                    diasPotenciaisVendedor,
+                    iapVendedor
                 };
             });
             const somaTotalDocinhos = frequenciaPorVendedor.reduce((total, vendedor) => total + vendedor.somaDocinhos, 0);
@@ -48,6 +61,10 @@ class FrequenciaVendasService {
             const quantidadeTotalAtividades = frequenciaPorVendedor.reduce((total, vendedor) => total + vendedor.numeroDiasComAtividade, 0);
             const mediaAtividadeGeralEquipe = somaTotalDocinhos / totalDiasPassados;
             const frequenciaAtividadeEquipe = (totalDiasComAtividade / totalDiasPassados) * 100;
+            const totalDiasDisponiveis = totalDiasPassados;
+            const feaEquipe = ((totalDiasDisponiveis - totalDiasComAtividade) / totalDiasComAtividade) * 100;
+            const diasPotenciaisEquipe = (totalDiasComAtividade * feaEquipe / 100) + 1;
+            const iapEquipe = mediaAtividadePorDiaEquipe * (diasPotenciaisEquipe - totalDiasComAtividade);
             return {
                 equipe: dadosCompletos.equipe,
                 frequenciaPorVendedor,
@@ -58,7 +75,12 @@ class FrequenciaVendasService {
                 somaTotalValorAtividades,
                 quantidadeTotalAtividades,
                 mediaAtividadeGeralEquipe,
-                frequenciaAtividadeEquipe
+                frequenciaAtividadeEquipe,
+                totalDiasDisponiveis,
+                diasComAtividade: totalDiasComAtividade,
+                feaEquipe,
+                diasPotenciaisEquipe,
+                iapEquipe
             };
         });
     }

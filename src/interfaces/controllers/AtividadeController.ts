@@ -276,7 +276,11 @@ export class AtividadeController {
             const dataFimObj = new Date(dataFim as string);
 
             const resultado = await this.frequenciaVendasService.calcularFrequencia(equipeId, dataInicioObj, dataFimObj);
-            return res.status(200).json(resultado);
+            const fea = await this.atividadeService.calcularFEA(equipeId, resultado.totalDiasDisponiveis, resultado.diasComAtividade);
+
+            return res.status(200).json({
+                resultado
+            });
         } catch (erro) {
             return res.status(500).json({ 
                 erro: 'Erro interno ao calcular frequência de vendas',
