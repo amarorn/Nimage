@@ -5,6 +5,7 @@ import atividadeRoutes from "./interfaces/routes/atividadeRoutes";
 import equipeRoutes from "./interfaces/routes/equipeRoutes";
 import metaRoutes from "./interfaces/routes/metaRoutes";
 import desempenhoIdealRoutes from "./interfaces/routes/desempenhoIdealRoutes";
+import vendorInsightsRoutes from './interfaces/routes/vendorInsightsRoutes';
 
 const app = express();
 app.use(express.json());
@@ -26,5 +27,6 @@ app.use("/api", atividadeRoutes);
 app.use("/api", equipeRoutes);
 app.use("/api", metaRoutes);
 app.use("/api", desempenhoIdealRoutes);
+app.use('/api', vendorInsightsRoutes);
 
 export default app;

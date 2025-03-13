@@ -66,6 +66,7 @@ export class FrequenciaVendasService {
 
         return {
             equipe: dadosCompletos.equipe,
+            meta: dadosCompletos.meta,
             frequenciaPorVendedor,
             mediaAtividadePorDiaEquipe,
             vendedoresAltaFrequencia,
@@ -79,7 +80,8 @@ export class FrequenciaVendasService {
             diasComAtividade: totalDiasComAtividade,
             feaEquipe,
             diasPotenciaisEquipe,
-            iapEquipe
+            iapEquipe,
+           
         };
     }
 } 
