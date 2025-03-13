@@ -11,23 +11,25 @@ Receba os seguintes dados de desempenho da equipe de vendas:
 
 {input_data}
 
-Com base nesses dados, gere um JSON estruturado no seguinte formato para cada vendedor:
+Com base nesses dados, gere um JSON estruturado no seguinte formato:
 
 {
-    "meta_atual": "{meta.objetivo}",
-    "vendedores": [
-        {% for vendedor in input_data.vendedores %}
-        {
-            "vendedorNome": "{{ vendedor.nome }}",
-            "posicionamentoDoVendedor": "analise os dados enviado de todos vendedor e posicione esse vendedor",
-            "perfilDeVendedor": "baseado nos dados respoda de esse vendedor é performático, intermediário o não performático",
-            "novaMetaVendedor": "baseado no resulta do final do vendedor me de um sugentão de um valor de a ser atingido no mes seginte",
-            "probCrecimentoVendedor": "traga em percetual qual a probabilidade desse vendedor elevar seus resultados"
-        }{% if not loop.last %},{% endif %}
-        {% endfor %}
+    "meta_atual": <meta atual da equipe>,
+    "novaMetaEquipe": <nova meta sugerida>,
+    "estrategiaDePromoção": [
+        "Marketing digital",
+        "CRM",
+        "Treinamento de vendedores"
     ],
-    "novaMetaEquipe": "baseado nos dados passado me sugira um novo valor de meta para equipe",
-    "estrategiaDePromoção": ["Marketing digital", "CRM", "Treinamento de vendedores"]
+    "vendedores": [
+        {
+            "vendedorNome": <nome do vendedor>,
+            "posicionamento": <"Alta frequência" ou "Baixa frequência">,
+            "perfil": <"Performático", "Intermediário" ou "Não Performático">,
+            "novaMetaVendedor": <nova meta sugerida>,
+            "probCrecimentoVendedor": <percentual de crescimento esperado>
+        }
+    ]
 }
 
 Diretrizes:
