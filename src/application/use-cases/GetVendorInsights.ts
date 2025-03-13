@@ -7,9 +7,9 @@ export class GetVendorInsights {
         this.ollamaService = new OllamaService();
     }
 
-    async execute(vendorInfo: any): Promise<any> {
+    async execute(equipeData: any): Promise<any> {
         try {
-            const insights = await this.ollamaService.getInsights(vendorInfo);
+            const insights = await this.ollamaService.getInsights(equipeData);
             return insights;
         } catch (error) {
             console.error('Error executing GetVendorInsights use case:', error);

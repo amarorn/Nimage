@@ -15,10 +15,10 @@ class GetVendorInsights {
     constructor() {
         this.ollamaService = new OllamaService_1.OllamaService();
     }
-    execute(vendorInfo) {
+    execute(equipeData) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const insights = yield this.ollamaService.getInsights(vendorInfo);
+                const insights = yield this.ollamaService.getInsights(equipeData);
                 return insights;
             }
             catch (error) {

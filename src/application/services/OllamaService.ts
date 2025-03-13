@@ -13,7 +13,7 @@ export class OllamaService {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    model: 'meu-modelo',
+                    model: 'nimage',
                     prompt: 'Os seguintes dados representam o desempenho de uma equipe de vendas:',
                     input_data: vendorInfo,
                     stream: false,
