@@ -20,18 +20,27 @@ class OllamaService {
     }
     getInsights(vendorInfo) {
         return __awaiter(this, void 0, void 0, function* () {
+            const results = [];
             try {
-                const response = yield (0, node_fetch_1.default)(`${this.baseUrl}/generate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        model: 'nimage',
-                        prompt: 'Os seguintes dados representam o desempenho de uma equipe de vendas:',
-                        input_data: vendorInfo,
-                        stream: false,
-                    }),
-                });
-                return yield response.json();
+                // Iterar sobre cada vendedor
+                for (const vendedor of vendorInfo.resultado.frequenciaPorVendedor) {
+                    const response = yield (0, node_fetch_1.default)(`${this.baseUrl}/generate`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            model: 'nimage',
+                            prompt: 'Os seguintes dados representam o desempenho de uma equipe de vendas:',
+                            input_data: {
+                                meta: vendorInfo.resultado.meta,
+                                vendedor: vendedor
+                            },
+                            stream: false,
+                        }),
+                    });
+                    const result = yield response.json();
+                    results.push(result);
+                }
+                return results;
             }
             catch (error) {
                 console.error('Error fetching insights from Ollama:', error);
