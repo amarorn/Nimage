@@ -11,15 +11,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetVendorInsights = void 0;
 const OllamaService_1 = require("../services/OllamaService");
+const FormatterService_1 = require("../services/FormatterService");
 class GetVendorInsights {
     constructor() {
         this.ollamaService = new OllamaService_1.OllamaService();
+        this.formatterService = new FormatterService_1.FormatterService();
     }
-    execute(equipeData) {
+    execute(equipeData, dataInicio, dataFim) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const insights = yield this.ollamaService.getInsights(equipeData);
-                return insights;
+                console.log("🚀 ~ GetVendorInsights ~ execute ~ insights:", insights);
+                const formattedInsights = insights.map((insight, index) => {
+                    const vendorData = equipeData.resultado.frequenciaPorVendedor[index];
+                    return this.formatterService.formatVendorData({
+                        resultado: {
+                            equipe: equipeData.resultado.equipe,
+                            meta: equipeData.resultado.meta,
+                            frequenciaPorVendedor: [vendorData]
+                        }
+                    });
+                });
+                return formattedInsights;
             }
             catch (error) {
                 console.error('Error executing GetVendorInsights use case:', error);

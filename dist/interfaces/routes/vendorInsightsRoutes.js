@@ -15,8 +15,9 @@ const router = (0, express_1.Router)();
 const getVendorInsights = new GetVendorInsights_1.GetVendorInsights();
 router.post('/vendor-insights', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const vendorInfo = req.body;
-        const insights = yield getVendorInsights.execute(vendorInfo);
+        const { vendorInfo } = req.body;
+        const { dataInicio, dataFim } = req.query;
+        const insights = yield getVendorInsights.execute(vendorInfo, new Date(dataInicio), new Date(dataFim));
         res.status(200).json(insights);
     }
     catch (error) {

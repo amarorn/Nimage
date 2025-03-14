@@ -27,16 +27,24 @@ Com base nesses dados, gere um JSON estruturado no seguinte formato:
             "posicionamento": <"Alta frequência" ou "Baixa frequência">,
             "perfil": <"Performático", "Intermediário" ou "Não Performático">,
             "novaMetaVendedor": <nova meta sugerida>,
-            "probCrecimentoVendedor": <percentual de crescimento esperado>
+            "probCrecimentoVendedor": <percentual de crescimento esperado>,
+            "fatorAjusteMeta": <fator de ajuste da meta>,
+            "estrategiaDePromoção": [
+                "Marketing digital",
+                "CRM",
+                "Treinamento de vendedores"
+            ],
+            "estrategiaDePromoçãoVendedor": [
+                "Marketing digital",
+                "CRM",
+                "Treinamento de vendedores"
+            ],
+            "recomendações": [
+                "Baseado no FEA de {vendedorNome}, considere aumentar a frequência de atividades.",
+                "Para melhorar o perfil de {vendedorNome}, participe de treinamentos específicos.",
+                "Analise os resultados passados de {vendedorNome} para identificar padrões de sucesso."
+            ]
         }
     ]
 }
-
-Diretrizes:
-- Se "mediaAtividadePorDia" for:
-    - Acima de 1300 → "Performático"
-    - Entre 900 e 1300 → "Intermediário"
-    - Abaixo de 900 → "Não Performático"
-- A nova meta da equipe será ajustada somando as metas individuais dos vendedores.
-- O percentual de crescimento é baseado no "iapVendedor" comparado com a "somaDocinhos".
 """
