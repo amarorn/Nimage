@@ -1,0 +1,165 @@
+{
+  "code-health": {
+    "enabled": true,
+    "threshold": 80
+  },
+  "mcpServers": [
+
+    {
+      "name": "github",
+      "url": "https://api.github.com",
+      "type": "github",
+      "description": "Gerenciamento de repositórios, issues e busca de código via GitHub API"
+    },
+    {
+      "name": "typescript-sdk",
+      "url": "https://modelcontextprotocol.io/typescript",
+      "type": "typescript",
+      "description": "SDK oficial do TypeScript para servidores e clientes MCP"
+    },
+    {
+      "name": "nodejs",
+      "url": "https://modelcontextprotocol.io/nodejs",
+      "type": "nodejs",
+      "description": "Servidor Node.js com suporte a recursos e ferramentas MCP"
+    },
+    {
+      "name": "code-context",
+      "url": "https://modelcontextprotocol.io/code-context",
+      "type": "development",
+      "description": "Análise de código, revisão e geração de documentação para TypeScript/Node.js"
+    },
+    {
+      "name": "clean-architecture",
+      "url": "https://modelcontextprotocol.io/clean-architecture",
+      "type": "architecture",
+      "description": "Servidor especializado em Clean Architecture com suporte para domain, application, infrastructure e interfaces",
+      "capabilities": {
+        "domainValidation": true,
+        "dependencyRules": true,
+        "layerSeparation": true,
+        "useCaseAnalysis": true
+      }
+    },
+    {
+      "name": "mongodb-tools",
+      "url": "https://modelcontextprotocol.io/mongodb",
+      "type": "database",
+      "description": "Ferramentas para MongoDB com suporte a queries, agregações e otimização",
+      "capabilities": {
+        "queryOptimization": true,
+        "schemaValidation": true,
+        "indexAnalysis": true,
+        "aggregationPipelines": true
+      }
+    },
+    {
+      "name": "endpoint-manager",
+      "url": "https://modelcontextprotocol.io/endpoints",
+      "type": "api",
+      "description": "Gerenciamento e validação de endpoints REST com suporte a documentação automática",
+      "capabilities": {
+        "routeValidation": true,
+        "swaggerGeneration": true,
+        "endpointTesting": true,
+        "securityChecks": true
+      }
+    },
+    {
+      "name": "commit-manager",
+      "url": "https://modelcontextprotocol.io/commits",
+      "type": "version-control",
+      "description": "Gerenciamento de commits seguindo Conventional Commits com análise automática",
+      "capabilities": {
+        "conventionalCommits": {
+          "types": ["feat", "fix", "docs", "style", "refactor", "perf", "test", "chore"],
+          "scopeValidation": true,
+          "breakingChangeDetection": true
+        },
+        "semanticVersioning": true,
+        "commitValidation": true,
+        "changelogGeneration": true,
+        "commitHistory": {
+          "analysis": true,
+          "suggestions": true
+        }
+      }
+    },
+    {
+      "name": "ollama-model-builder",
+      "url": "https://modelcontextprotocol.io/ollama",
+      "type": "ai-model",
+      "description": "Criação e gerenciamento de modelos personalizados para Ollama",
+      "capabilities": {
+        "modelfile": {
+          "generation": true,
+          "templates": true,
+          "validation": true
+        },
+        "modelTraining": {
+          "parameterTuning": true,
+          "contextOptimization": true,
+          "promptEngineering": true
+        },
+        "modelTesting": {
+          "evaluation": true,
+          "benchmarking": true,
+          "qualityAssurance": true
+        },
+        "modelDeployment": {
+          "versionControl": true,
+          "rollback": true,
+          "monitoring": true
+        },
+        "customization": {
+          "systemPrompts": true,
+          "parameters": true,
+          "formats": ["json", "markdown", "yaml"]
+        }
+      }
+    },
+    {
+      "name": "kubernetes-manager",
+      "url": "https://modelcontextprotocol.io/kubernetes",
+      "type": "container-orchestration",
+      "description": "Gerenciamento e automação de clusters Kubernetes com suporte a implantação e monitoramento",
+      "capabilities": {
+        "clusterManagement": {
+          "deployment": true,
+          "scaling": true,
+          "monitoring": true,
+          "healthChecks": true
+        },
+        "resourceManagement": {
+          "pods": true,
+          "services": true,
+          "deployments": true,
+          "statefulSets": true,
+          "configMaps": true,
+          "secrets": true
+        },
+        "networkPolicies": {
+          "ingress": true,
+          "egress": true,
+          "loadBalancing": true
+        },
+        "security": {
+          "rbac": true,
+          "podSecurity": true,
+          "networkSecurity": true
+        },
+        "automation": {
+          "cicd": true,
+          "autoScaling": true,
+          "rollbacks": true
+        },
+        "observability": {
+          "logging": true,
+          "metrics": true,
+          "tracing": true,
+          "alerts": true
+        }
+      }
+    }
+  ]
+}

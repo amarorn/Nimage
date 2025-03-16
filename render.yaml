@@ -6,11 +6,11 @@ services:
   - type: web
     runtime: node
     name: nimage-app
-    repo: https://github.com/your-repo/nimage-app # Replace with your actual repo URL
+    repo: https://github.com/amarorn/Nimage # Replace with your actual repo URL
     numInstances: 2   # Adjust based on your scaling needs
     region: oregon    # Choose the region closest to your users
     plan: standard    # Choose a plan based on your needs
-    branch: main      # Use the main branch for production
+    branch: feacture/ollamaIntegration       # Use the main branch for production
     buildCommand: npm install
     startCommand: npm start
     autoDeploy: true  # Enable automatic deploys
