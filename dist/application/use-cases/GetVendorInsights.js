@@ -17,22 +17,15 @@ class GetVendorInsights {
         this.ollamaService = new OllamaService_1.OllamaService();
         this.formatterService = new FormatterService_1.FormatterService();
     }
-    execute(equipeData, dataInicio, dataFim) {
+    execute(vendorInfo) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const insights = yield this.ollamaService.getInsights(equipeData);
+                const insights = yield this.ollamaService.getInsights(vendorInfo);
                 console.log("🚀 ~ GetVendorInsights ~ execute ~ insights:", insights);
-                const formattedInsights = insights.map((insight, index) => {
-                    const vendorData = equipeData.resultado.frequenciaPorVendedor[index];
-                    return this.formatterService.formatVendorData({
-                        resultado: {
-                            equipe: equipeData.resultado.equipe,
-                            meta: equipeData.resultado.meta,
-                            frequenciaPorVendedor: [vendorData]
-                        }
-                    });
-                });
-                return formattedInsights;
+                if (insights && insights.resultado) {
+                    return this.formatterService.formatVendorData(insights);
+                }
+                throw new Error('No insights available');
             }
             catch (error) {
                 console.error('Error executing GetVendorInsights use case:', error);

@@ -10,22 +10,16 @@ export class GetVendorInsights {
         this.formatterService = new FormatterService();
     }
 
-    async execute(equipeData: any, dataInicio: Date, dataFim: Date): Promise<any> {
+    async execute(vendorInfo: any): Promise<any> {
         try {
-            const insights = await this.ollamaService.getInsights(equipeData);
+            const insights = await this.ollamaService.getInsights(vendorInfo);
             console.log("🚀 ~ GetVendorInsights ~ execute ~ insights:", insights)
             
-            const formattedInsights = insights.map((insight: any, index: number) => {
-                const vendorData = equipeData.resultado.frequenciaPorVendedor[index];
-                return this.formatterService.formatVendorData({
-                    resultado: {
-                        equipe: equipeData.resultado.equipe,
-                        meta: equipeData.resultado.meta,
-                        frequenciaPorVendedor: [vendorData]
-                    }
-                });
-            });
-            return formattedInsights;
+            if (insights && insights.resultado) {
+                return this.formatterService.formatVendorData(insights);
+            }
+            
+            throw new Error('No insights available');
         } catch (error) {
             console.error('Error executing GetVendorInsights use case:', error);
             throw error;

@@ -203,25 +203,15 @@ class AtividadeController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { vendedorId } = req.params;
-                const { dataInicio, dataFim } = req.query;
-                console.log('Debug - Parâmetros recebidos:', {
-                    vendedorId,
+                // Usa o primeiro dia do mês atual como data inicial e o último dia como data final
+                const hoje = new Date();
+                const dataInicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+                const dataFim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+                console.log('Debug - Datas calculadas:', {
                     dataInicio,
                     dataFim
                 });
-                if (!dataInicio || !dataFim) {
-                    return res.status(400).json({
-                        erro: 'Datas não fornecidas',
-                        detalhes: { dataInicio, dataFim }
-                    });
-                }
-                const dataInicioObj = new Date(dataInicio);
-                const dataFimObj = new Date(dataFim);
-                console.log('Debug - Datas convertidas:', {
-                    dataInicioObj,
-                    dataFimObj
-                });
-                const resultado = yield this.obterAtividadesPorVendedorEData.executar(vendedorId, dataInicioObj, dataFimObj);
+                const resultado = yield this.obterAtividadesPorVendedorEData.executar(vendedorId, dataInicio, dataFim);
                 console.log('Debug - Resultado obtido:', resultado);
                 // Calcula o progresso em relação à meta
                 let progresso = null;

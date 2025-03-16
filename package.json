@@ -9,9 +9,16 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write .",
-    "test": "jest"
+    "test": "jest",
+    "generate-training-data": "ts-node src/scripts/generateTrainingData.ts",
+    "generate-metas": "ts-node src/scripts/generateMetas.ts",
+    "generate-activities": "ts-node src/scripts/generateActivities.ts",
+    "prepare-training": "ts-node src/scripts/prepareTrainingData.ts",
+    "train-model": "ts-node src/domain/models/trainModel.ts",
+    "train-ollama": "ts-node src/domain/models/ollamaTrainer.ts"
   },
   "dependencies": {
+    "@types/uuid": "^10.0.0",
     "badge-maker": "^4.1.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
@@ -19,7 +26,8 @@
     "mongodb": "^6.13.0",
     "mongoose": "^8.10.1",
     "node-fetch": "^2.7.0",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "@tensorflow/tfjs": "^4.17.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -36,7 +44,8 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "nodemon": "^3.0.3"
   },
   "private": true
 }
