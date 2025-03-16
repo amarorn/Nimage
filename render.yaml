@@ -1,0 +1,79 @@
+previews:
+  generation: automatic # Enable preview environments
+
+services:
+  # Main application service using Node.js
+  - type: web
+    runtime: node
+    name: nimage-app
+    repo: https://github.com/your-repo/nimage-app # Replace with your actual repo URL
+    numInstances: 2   # Adjust based on your scaling needs
+    region: oregon    # Choose the region closest to your users
+    plan: standard    # Choose a plan based on your needs
+    branch: main      # Use the main branch for production
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true  # Enable automatic deploys
+    envVars: # Environment variables
+      - key: OLLAMA_URL
+        value: http://localhost:11500/api # Replace with your actual API URL
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mydatabase
+          property: connectionString
+      - fromGroup: my-env-group # Add all variables from an environment group
+
+  # EquipeMetaService - A web service using Node.js
+  - type: web
+    runtime: node
+    name: equipe-meta-service
+    repo: https://github.com/your-repo/equipe-meta-service # Replace with your actual repo URL
+    numInstances: 1
+    region: oregon
+    plan: starter
+    branch: main
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mydatabase
+          property: connectionString
+      - fromGroup: my-env-group
+
+  # A static site for documentation or other purposes
+  - type: web
+    name: project-docs
+    runtime: static
+    buildCommand: yarn build
+    staticPublishPath: ./build
+    previews:
+      generation: automatic
+    buildFilter:
+      paths:
+      - docs/**/*.md
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: sameorigin
+
+# PostgreSQL databases
+databases:
+  - name: mydatabase
+    databaseName: mydb
+    user: your-db-user # Replace with your actual database user
+    ipAllowList:
+      - source: 203.0.113.4/30
+        description: office
+      - source: 198.51.100.1
+        description: home
+
+# Environment groups
+envVarGroups:
+  - name: my-env-group
+    envVars:
+      - key: API_BASE_URL
+        value: https://api.example.com
+      - key: APP_SECRET
+        generateValue: true
