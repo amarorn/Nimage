@@ -6,41 +6,59 @@ class FormatterService {
         const equipe = vendorData.resultado.equipe;
         const vendedor = vendorData.resultado.vendedor;
         const formattedData = {
-            "meta_atual": this.formatNumber(equipe.meta),
-            "novaMetaEquipe": this.formatNumber(vendedor.nova_meta_sugerida || equipe.meta),
-            "estrategiaDePromoção": vendedor.estrategias_personalizadas || [
+            "meta_atual": this.formatCurrency(equipe.meta),
+            "novaMetaEquipe": this.formatCurrency(equipe.meta),
+            "estrategiaDePromoção": [
                 "Marketing digital",
                 "CRM",
                 "Treinamento de vendedores"
             ],
             "vendedores": [{
                     "vendedorNome": vendedor.nome,
-                    "posicionamento": this.determinePositioning(vendedor),
-                    "perfil": this.determineProfile(vendedor),
+                    "posicionamento": this.getPosicionamento(vendedor.feaVendedor),
+                    "perfil": this.getProfile(vendedor),
                     "novaMetaVendedor": this.formatNumber(vendedor.nova_meta_sugerida || equipe.meta),
                     "probCrecimentoVendedor": vendedor.probabilidade_crescimento || this.calculateGrowthProbability(vendedor),
                     "fatorAjusteMeta": this.formatNumber(vendedor.fator_ajuste_meta || this.calculateAdjustmentFactor(vendedor), true),
+                    "percentualContribuicao": this.formatPercentage(vendedor.percentual_contribuicao / 100),
+                    "pesoVendedor": this.formatPercentage(vendedor.peso_vendedor || 0),
+                    "distribuicaoMeta": this.formatNumber(vendedor.distribuicao_meta || 0),
+                    "desempenhoDiarioIdeal": this.formatNumber(vendedor.desempenho_diario_ideal || 0),
                     "estrategiaDePromoçãoVendedor": vendedor.estrategias_personalizadas || [
                         "Marketing digital",
                         "CRM",
                         "Treinamento de vendedores"
                     ],
-                    "recomendações": vendedor.recomendacoes || this.generateRecommendations(vendedor),
+                    "recomendações": vendedor.recomendacoes || [],
                     "metricas": {
-                        "diasComAtividade": vendedor.numeroDiasComAtividade,
-                        "totalDocinhos": this.formatNumber(vendedor.somaDocinhos),
-                        "mediaPorDia": this.formatNumber(vendedor.mediaAtividadePorDia),
-                        "fea": this.formatNumber(vendedor.feaVendedor),
-                        "iap": this.formatNumber(vendedor.iapVendedor),
-                        "eficienciaVendas": this.calculateEfficiency(vendedor),
-                        "tendenciaCrescimento": vendedor.projecao_crescimento || this.calculateGrowthTrend(vendedor)
+                        "diasAtivos": vendedor.numeroDiasComAtividade,
+                        "totalVendas": this.formatCurrency(vendedor.somaDocinhos),
+                        "mediaPorDia": this.formatCurrency(vendedor.mediaAtividadePorDia),
+                        "fea": vendedor.feaVendedor.toFixed(2),
+                        "iap": this.formatCurrency(vendedor.iapVendedor),
+                        "eficienciaVendas": this.formatCurrency(vendedor.mediaAtividadePorDia * 100)
                     },
-                    "pontosFortes": vendedor.pontos_fortes || this.identifyStrengths(vendedor),
-                    "pontosFracos": vendedor.pontos_fracos || this.identifyWeaknesses(vendedor),
-                    "estrategiasPersonalizadas": vendedor.estrategias_personalizadas || this.generatePersonalizedStrategies(vendedor),
-                    "dadosGrafico": vendedor.dados_grafico || {
-                        historico: Array(6).fill({ mes: "", valor: 0 }),
-                        previsao: Array(3).fill({ mes: "", valor: 0 })
+                    "pontosFortes": vendedor.pontos_fortes || [],
+                    "pontosFracos": vendedor.pontos_fracos || [],
+                    "estrategiasPersonalizadas": [
+                        "Participar de treinamentos específicos",
+                        "Aumentar frequência de visitas",
+                        "Desenvolver técnicas de vendas consultivas"
+                    ],
+                    "dadosGrafico": {
+                        "historico": [
+                            { mes: "Janeiro", valor: vendedor.somaDocinhos / 6 },
+                            { mes: "Fevereiro", valor: vendedor.somaDocinhos / 6 },
+                            { mes: "Março", valor: vendedor.somaDocinhos / 6 },
+                            { mes: "Abril", valor: vendedor.somaDocinhos / 6 },
+                            { mes: "Maio", valor: vendedor.somaDocinhos / 6 },
+                            { mes: "Junho", valor: vendedor.somaDocinhos / 6 }
+                        ],
+                        "previsao": [
+                            { mes: "Julho", valor: vendedor.somaDocinhos / 6 * 1.2 },
+                            { mes: "Agosto", valor: vendedor.somaDocinhos / 6 * 1.2 },
+                            { mes: "Setembro", valor: vendedor.somaDocinhos / 6 * 1.2 }
+                        ]
                     }
                 }]
         };
@@ -111,6 +129,10 @@ class FormatterService {
                 novaMetaVendedor: vendedor.novaMetaVendedor,
                 probCrecimentoVendedor: vendedor.probCrecimentoVendedor,
                 fatorAjusteMeta: vendedor.fatorAjusteMeta,
+                percentualContribuicao: vendedor.percentualContribuicao,
+                pesoVendedor: vendedor.pesoVendedor,
+                distribuicaoMeta: vendedor.distribuicaoMeta,
+                desempenhoDiarioIdeal: vendedor.desempenhoDiarioIdeal,
                 estrategiaDePromoçãoVendedor: vendedor.estrategiaDePromoçãoVendedor,
                 recomendações: vendedor.recomendações,
                 metricas: vendedor.metricas,
@@ -153,6 +175,30 @@ class FormatterService {
             "Aumentar a frequência de visitas",
             "Desenvolver técnicas de venda consultiva"
         ];
+    }
+    formatCurrency(value) {
+        return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    formatPercentage(value) {
+        return (value * 100).toFixed(2) + '%';
+    }
+    getPosicionamento(fea) {
+        if (fea >= 1.5)
+            return 'Alta Frequência';
+        if (fea >= 1.2)
+            return 'Média Frequência';
+        return 'Baixa Frequência';
+    }
+    getProfile(vendedor) {
+        if (vendedor.iapVendedor > 30000 && vendedor.feaVendedor > 900) {
+            return "Performático";
+        }
+        else if (vendedor.iapVendedor > 20000 && vendedor.feaVendedor > 500) {
+            return "Intermediário";
+        }
+        else {
+            return "Iniciante";
+        }
     }
 }
 exports.FormatterService = FormatterService;

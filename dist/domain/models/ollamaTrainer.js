@@ -153,15 +153,20 @@ Baseado nessas informações, quantos docinhos serão vendidos?`;
     trainModel() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log('Preparando dados de treinamento...');
+                console.log('\n🚀 Iniciando processo de treinamento do modelo...');
+                console.log('===============================================');
+                console.log('\n📊 Preparando dados de treinamento...');
                 const examples = yield this.prepareTrainingData();
-                console.log(`Carregados ${examples.length} exemplos de treinamento`);
-                console.log('Iniciando treinamento no Ollama...');
+                console.log(`✅ Carregados ${examples.length} exemplos de treinamento`);
+                console.log('\n🤖 Iniciando treinamento no Ollama...');
                 yield this.createModelInOllama('nimage', examples);
-                console.log('Treinamento concluído!');
+                console.log('\n🎉 Treinamento concluído com sucesso!');
+                console.log('===============================================');
                 // Testar o modelo
-                console.log('\nTestando o modelo com alguns exemplos:');
-                for (let i = 0; i < 5 && i < examples.length; i++) {
+                console.log('\n🧪 Testando o modelo com alguns exemplos:');
+                for (let i = 0; i < 3 && i < examples.length; i++) {
+                    console.log(`\n📝 Exemplo ${i + 1}:`);
+                    console.log('Prompt:', examples[i].prompt);
                     const result = yield this.fetchWithRetry(`${this.baseUrl}/generate`, {
                         method: 'POST',
                         body: JSON.stringify({
@@ -170,15 +175,13 @@ Baseado nessas informações, quantos docinhos serão vendidos?`;
                         }),
                         headers: { 'Content-Type': 'application/json' }
                     });
-                    console.log(`\nExemplo ${i + 1}:`);
-                    console.log('Prompt:', examples[i].prompt);
-                    console.log('Previsão:', result.response);
+                    console.log('Resposta:', result.response);
                     console.log('Real:', examples[i].completion);
-                    yield this.delay(500); // Delay entre os testes
+                    yield this.delay(1000);
                 }
             }
             catch (error) {
-                console.error('Erro durante o treinamento:', error);
+                console.error('\n❌ Erro durante o treinamento:', error);
                 throw error;
             }
         });
