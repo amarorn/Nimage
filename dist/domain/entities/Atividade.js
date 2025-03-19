@@ -11,3 +11,4 @@ class Atividade {
     }
 }
 exports.Atividade = Atividade;
+//# sourceMappingURL=Atividade.js.map

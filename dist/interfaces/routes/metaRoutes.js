@@ -48,3 +48,4 @@ router.put("/metas/:id", (req, res) => __awaiter(void 0, void 0, void 0, functio
     return metaController.atualizar(req, res);
 }));
 exports.default = router;
+//# sourceMappingURL=metaRoutes.js.map

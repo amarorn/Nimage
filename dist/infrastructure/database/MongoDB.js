@@ -21,8 +21,12 @@ class MongoDB {
         return __awaiter(this, void 0, void 0, function* () {
             //console.log("🔥 Conectado ao MongoDB com sucesso!")
             try {
-                yield mongoose_1.default.connect(MONGO_URI);
-                //console.log("🔥 Conectado ao MongoDB com sucesso!");
+                yield mongoose_1.default.connect(MONGO_URI, {
+                    serverSelectionTimeoutMS: 60000, // Aumentado para 60 segundos
+                    socketTimeoutMS: 90000, // Aumentado para 90 segundos
+                    connectTimeoutMS: 60000, // Aumentado para 60 segundos
+                });
+                console.log("✅ Conectado ao MongoDB com sucesso!");
             }
             catch (error) {
                 console.error("❌ Erro ao conectar ao MongoDB:", error);
@@ -32,3 +36,4 @@ class MongoDB {
     }
 }
 exports.MongoDB = MongoDB;
+//# sourceMappingURL=MongoDB.js.map

@@ -25,10 +25,10 @@ class VendedorRepositoryImpl {
             const vendedor = yield VendedorModel_1.VendedorModel.findOne({ id }).lean();
             console.log('Debug - Repository - Resultado da busca no banco:', vendedor);
             if (vendedor) {
-                console.log('Debug - Repository - Vendedor encontrado, buscando equipe com ID:', vendedor.equipe_id);
-                const equipe = yield EquipeModel_1.EquipeModel.findOne({ id: vendedor.equipe_id }).lean();
+                console.log('Debug - Repository - Vendedor encontrado, buscando equipe com ID:', vendedor.equipeId);
+                const equipe = yield EquipeModel_1.EquipeModel.findOne({ id: vendedor.equipeId }).lean();
                 console.log('Debug - Repository - Resultado da busca da equipe:', equipe);
-                return new Vendedor_1.Vendedor(vendedor.id, vendedor.nome, vendedor.equipe_id, equipe ? { id: equipe.id, nome: equipe.nome } : null);
+                return new Vendedor_1.Vendedor(vendedor.id, vendedor.nome, vendedor.equipeId, vendedor.email, vendedor.telefone, vendedor.meta, vendedor.cargo);
             }
             return null;
         });
@@ -36,30 +36,29 @@ class VendedorRepositoryImpl {
     obterTodos(skip, limit) {
         return __awaiter(this, void 0, void 0, function* () {
             const vendedores = yield VendedorModel_1.VendedorModel.find().skip(skip).limit(limit).lean();
-            return yield Promise.all(vendedores.map((vendedor) => __awaiter(this, void 0, void 0, function* () {
-                const equipe = yield EquipeModel_1.EquipeModel.findOne({ id: vendedor.equipe_id }).lean();
-                return new Vendedor_1.Vendedor(vendedor.id, vendedor.nome, vendedor.equipe_id, equipe ? { id: equipe.id, nome: equipe.nome } : null);
-            })));
+            return vendedores.map(vendedor => new Vendedor_1.Vendedor(vendedor.id, vendedor.nome, vendedor.equipeId, vendedor.email, vendedor.telefone, vendedor.meta, vendedor.cargo));
         });
     }
     obterPorEquipeId(equipeId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const vendedores = yield VendedorModel_1.VendedorModel.find({ equipe_id: equipeId }).lean();
-            return yield Promise.all(vendedores.map((vendedor) => __awaiter(this, void 0, void 0, function* () {
-                const equipe = yield EquipeModel_1.EquipeModel.findOne({ id: vendedor.equipe_id }).lean();
-                return new Vendedor_1.Vendedor(vendedor.id, vendedor.nome, vendedor.equipe_id, equipe ? { id: equipe.id, nome: equipe.nome } : null);
-            })));
+            const vendedores = yield VendedorModel_1.VendedorModel.find({ equipeId }).lean();
+            return vendedores.map(vendedor => new Vendedor_1.Vendedor(vendedor.id, vendedor.nome, vendedor.equipeId, vendedor.email, vendedor.telefone, vendedor.meta, vendedor.cargo));
         });
     }
     atualizar(id, dados) {
         return __awaiter(this, void 0, void 0, function* () {
-            const vendedorAtualizado = yield VendedorModel_1.VendedorModel.findOneAndUpdate({ id }, { nome: dados.nome, equipe_id: dados.equipe_id }, { new: true }).lean();
+            const vendedorAtualizado = yield VendedorModel_1.VendedorModel.findOneAndUpdate({ id }, { $set: dados }, { new: true }).lean();
             if (vendedorAtualizado) {
-                const equipe = yield EquipeModel_1.EquipeModel.findOne({ id: vendedorAtualizado.equipe_id }).lean();
-                return new Vendedor_1.Vendedor(vendedorAtualizado.id, vendedorAtualizado.nome, vendedorAtualizado.equipe_id, equipe ? { id: equipe.id, nome: equipe.nome } : null);
+                return new Vendedor_1.Vendedor(vendedorAtualizado.id, vendedorAtualizado.nome, vendedorAtualizado.equipeId, vendedorAtualizado.email, vendedorAtualizado.telefone, vendedorAtualizado.meta, vendedorAtualizado.cargo);
             }
             return null;
         });
     }
+    deletar(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield VendedorModel_1.VendedorModel.deleteOne({ id });
+        });
+    }
 }
 exports.VendedorRepositoryImpl = VendedorRepositoryImpl;
+//# sourceMappingURL=VendedorRepositoryImpl.js.map

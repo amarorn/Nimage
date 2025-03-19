@@ -53,11 +53,11 @@ async function prepareTrainingData() {
             const vendedor = vendedorMap.get(atividade.vendedorId);
             if (!vendedor) continue;
 
-            const equipe = equipeMap.get(vendedor.equipe_id);
+            const equipe = equipeMap.get(vendedor.equipeId);
             if (!equipe) continue;
 
             const data = new Date(atividade.data);
-            const metaKey = `${vendedor.equipe_id}_${data.getMonth()}_${data.getFullYear()}`;
+            const metaKey = `${vendedor.equipeId}_${data.getMonth()}_${data.getFullYear()}`;
             const meta = metaMap.get(metaKey);
             if (!meta) continue;
 

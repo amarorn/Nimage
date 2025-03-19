@@ -36,12 +36,12 @@ const atividadeRepo = new AtividadeRepositoryImpl_1.AtividadeRepositoryImpl();
 const criarAtividade = new CriarAtividade_1.CriarAtividade(atividadeRepo);
 const obterAtividades = new ObterAtividades_1.ObterAtividades(atividadeRepo);
 const atualizarAtividade = new AtualizarAtividade_1.AtualizarAtividade(atividadeRepo);
-const atividadeService = new AtividadeService_1.AtividadeService(atividadeRepo);
-const obterAtividadesPorVendedorEData = new ObterAtividadesPorVendedorEData_1.ObterAtividadesPorVendedorEData(atividadeService);
 // Instantiate the necessary dependencies for FrequenciaVendasService
 const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
 const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
 const metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
+const atividadeService = new AtividadeService_1.AtividadeService(atividadeRepo, vendedorRepo, equipeRepo, metaRepo);
+const obterAtividadesPorVendedorEData = new ObterAtividadesPorVendedorEData_1.ObterAtividadesPorVendedorEData(atividadeService);
 const obterEquipeDadosFull = new ObterEquipeDadosFull_1.ObterEquipeDadosFull(equipeRepo, vendedorRepo, atividadeRepo, metaRepo);
 const frequenciaVendasService = new FrequenciaVendasService_1.FrequenciaVendasService(obterEquipeDadosFull);
 const atividadeController = new AtividadeController_1.AtividadeController(criarAtividade, obterAtividades, atualizarAtividade, atividadeService, obterAtividadesPorVendedorEData, frequenciaVendasService);
@@ -67,3 +67,4 @@ describe('AtividadeController', () => {
     }), 10000);
     // Add more tests for other methods like obterTodos, obterPorId, atualizar, etc.
 });
+//# sourceMappingURL=AtividadeController.test.js.map

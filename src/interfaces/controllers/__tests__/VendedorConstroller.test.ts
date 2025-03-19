@@ -3,6 +3,7 @@ import { VendedorController } from '../VendedorController';
 import { CriarVendedor } from '../../../application/use-cases/CriarVendedor';
 import { ObterVendedor } from '../../../application/use-cases/ObterVendedor';
 import { AtualizarVendedor } from '../../../application/use-cases/AtualizarVendedor';
+import { GetVendedorInsights } from '../../../application/use-cases/GetVendedorInsights';
 import { VendedorRepositoryImpl } from '../../../infrastructure/repositories/VendedorRepositoryImpl';
 
 // Mocking the repository and use cases
@@ -11,13 +12,23 @@ const criarVendedor = new CriarVendedor(vendedorRepo);
 const obterVendedor = new ObterVendedor(vendedorRepo);
 const atualizarVendedor = new AtualizarVendedor(vendedorRepo);
 
-const vendedorController = new VendedorController(criarVendedor, obterVendedor, atualizarVendedor);
+// Mock do GetVendedorInsights
+const getVendedorInsights = {
+    execute: jest.fn().mockResolvedValue({})
+} as unknown as GetVendedorInsights;
+
+const vendedorController = new VendedorController(
+    criarVendedor,
+    obterVendedor,
+    atualizarVendedor,
+    getVendedorInsights
+);
 
 jest.mock('../../../infrastructure/repositories/VendedorRepositoryImpl', () => {
   return {
     VendedorRepositoryImpl: jest.fn().mockImplementation(() => {
       return {
-        criar: jest.fn().mockResolvedValue({ id: '1', nome: 'Vendedor Teste', equipe_id: 'equipe1' }),
+        criar: jest.fn().mockResolvedValue({ id: '1', nome: 'Vendedor Teste', equipeId: 'equipe1' }),
         // Mock other methods as needed
       };
     }),
@@ -37,7 +48,7 @@ describe('VendedorController', () => {
   });
 
   it('should create a new vendedor', async () => {
-    req.body = { id: '1', nome: 'Vendedor Teste', equipe_id: 'equipe1' };
+    req.body = { id: '1', nome: 'Vendedor Teste', equipeId: 'equipe1' };
 
     await vendedorController.criar(req as Request, res as Response);
 
@@ -45,7 +56,7 @@ describe('VendedorController', () => {
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
       id: '1',
       nome: 'Vendedor Teste',
-      equipe_id: 'equipe1',
+      equipeId: 'equipe1',
     }));
   }, 10000);
 

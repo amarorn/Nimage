@@ -1,19 +1,38 @@
-import { VendedorRepository } from "../../domain/repositories/VendedorRepository";
 import { Vendedor } from "../../domain/entities/Vendedor";
+import { VendedorRepository } from "../../domain/repositories/VendedorRepository";
+
+interface AtualizarVendedorDTO {
+    nome?: string;
+    equipeId?: string;
+    email?: string;
+    telefone?: string;
+    meta?: number;
+    cargo?: string;
+}
 
 export class AtualizarVendedor {
-    constructor(private vendedorRepo: VendedorRepository) {}
+    constructor(private vendedorRepository: VendedorRepository) {}
 
-    async executar(id: string, dados: { nome: string; equipe_id: string }): Promise<Vendedor | null> {
-        //console.log("📝 Iniciando atualização de vendedor com dados:", dados);
-
-        if (!dados.nome || !dados.equipe_id) {
-            throw new Error('Dados inválidos para atualizar vendedor');
+    async executar(id: string, dados: AtualizarVendedorDTO): Promise<Vendedor | null> {
+        if (!id) {
+            throw new Error('ID do vendedor é obrigatório');
         }
 
-        const vendedorAtualizado = await this.vendedorRepo.atualizar(id, dados);
-        //console.log("💾 Vendedor atualizado no banco:", vendedorAtualizado);
+        // Verifica se o vendedor existe
+        const vendedorExistente = await this.vendedorRepository.obterPorId(id);
+        if (!vendedorExistente) {
+            throw new Error('Vendedor não encontrado');
+        }
 
-        return vendedorAtualizado;
+        // Filtra apenas os campos que foram fornecidos
+        const dadosAtualizacao: AtualizarVendedorDTO = {};
+        if (dados.nome !== undefined) dadosAtualizacao.nome = dados.nome;
+        if (dados.equipeId !== undefined) dadosAtualizacao.equipeId = dados.equipeId;
+        if (dados.email !== undefined) dadosAtualizacao.email = dados.email;
+        if (dados.telefone !== undefined) dadosAtualizacao.telefone = dados.telefone;
+        if (dados.meta !== undefined) dadosAtualizacao.meta = dados.meta;
+        if (dados.cargo !== undefined) dadosAtualizacao.cargo = dados.cargo;
+
+        return await this.vendedorRepository.atualizar(id, dadosAtualizacao);
     }
 } 

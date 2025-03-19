@@ -18,13 +18,14 @@ class CriarEquipe {
     executar(dados) {
         return __awaiter(this, void 0, void 0, function* () {
             //console.log("📝 Iniciando criação de equipe com dados:", dados);
-            if (!dados.id || !dados.nome) {
+            if (!dados.id || !dados.nome || !dados.nomepdv || !dados.cidade || !dados.estado ||
+                !dados.gerente || !dados.contato_gerente || !dados.capitao || !dados.contato_capitao) {
                 throw new Error('Dados inválidos para criar equipe');
             }
             if (dados.nome.trim().length === 0) {
                 throw new Error('Nome da equipe não pode estar vazio');
             }
-            const equipe = new Equipe_1.Equipe(dados.id, dados.nome);
+            const equipe = new Equipe_1.Equipe(dados.id, dados.nome, dados.nomepdv, dados.cidade, dados.estado, dados.gerente, dados.contato_gerente, dados.capitao, dados.contato_capitao);
             //console.log("🏗️ Equipe instanciada:", equipe);
             yield this.equipeRepo.criar(equipe);
             //console.log("💾 Equipe persistida no banco");
@@ -33,3 +34,4 @@ class CriarEquipe {
     }
 }
 exports.CriarEquipe = CriarEquipe;
+//# sourceMappingURL=CriarEquipe.js.map

@@ -64,3 +64,4 @@ class AtividadeRepositoryImpl {
     }
 }
 exports.AtividadeRepositoryImpl = AtividadeRepositoryImpl;
+//# sourceMappingURL=AtividadeRepositoryImpl.js.map

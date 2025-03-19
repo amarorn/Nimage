@@ -129,7 +129,7 @@ class AtividadeController {
                     return res.status(404).json({ erro: 'Vendedor não encontrado' });
                 }
                 const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
-                const equipe = yield equipeRepo.obterPorId(vendedor.equipe_id);
+                const equipe = yield equipeRepo.obterPorId(vendedor.equipeId);
                 if (!equipe) {
                     // //console.log("⚠️ Equipe não encontrada");
                     return res.status(404).json({ erro: 'Equipe não encontrada' });
@@ -147,7 +147,7 @@ class AtividadeController {
                     vendedor: {
                         id: vendedor.id,
                         nome: vendedor.nome,
-                        equipe_id: vendedor.equipe_id
+                        equipeId: vendedor.equipeId
                     },
                     equipe: {
                         id: equipe.id,
@@ -258,3 +258,4 @@ class AtividadeController {
     }
 }
 exports.AtividadeController = AtividadeController;
+//# sourceMappingURL=AtividadeController.js.map

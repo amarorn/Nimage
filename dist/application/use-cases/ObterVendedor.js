@@ -11,20 +11,32 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ObterVendedor = void 0;
 class ObterVendedor {
-    constructor(vendedorRepo) {
-        this.vendedorRepo = vendedorRepo;
+    constructor(vendedorRepository) {
+        this.vendedorRepository = vendedorRepository;
     }
     executar(skip, limit) {
         return __awaiter(this, void 0, void 0, function* () {
             //console.log("Executando ObterVendedor com paginação", { skip, limit });
-            return yield this.vendedorRepo.obterTodos(skip, limit);
+            return yield this.vendedorRepository.obterTodos(skip, limit);
         });
     }
     executarPorId(id) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!id) {
+                throw new Error('ID do vendedor é obrigatório');
+            }
             //console.log("Executando ObterVendedor por ID", { id });
-            return yield this.vendedorRepo.obterPorId(id);
+            return yield this.vendedorRepository.obterPorId(id);
+        });
+    }
+    executarPorEquipeId(equipeId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!equipeId) {
+                throw new Error('ID da equipe é obrigatório');
+            }
+            return yield this.vendedorRepository.obterPorEquipeId(equipeId);
         });
     }
 }
 exports.ObterVendedor = ObterVendedor;
+//# sourceMappingURL=ObterVendedor.js.map

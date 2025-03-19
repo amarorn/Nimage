@@ -29,13 +29,14 @@ const criarAtividade = new CriarAtividade(atividadeRepo);
 const obterAtividades = new ObterAtividades(atividadeRepo);
 const atualizarAtividade = new AtualizarAtividade(atividadeRepo);
 
-const atividadeService = new AtividadeService(atividadeRepo);
-const obterAtividadesPorVendedorEData = new ObterAtividadesPorVendedorEData(atividadeService);
-
 // Instantiate the necessary dependencies for FrequenciaVendasService
 const equipeRepo = new EquipeRepositoryImpl();
 const vendedorRepo = new VendedorRepositoryImpl();
 const metaRepo = new MetaRepositoryImpl();
+
+const atividadeService = new AtividadeService(atividadeRepo, vendedorRepo, equipeRepo, metaRepo);
+const obterAtividadesPorVendedorEData = new ObterAtividadesPorVendedorEData(atividadeService);
+
 const obterEquipeDadosFull = new ObterEquipeDadosFull(equipeRepo, vendedorRepo, atividadeRepo, metaRepo);
 const frequenciaVendasService = new FrequenciaVendasService(obterEquipeDadosFull);
 

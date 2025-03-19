@@ -21,3 +21,4 @@ class ObterEquipePorId {
     }
 }
 exports.ObterEquipePorId = ObterEquipePorId;
+//# sourceMappingURL=ObterEquipePorId.js.map

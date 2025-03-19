@@ -4,7 +4,7 @@ export class FormatterService {
         const vendedor = vendorData.resultado.vendedor;
 
         const formattedData = {
-            "meta_atual": this.formatCurrency(equipe.meta),
+            "meta_anterior": this.formatCurrency(equipe.meta),
             "novaMetaEquipe": this.formatCurrency(equipe.meta),
             "estrategiaDePromoção": [
                 "Marketing digital",
@@ -18,8 +18,10 @@ export class FormatterService {
                 "novaMetaVendedor": this.formatNumber(vendedor.nova_meta_sugerida || equipe.meta),
                 "probCrecimentoVendedor": vendedor.probabilidade_crescimento || this.calculateGrowthProbability(vendedor),
                 "fatorAjusteMeta": this.formatNumber(vendedor.fator_ajuste_meta || this.calculateAdjustmentFactor(vendedor), true),
-                "percentualContribuicao": this.formatPercentage(vendedor.percentual_contribuicao / 100),
-                "pesoVendedor": this.formatPercentage(vendedor.peso_vendedor || 0),
+                "percentualContribuicao": typeof vendedor.percentual_contribuicao === 'string' && vendedor.percentual_contribuicao.includes('NaN') ? 
+                    "0.00%" : this.formatPercentage(vendedor.percentual_contribuicao / 100 || 0),
+                "pesoVendedor": typeof vendedor.peso_vendedor === 'string' && vendedor.peso_vendedor.includes('NaN') ? 
+                    "0.00%" : this.formatPercentage(vendedor.peso_vendedor || 0),
                 "distribuicaoMeta": this.formatNumber(vendedor.distribuicao_meta || 0),
                 "desempenhoDiarioIdeal": this.formatNumber(vendedor.desempenho_diario_ideal || 0),
                 "estrategiaDePromoçãoVendedor": vendedor.estrategias_personalizadas || [
@@ -120,7 +122,7 @@ export class FormatterService {
 
     private formatModelResponse(modelResponse: any): any {
         return {
-            meta_atual: modelResponse.meta_atual,
+            meta_anterior: modelResponse.meta_anterior,
             novaMetaEquipe: modelResponse.novaMetaEquipe,
             estrategiaDePromoção: modelResponse.estrategiaDePromoção,
             vendedores: modelResponse.vendedores.map((vendedor: any) => ({
@@ -185,7 +187,19 @@ export class FormatterService {
         return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    private formatPercentage(value: number): string {
+    private formatPercentage(value: number | string): string {
+        if (typeof value === 'string') {
+            // Se já for string formatada, verifica se contém NaN
+            if (value.includes('NaN')) return '0.00%';
+            // Se já for string formatada, retorna
+            if (value.includes('%')) return value;
+            // Caso contrário, tenta converter para número
+            value = parseFloat(value);
+        }
+        
+        if (typeof value !== 'number' || isNaN(value)) {
+            return '0.00%';
+        }
         return (value * 100).toFixed(2) + '%';
     }
 

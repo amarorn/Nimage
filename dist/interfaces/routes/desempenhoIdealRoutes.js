@@ -19,3 +19,4 @@ router.get("/equipes/:equipeId/desempenho-ideal", (req, res) => __awaiter(void 0
     return desempenhoIdealController.calcularDesempenhoIdeal(req, res);
 }));
 exports.default = router;
+//# sourceMappingURL=desempenhoIdealRoutes.js.map

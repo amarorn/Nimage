@@ -66,7 +66,7 @@ class ModelTrainer {
                 const vendedor = yield this.vendedorRepo.obterPorId(atividade.vendedorId);
                 if (!vendedor)
                     continue;
-                const equipe = yield this.equipeRepo.obterPorId(vendedor.equipe_id);
+                const equipe = yield this.equipeRepo.obterPorId(vendedor.equipeId);
                 if (!equipe)
                     continue;
                 const meta = yield this.metaRepo.obterPorEquipe(equipe.id);
@@ -168,3 +168,4 @@ exports.ModelTrainer = ModelTrainer;
 // Executar treinamento
 const trainer = new ModelTrainer();
 trainer.trainModel().catch(console.error);
+//# sourceMappingURL=trainModel.js.map

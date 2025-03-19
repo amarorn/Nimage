@@ -35,3 +35,4 @@ class GetVendorInsights {
     }
 }
 exports.GetVendorInsights = GetVendorInsights;
+//# sourceMappingURL=GetVendorInsights.js.map

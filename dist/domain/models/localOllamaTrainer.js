@@ -232,3 +232,4 @@ exports.LocalOllamaTrainer = LocalOllamaTrainer;
 // Executar treinamento
 const trainer = new LocalOllamaTrainer();
 trainer.trainModel().catch(console.error);
+//# sourceMappingURL=localOllamaTrainer.js.map

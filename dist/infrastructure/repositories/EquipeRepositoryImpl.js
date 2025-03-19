@@ -20,22 +20,33 @@ class EquipeRepositoryImpl {
     }
     obterPorId(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield EquipeModel_1.EquipeModel.findOne({ id }).lean();
-        });
-    }
-    obterTodos(skip, limit) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield EquipeModel_1.EquipeModel.find().skip(skip).limit(limit).lean();
-        });
-    }
-    atualizar(id, dados) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const equipeAtualizada = yield EquipeModel_1.EquipeModel.findOneAndUpdate({ id }, { nome: dados.nome }, { new: true }).lean();
-            if (equipeAtualizada) {
-                return new Equipe_1.Equipe(equipeAtualizada.id, equipeAtualizada.nome);
+            const equipe = yield EquipeModel_1.EquipeModel.findOne({ id }).lean();
+            if (equipe) {
+                return new Equipe_1.Equipe(equipe.id, equipe.nome, equipe.nomepdv, equipe.cidade, equipe.estado, equipe.gerente, equipe.contato_gerente, equipe.capitao, equipe.contato_capitao);
             }
             return null;
         });
     }
+    obterTodos(skip, limit) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const equipes = yield EquipeModel_1.EquipeModel.find().skip(skip).limit(limit).lean();
+            return equipes.map(equipe => new Equipe_1.Equipe(equipe.id, equipe.nome, equipe.nomepdv, equipe.cidade, equipe.estado, equipe.gerente, equipe.contato_gerente, equipe.capitao, equipe.contato_capitao));
+        });
+    }
+    atualizar(id, dados) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const equipeAtualizada = yield EquipeModel_1.EquipeModel.findOneAndUpdate({ id }, { $set: dados }, { new: true }).lean();
+            if (equipeAtualizada) {
+                return new Equipe_1.Equipe(equipeAtualizada.id, equipeAtualizada.nome, equipeAtualizada.nomepdv, equipeAtualizada.cidade, equipeAtualizada.estado, equipeAtualizada.gerente, equipeAtualizada.contato_gerente, equipeAtualizada.capitao, equipeAtualizada.contato_capitao);
+            }
+            return null;
+        });
+    }
+    deletar(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield EquipeModel_1.EquipeModel.deleteOne({ id });
+        });
+    }
 }
 exports.EquipeRepositoryImpl = EquipeRepositoryImpl;
+//# sourceMappingURL=EquipeRepositoryImpl.js.map

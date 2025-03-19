@@ -11,3 +11,4 @@ MongoDB_1.MongoDB.conectar().then(() => {
         console.log(`🚀 Servidor rodando na porta ${PORT}`);
     });
 });
+//# sourceMappingURL=server.js.map

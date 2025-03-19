@@ -27,3 +27,4 @@ class AtualizarAtividade {
     }
 }
 exports.AtualizarAtividade = AtualizarAtividade;
+//# sourceMappingURL=AtualizarAtividade.js.map

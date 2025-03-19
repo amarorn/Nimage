@@ -370,3 +370,4 @@ class NimageModel {
     }
 }
 exports.NimageModel = NimageModel;
+//# sourceMappingURL=NimageModel.js.map

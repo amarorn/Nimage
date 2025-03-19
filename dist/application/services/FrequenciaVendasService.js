@@ -81,3 +81,4 @@ class FrequenciaVendasService {
     }
 }
 exports.FrequenciaVendasService = FrequenciaVendasService;
+//# sourceMappingURL=FrequenciaVendasService.js.map

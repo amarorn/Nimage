@@ -21,28 +21,42 @@ class EquipeController {
     criar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // //console.log("📥 Dados recebidos no body:", req.body);
                 if (!req.body) {
                     return res.status(400).json({ erro: 'Body da requisição está vazio' });
                 }
-                const { id, nome } = req.body;
+                const { id, nome, nomepdv, cidade, estado, gerente, contato_gerente, capitao, contato_capitao } = req.body;
                 // Validação dos campos obrigatórios
-                if (!id || !nome) {
+                if (!id || !nome || !nomepdv || !cidade || !estado ||
+                    !gerente || !contato_gerente || !capitao || !contato_capitao) {
                     return res.status(400).json({
                         erro: 'Dados inválidos',
                         detalhes: {
                             id: id ? 'presente' : 'ausente',
-                            nome: nome ? 'presente' : 'ausente'
+                            nome: nome ? 'presente' : 'ausente',
+                            nomepdv: nomepdv ? 'presente' : 'ausente',
+                            cidade: cidade ? 'presente' : 'ausente',
+                            estado: estado ? 'presente' : 'ausente',
+                            gerente: gerente ? 'presente' : 'ausente',
+                            contato_gerente: contato_gerente ? 'presente' : 'ausente',
+                            capitao: capitao ? 'presente' : 'ausente',
+                            contato_capitao: contato_capitao ? 'presente' : 'ausente'
                         }
                     });
                 }
-                // //console.log("✨ Dados extraídos:", { id, nome });
-                const equipe = yield this.criarEquipe.executar({ id, nome });
-                // //console.log("✅ Equipe criada com sucesso:", equipe);
+                const equipe = yield this.criarEquipe.executar({
+                    id,
+                    nome,
+                    nomepdv,
+                    cidade,
+                    estado,
+                    gerente,
+                    contato_gerente,
+                    capitao,
+                    contato_capitao
+                });
                 return res.status(201).json(equipe);
             }
             catch (erro) {
-                // console.error("❌ Erro ao criar equipe:", erro);
                 return res.status(500).json({
                     erro: 'Erro interno ao criar equipe',
                     mensagem: erro.message
@@ -171,3 +185,4 @@ class EquipeController {
     }
 }
 exports.EquipeController = EquipeController;
+//# sourceMappingURL=EquipeController.js.map

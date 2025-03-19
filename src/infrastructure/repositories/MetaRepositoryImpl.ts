@@ -10,8 +10,10 @@ export class MetaRepositoryImpl implements MetaRepository {
     }
 
     async obterPorEquipe(equipeId: string): Promise<Meta | null> {
-        //console.log("🔍 Buscando meta para equipe ID:", equipeId);
-        return await MetaModel.findOne({ equipeId }).lean();
+        console.log('Buscando meta por equipe:', equipeId);
+        const meta = await MetaModel.findOne({ equipeId: equipeId });
+        console.log('Meta encontrada:', meta);
+        return meta ? this.toDomain(meta) : null;
     }
 
     async obterPorId(id: string): Promise<Meta | null> {
@@ -19,10 +21,13 @@ export class MetaRepositoryImpl implements MetaRepository {
     }
 
     async obterPorEquipeEData(equipeId: string, dataInicio: Date, dataFim: Date): Promise<Meta | null> {
-        return await MetaModel.findOne({
-            equipeId,
+        console.log('Buscando meta por equipe e data:', { equipeId, dataInicio, dataFim });
+        const meta = await MetaModel.findOne({
+            equipeId: equipeId,
             data: { $gte: dataInicio, $lte: dataFim }
-        }).lean();
+        });
+        console.log('Meta encontrada:', meta);
+        return meta ? this.toDomain(meta) : null;
     }
 
     async obterTodos(skip: number, limit: number): Promise<Meta[]> {
@@ -40,5 +45,14 @@ export class MetaRepositoryImpl implements MetaRepository {
             return new Meta(metaAtualizada.id, metaAtualizada.equipeId, metaAtualizada.objetivo, metaAtualizada.data);
         }
         return null;
+    }
+
+    private toDomain(meta: any): Meta {
+        return new Meta(
+            meta.id || meta._id.toString(),
+            meta.equipeId,
+            meta.objetivo,
+            meta.data
+        );
     }
 }

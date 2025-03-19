@@ -23,8 +23,10 @@ class MetaRepositoryImpl {
     }
     obterPorEquipe(equipeId) {
         return __awaiter(this, void 0, void 0, function* () {
-            //console.log("🔍 Buscando meta para equipe ID:", equipeId);
-            return yield MetaModel_1.MetaModel.findOne({ equipeId }).lean();
+            console.log('Buscando meta por equipe:', equipeId);
+            const meta = yield MetaModel_1.MetaModel.findOne({ equipeId: equipeId });
+            console.log('Meta encontrada:', meta);
+            return meta ? this.toDomain(meta) : null;
         });
     }
     obterPorId(id) {
@@ -34,10 +36,13 @@ class MetaRepositoryImpl {
     }
     obterPorEquipeEData(equipeId, dataInicio, dataFim) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield MetaModel_1.MetaModel.findOne({
-                equipeId,
+            console.log('Buscando meta por equipe e data:', { equipeId, dataInicio, dataFim });
+            const meta = yield MetaModel_1.MetaModel.findOne({
+                equipeId: equipeId,
                 data: { $gte: dataInicio, $lte: dataFim }
-            }).lean();
+            });
+            console.log('Meta encontrada:', meta);
+            return meta ? this.toDomain(meta) : null;
         });
     }
     obterTodos(skip, limit) {
@@ -54,5 +59,9 @@ class MetaRepositoryImpl {
             return null;
         });
     }
+    toDomain(meta) {
+        return new Meta_1.Meta(meta.id || meta._id.toString(), meta.equipeId, meta.objetivo, meta.data);
+    }
 }
 exports.MetaRepositoryImpl = MetaRepositoryImpl;
+//# sourceMappingURL=MetaRepositoryImpl.js.map

@@ -89,3 +89,4 @@ describe('EquipeController', () => {
     }), 10000);
     // Add more tests for other methods like obterTodos, obterPorId, atualizar, etc.
 });
+//# sourceMappingURL=EquipeController.test.js.map

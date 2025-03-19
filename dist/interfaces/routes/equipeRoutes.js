@@ -58,3 +58,4 @@ router.put("/equipes/:id", (req, res) => __awaiter(void 0, void 0, void 0, funct
     return equipeController.atualizar(req, res);
 }));
 exports.default = router;
+//# sourceMappingURL=equipeRoutes.js.map

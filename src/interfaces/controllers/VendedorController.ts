@@ -2,45 +2,43 @@ import { Request, Response } from "express";
 import { CriarVendedor } from "../../application/use-cases/CriarVendedor";
 import { ObterVendedor } from "../../application/use-cases/ObterVendedor";
 import { AtualizarVendedor } from "../../application/use-cases/AtualizarVendedor";
+import { GetVendedorInsights } from "../../application/use-cases/GetVendedorInsights";
 
 export class VendedorController {
     constructor(
         private criarVendedor: CriarVendedor,
         private obterVendedor: ObterVendedor,
-        private atualizarVendedor: AtualizarVendedor
+        private atualizarVendedor: AtualizarVendedor,
+        private getVendedorInsights: GetVendedorInsights
     ) {}
 
     async criar(req: Request, res: Response) {
         try {
-            // //console.log("📥 Dados recebidos no body:", req.body);
-            
-            // Validação dos dados de entrada
             if (!req.body) {
                 return res.status(400).json({ erro: 'Body da requisição está vazio' });
             }
 
-            const { id, nome, equipe_id } = req.body;
+            const { id, nome, equipeId, email, telefone, meta, cargo } = req.body;
 
             // Validação dos campos obrigatórios
-            if (!id || !nome || !equipe_id) {
+            if (!id || !nome || !equipeId || !email || !telefone || !meta || !cargo) {
                 return res.status(400).json({
                     erro: 'Dados inválidos',
                     detalhes: {
                         id: id ? 'presente' : 'ausente',
                         nome: nome ? 'presente' : 'ausente',
-                        equipe_id: equipe_id ? 'presente' : 'ausente'
+                        equipeId: equipeId ? 'presente' : 'ausente',
+                        email: email ? 'presente' : 'ausente',
+                        telefone: telefone ? 'presente' : 'ausente',
+                        meta: meta ? 'presente' : 'ausente',
+                        cargo: cargo ? 'presente' : 'ausente'
                     }
                 });
             }
 
-            // //console.log("✨ Dados extraídos:", { id, nome, equipe_id });
-
-            const vendedor = await this.criarVendedor.executar({ id, nome, equipe_id });
-            // //console.log("✅ Vendedor criado com sucesso:", vendedor);
-            
+            const vendedor = await this.criarVendedor.executar({ id, nome, equipeId, email, telefone, meta, cargo });
             return res.status(201).json(vendedor);
         } catch (erro) {
-            // console.error("❌ Erro ao criar vendedor:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao criar vendedor',
                 mensagem: (erro as Error).message 
@@ -55,9 +53,7 @@ export class VendedorController {
             const skip = (page - 1) * limit;
 
             const vendedores = await this.obterVendedor.executar(skip, limit);
-            // //console.log("✅ Vendedores obtidos com sucesso:", vendedores);
 
-            // Criar uma resposta personalizada com paginação
             const respostaPersonalizada = {
                 pagina: page,
                 limite: limit,
@@ -65,14 +61,16 @@ export class VendedorController {
                 vendedores: vendedores.map(vendedor => ({
                     id: vendedor.id,
                     nome: vendedor.nome,
-                    equipe_id: vendedor.equipe_id,
-                    equipeDetalhes: vendedor.equipeDetalhes
+                    equipeId: vendedor.equipeId,
+                    email: vendedor.email,
+                    telefone: vendedor.telefone,
+                    meta: vendedor.meta,
+                    cargo: vendedor.cargo
                 }))
             };
 
             return respostaPersonalizada;
         } catch (erro) {
-            // console.error("❌ Erro ao obter vendedores:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao obter vendedores',
                 mensagem: (erro as Error).message 
@@ -84,7 +82,6 @@ export class VendedorController {
         try {
             const { id } = req.params;
             const vendedor = await this.obterVendedor.executarPorId(id);
-            // //console.log("✅ Vendedor obtido com sucesso:", vendedor);
 
             if (!vendedor) {
                 return res.status(404).json({ erro: 'Vendedor não encontrado' });
@@ -93,11 +90,13 @@ export class VendedorController {
             return res.status(200).json({
                 id: vendedor.id,
                 nome: vendedor.nome,
-                equipe_id: vendedor.equipe_id,
-                equipeDetalhes: vendedor.equipeDetalhes
+                equipeId: vendedor.equipeId,
+                email: vendedor.email,
+                telefone: vendedor.telefone,
+                meta: vendedor.meta,
+                cargo: vendedor.cargo
             });
         } catch (erro) {
-            // console.error("❌ Erro ao obter vendedor:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao obter vendedor',
                 mensagem: (erro as Error).message 
@@ -107,31 +106,41 @@ export class VendedorController {
 
     async atualizar(req: Request, res: Response) {
         try {
-            // //console.log("📥 Dados recebidos para atualização:", req.body);
             const { id } = req.params;
-            const { nome, equipe_id } = req.body;
+            const { nome, equipeId, email, telefone, meta, cargo } = req.body;
 
             // Validação dos campos obrigatórios
-            if (!nome || !equipe_id) {
+            const camposAtualizacao = { nome, equipeId, email, telefone, meta, cargo };
+            const camposVazios = Object.entries(camposAtualizacao)
+                .filter(([_, valor]) => valor !== undefined && !valor)
+                .map(([campo]) => campo);
+
+            if (camposVazios.length > 0) {
                 return res.status(400).json({
                     erro: 'Dados inválidos',
-                    detalhes: {
-                        nome: nome ? 'presente' : 'ausente',
-                        equipe_id: equipe_id ? 'presente' : 'ausente'
-                    }
+                    detalhes: `Os seguintes campos estão vazios: ${camposVazios.join(', ')}`
                 });
             }
 
-            const vendedorAtualizado = await this.atualizarVendedor.executar(id, { nome, equipe_id });
-            // //console.log("✅ Vendedor atualizado com sucesso:", vendedorAtualizado);
-
+            const vendedorAtualizado = await this.atualizarVendedor.executar(id, camposAtualizacao);
             return res.status(200).json(vendedorAtualizado);
         } catch (erro) {
-            // console.error("❌ Erro ao atualizar vendedor:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao atualizar vendedor',
                 mensagem: (erro as Error).message 
             });
+        }
+    }
+
+    async obterInsights(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+            const { mes } = req.query;
+            const insights = await this.getVendedorInsights.execute(id, mes as string);
+            return res.json(insights);
+        } catch (error) {
+            console.error('Erro ao obter insights do vendedor:', error);
+            return res.status(400).json({ error: 'Erro ao obter insights do vendedor' });
         }
     }
 }

@@ -10,133 +10,205 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const OllamaService_1 = require("../application/services/OllamaService");
-const AtividadeRepositoryImpl_1 = require("../infrastructure/repositories/AtividadeRepositoryImpl");
-const VendedorRepositoryImpl_1 = require("../infrastructure/repositories/VendedorRepositoryImpl");
-const EquipeRepositoryImpl_1 = require("../infrastructure/repositories/EquipeRepositoryImpl");
-const MetaRepositoryImpl_1 = require("../infrastructure/repositories/MetaRepositoryImpl");
-const FrequenciaVendasService_1 = require("../application/services/FrequenciaVendasService");
-const ObterEquipeDadosFull_1 = require("../application/use-cases/ObterEquipeDadosFull");
-const AtividadeService_1 = require("../application/services/AtividadeService");
-const MongoDB_1 = require("../infrastructure/database/MongoDB");
-function trainModel() {
+function trainOllamaModel() {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log('🚀 Iniciando treinamento do modelo Ollama...');
         try {
-            // Conecta ao MongoDB
-            console.log('🔄 Conectando ao MongoDB...');
-            yield MongoDB_1.MongoDB.conectar();
-            console.log('✅ Conectado ao MongoDB com sucesso!');
+            console.log('🚀 Iniciando treinamento do modelo...');
             const ollamaService = new OllamaService_1.OllamaService();
-            const atividadeRepo = new AtividadeRepositoryImpl_1.AtividadeRepositoryImpl();
-            const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
-            const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
-            const metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
-            const obterEquipeDadosFull = new ObterEquipeDadosFull_1.ObterEquipeDadosFull(equipeRepo, vendedorRepo, atividadeRepo, metaRepo);
-            const frequenciaVendasService = new FrequenciaVendasService_1.FrequenciaVendasService(obterEquipeDadosFull);
-            const atividadeService = new AtividadeService_1.AtividadeService(atividadeRepo);
-            // Busca todos os vendedores
-            const vendedores = yield vendedorRepo.obterTodos(0, 1000);
-            console.log(`📊 Encontrados ${vendedores.length} vendedores para treinamento`);
-            // Calcula datas para análise (últimos 6 meses)
-            const hoje = new Date();
-            const dataFim = hoje;
-            const dataInicio = new Date(hoje.getFullYear(), hoje.getMonth() - 6, hoje.getDate());
-            // Array para armazenar exemplos de treinamento
-            const trainingExamples = [];
-            for (const vendedor of vendedores) {
-                try {
-                    // Busca dados da equipe
-                    const equipe = yield equipeRepo.obterPorId(vendedor.equipe_id);
-                    if (!equipe)
-                        continue;
-                    // Busca meta da equipe
-                    const meta = yield metaRepo.obterPorEquipe(equipe.id);
-                    // Busca atividades do vendedor
-                    const atividades = yield atividadeRepo.obterPorVendedorEData(vendedor.id, dataInicio, dataFim);
-                    // Calcula métricas
-                    const diasComAtividade = atividades.length;
-                    const totalDocinhos = atividades.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
-                    const mediaPorDia = diasComAtividade > 0 ? totalDocinhos / diasComAtividade : 0;
-                    // Calcula FEA e IAP
-                    const frequencia = yield frequenciaVendasService.calcularFrequencia(equipe.id, dataInicio, dataFim);
-                    const fea = yield atividadeService.calcularFEA(equipe.id, frequencia.totalDiasDisponiveis, frequencia.diasComAtividade);
-                    const iap = mediaPorDia * (frequencia.totalDiasDisponiveis - diasComAtividade);
-                    // Prepara exemplo de treinamento
-                    const example = {
-                        prompt: `Analise o desempenho do vendedor ${vendedor.nome} com base nos seguintes dados:
+            // Exemplo de treinamento 1
+            const example1 = {
+                prompt: `Você é um assistente especializado em análise de vendedores. Analise o desempenho do vendedor João com base nos seguintes dados:
 
-Métricas Atuais:
-- FEA (Fator de Eficiência de Atividade): ${fea}
-- IAP (Indicador de Atividade Potencial): ${iap}
-- Dias com Atividade: ${diasComAtividade}
-- Total de Docinhos Vendidos: ${totalDocinhos}
-- Média por Dia: ${mediaPorDia}
+Métricas:
+- FEA: 1.5 (Eficiência das atividades)
+- IAP: 2250 (Potencial de vendas)
+- Dias Ativos: 120
+- Total Vendido: 150000
+- Média Diária: 1250
+- % Meta Equipe: 150.00%
+- Peso na Equipe: 150.00%
+- Meta Individual: 150000
+- Meta Diária: 4838.71
+- Meta Equipe: 100000
 
-Meta da Equipe:
-- Objetivo: ${(meta === null || meta === void 0 ? void 0 : meta.objetivo) || 0}`,
-                        completion: `{
-  "perfil_vendas": "${diasComAtividade > 100 ? 'Vendedor experiente com excelente performance' : diasComAtividade > 50 ? 'Vendedor intermediário com boa performance' : 'Vendedor iniciante com potencial de crescimento'}",
-  "tendencias": [
-    "${mediaPorDia > 150 ? 'Alta produtividade e consistência nas vendas' : mediaPorDia > 100 ? 'Boa produtividade com espaço para melhoria' : 'Produtividade abaixo do esperado'}",
-    "${fea > 1.5 ? 'Excelente eficiência de atividade' : fea > 1.0 ? 'Boa eficiência de atividade' : 'Eficiência de atividade precisa melhorar'}"
-  ],
-  "pontos_fortes": [
-    "${mediaPorDia > 150 ? 'Alta produtividade diária' : mediaPorDia > 100 ? 'Boa produtividade diária' : 'Consistência nas atividades'}",
-    "${fea > 1.5 ? 'Excelente eficiência operacional' : fea > 1.0 ? 'Boa eficiência operacional' : 'Dedicação nas atividades'}"
-  ],
-  "pontos_fracos": [
-    "${mediaPorDia < 100 ? 'Baixa produtividade diária' : mediaPorDia < 150 ? 'Produtividade pode melhorar' : 'Possível sobrecarga de trabalho'}",
-    "${fea < 1.0 ? 'Baixa eficiência operacional' : fea < 1.5 ? 'Eficiência pode melhorar' : 'Possível necessidade de mais desafios'}"
-  ],
-  "recomendacoes": [
-    "${mediaPorDia < 100 ? 'Focar em aumentar a produtividade diária' : mediaPorDia < 150 ? 'Manter a produtividade e buscar melhorias' : 'Compartilhar boas práticas com a equipe'}",
-    "${fea < 1.0 ? 'Melhorar a eficiência operacional' : fea < 1.5 ? 'Manter a eficiência e buscar melhorias' : 'Mentorar outros vendedores'}"
-  ],
-  "projecao_crescimento": "${mediaPorDia > 150 ? 'Alto potencial de crescimento' : mediaPorDia > 100 ? 'Bom potencial de crescimento' : 'Potencial de crescimento moderado'}",
-  "estrategias_personalizadas": [
-    "${mediaPorDia < 100 ? 'Implementar técnicas de vendas mais eficientes' : mediaPorDia < 150 ? 'Otimizar rotas e horários de vendas' : 'Expandir área de atuação'}",
-    "${fea < 1.0 ? 'Melhorar gestão de tempo' : fea < 1.5 ? 'Otimizar processos de vendas' : 'Desenvolver novas estratégias de vendas'}"
-  ],
-  "nova_meta_sugerida": "${(mediaPorDia * 1.2).toFixed(2)}",
-  "probabilidade_crescimento": "${mediaPorDia > 150 ? '30% a 40%' : mediaPorDia > 100 ? '20% a 30%' : '10% a 20%'}",
-  "fator_ajuste_meta": "${(mediaPorDia / 150).toFixed(4)}",
-  "dados_grafico": {
-    "historico": [
-      {"mes": "Janeiro", "valor": ${totalDocinhos / 6}},
-      {"mes": "Fevereiro", "valor": ${totalDocinhos / 6}},
-      {"mes": "Março", "valor": ${totalDocinhos / 6}},
-      {"mes": "Abril", "valor": ${totalDocinhos / 6}},
-      {"mes": "Maio", "valor": ${totalDocinhos / 6}},
-      {"mes": "Junho", "valor": ${totalDocinhos / 6}}
+Histórico de Vendas:
+[
+    {"mes": "Janeiro", "valor": 37500},
+    {"mes": "Fevereiro", "valor": 37500},
+    {"mes": "Março", "valor": 37500},
+    {"mes": "Abril", "valor": 37500},
+    {"mes": "Maio", "valor": 37500},
+    {"mes": "Junho", "valor": 37500}
+]
+
+Responda APENAS com um JSON válido no formato abaixo. Não inclua texto adicional ou explicações:`,
+                completion: `{
+    "perfil_vendas": "Vendedor experiente com alto desempenho e consistência nas vendas",
+    "tendencias": [
+        "Vendas estáveis ao longo dos meses",
+        "Alta eficiência operacional",
+        "Superação consistente das metas"
     ],
-    "previsao": [
-      {"mes": "Julho", "valor": ${totalDocinhos / 6 * 1.2}},
-      {"mes": "Agosto", "valor": ${totalDocinhos / 6 * 1.2}},
-      {"mes": "Setembro", "valor": ${totalDocinhos / 6 * 1.2}}
-    ]
-  }
+    "pontos_fortes": [
+        "Excelente FEA (1.5) indicando alta eficiência",
+        "Consistência nas vendas mensais",
+        "Contribuição significativa para a meta da equipe"
+    ],
+    "pontos_fracos": [
+        "Possível estagnação no crescimento",
+        "Dependência da equipe em um único vendedor",
+        "Risco de sobrecarga"
+    ],
+    "recomendacoes": [
+        "Desenvolver plano de mentoria para outros vendedores",
+        "Estabelecer metas de crescimento progressivo",
+        "Implementar sistema de reconhecimento e recompensas"
+    ],
+    "projecao_crescimento": "Potencial de crescimento de 10% nos próximos 3 meses",
+    "estrategias_personalizadas": [
+        "Criar programa de desenvolvimento de liderança",
+        "Estabelecer metas desafiadoras mas alcançáveis",
+        "Implementar sistema de feedback regular"
+    ],
+    "nova_meta_sugerida": 165000,
+    "probabilidade_crescimento": "30% a 40%",
+    "fator_ajuste_meta": 1.2,
+    "dados_grafico": {
+        "historico": [
+            {"mes": "Janeiro", "valor": 37500},
+            {"mes": "Fevereiro", "valor": 37500},
+            {"mes": "Março", "valor": 37500},
+            {"mes": "Abril", "valor": 37500},
+            {"mes": "Maio", "valor": 37500},
+            {"mes": "Junho", "valor": 37500}
+        ],
+        "previsao": [
+            {"mes": "Julho", "valor": 41250},
+            {"mes": "Agosto", "valor": 42500},
+            {"mes": "Setembro", "valor": 43750}
+        ]
+    },
+    "analise_historico": {
+        "crescimento_periodo": "Estável com média de 37500 por mês",
+        "tendencias_identificadas": [
+            "Consistência nas vendas mensais",
+            "Alta performance sustentada",
+            "Superação constante das metas"
+        ],
+        "pontos_melhoria": [
+            "Diversificação de estratégias de venda",
+            "Desenvolvimento de novas habilidades",
+            "Equilíbrio entre performance e sustentabilidade"
+        ],
+        "estrategias_historico": [
+            "Manter a consistência nas vendas",
+            "Compartilhar boas práticas com a equipe",
+            "Desenvolver plano de sucessão"
+        ]
+    }
 }`
-                    };
-                    trainingExamples.push(example);
-                    console.log(`✅ Processado vendedor: ${vendedor.nome}`);
-                }
-                catch (error) {
-                    console.error(`❌ Erro ao processar vendedor ${vendedor.nome}:`, error);
-                }
-            }
-            console.log(`\n📚 Total de exemplos de treinamento gerados: ${trainingExamples.length}`);
+            };
+            // Exemplo de treinamento 2
+            const example2 = {
+                prompt: `Você é um assistente especializado em análise de vendedores. Analise o desempenho do vendedor Maria com base nos seguintes dados:
+
+Métricas:
+- FEA: 0.8 (Eficiência das atividades)
+- IAP: 1500 (Potencial de vendas)
+- Dias Ativos: 90
+- Total Vendido: 75000
+- Média Diária: 833
+- % Meta Equipe: 75.00%
+- Peso na Equipe: 75.00%
+- Meta Individual: 75000
+- Meta Diária: 2500
+- Meta Equipe: 100000
+
+Histórico de Vendas:
+[
+    {"mes": "Janeiro", "valor": 10000},
+    {"mes": "Fevereiro", "valor": 12000},
+    {"mes": "Março", "valor": 15000},
+    {"mes": "Abril", "valor": 18000},
+    {"mes": "Maio", "valor": 20000}
+]
+
+Responda APENAS com um JSON válido no formato abaixo. Não inclua texto adicional ou explicações:`,
+                completion: `{
+    "perfil_vendas": "Vendedora em desenvolvimento com potencial de crescimento",
+    "tendencias": [
+        "Crescimento constante nas vendas",
+        "Evolução gradual do desempenho",
+        "Adaptação progressiva às metas"
+    ],
+    "pontos_fortes": [
+        "Crescimento consistente mês a mês",
+        "Boa evolução no volume de vendas",
+        "Potencial de desenvolvimento"
+    ],
+    "pontos_fracos": [
+        "FEA abaixo do ideal (0.8)",
+        "Eficiência operacional a melhorar",
+        "Meta individual ainda não alcançada"
+    ],
+    "recomendacoes": [
+        "Investir em treinamento e capacitação",
+        "Acompanhamento próximo da liderança",
+        "Estabelecer metas intermediárias"
+    ],
+    "projecao_crescimento": "Potencial de crescimento de 20% nos próximos 3 meses",
+    "estrategias_personalizadas": [
+        "Programa de mentoria personalizado",
+        "Foco em desenvolvimento de habilidades",
+        "Acompanhamento semanal de resultados"
+    ],
+    "nova_meta_sugerida": 85000,
+    "probabilidade_crescimento": "40% a 50%",
+    "fator_ajuste_meta": 0.9,
+    "dados_grafico": {
+        "historico": [
+            {"mes": "Janeiro", "valor": 10000},
+            {"mes": "Fevereiro", "valor": 12000},
+            {"mes": "Março", "valor": 15000},
+            {"mes": "Abril", "valor": 18000},
+            {"mes": "Maio", "valor": 20000}
+        ],
+        "previsao": [
+            {"mes": "Junho", "valor": 22000},
+            {"mes": "Julho", "valor": 24000},
+            {"mes": "Agosto", "valor": 26000}
+        ]
+    },
+    "analise_historico": {
+        "crescimento_periodo": "Crescimento médio de 25% ao mês",
+        "tendencias_identificadas": [
+            "Evolução constante no desempenho",
+            "Adaptação progressiva ao papel",
+            "Melhoria na curva de aprendizado"
+        ],
+        "pontos_melhoria": [
+            "Eficiência nas atividades diárias",
+            "Volume de vendas por dia",
+            "Consistência na performance"
+        ],
+        "estrategias_historico": [
+            "Manter ritmo de crescimento",
+            "Focar em eficiência operacional",
+            "Desenvolver habilidades específicas"
+        ]
+    }
+}`
+            };
             // Treina o modelo com os exemplos
-            console.log('\n🔄 Iniciando treinamento do modelo...');
-            for (let i = 0; i < trainingExamples.length; i++) {
-                const example = trainingExamples[i];
-                yield ollamaService.trainModel(example);
-                console.log(`✅ Exemplo ${i + 1}/${trainingExamples.length} processado`);
-            }
-            console.log('\n🎉 Treinamento concluído com sucesso!');
+            console.log('\n📚 Treinando exemplo 1...');
+            yield ollamaService.trainModel(example1);
+            console.log('\n📚 Treinando exemplo 2...');
+            yield ollamaService.trainModel(example2);
+            console.log('\n✅ Treinamento concluído com sucesso!');
         }
         catch (error) {
             console.error('❌ Erro durante o treinamento:', error);
         }
     });
 }
-trainModel();
+trainOllamaModel().catch(console.error);

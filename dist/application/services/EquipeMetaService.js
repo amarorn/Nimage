@@ -49,3 +49,4 @@ class EquipeMetaService {
     }
 }
 exports.EquipeMetaService = EquipeMetaService;
+//# sourceMappingURL=EquipeMetaService.js.map

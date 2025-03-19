@@ -31,6 +31,7 @@ const frequenciaVendasService = new FrequenciaVendasService_1.FrequenciaVendasSe
 router.get('/vendor-insights/:vendedorId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { vendedorId } = req.params;
+        const { mes } = req.query; // Obtém o mês da query string
         // Busca dados do vendedor
         const vendedor = yield vendedorRepo.obterPorId(vendedorId);
         if (!vendedor) {
@@ -43,20 +44,91 @@ router.get('/vendor-insights/:vendedorId', (req, res) => __awaiter(void 0, void 
         }
         // Busca meta da equipe
         const meta = yield metaRepo.obterPorEquipe(equipe.id);
-        // Calcula datas para análise (últimos 6 meses)
+        // Calcula datas para análise
         const hoje = new Date();
-        const dataFim = hoje;
-        const dataInicio = new Date(hoje.getFullYear(), hoje.getMonth() - 6, hoje.getDate());
+        let dataInicio;
+        let dataFim;
+        let mesAnteriorInicio;
+        let mesAnteriorFim;
+        if (mes) {
+            // Se um mês específico foi fornecido, usa esse mês
+            const [ano, mesNumero] = mes.split('-').map(Number);
+            dataInicio = new Date(ano, mesNumero - 1, 1);
+            dataFim = new Date(ano, mesNumero, 0);
+            // Calcula datas para o mês anterior
+            mesAnteriorInicio = new Date(ano, mesNumero - 2, 1);
+            console.log("🚀 ~ router.get ~ mesAnteriorInicio:", mesAnteriorInicio);
+            mesAnteriorFim = new Date(ano, mesNumero - 1, 0);
+            console.log("🚀 ~ router.get ~ mesAnteriorFim:", mesAnteriorFim);
+        }
+        else {
+            // Se não foi fornecido mês, usa o mês atual
+            dataInicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+            dataFim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+            // Calcula datas para o mês anterior
+            mesAnteriorInicio = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1);
+            mesAnteriorFim = new Date(hoje.getFullYear(), hoje.getMonth(), 0);
+        }
         // Busca atividades do vendedor
         const atividades = yield atividadeRepo.obterPorVendedorEData(vendedorId, dataInicio, dataFim);
         // Calcula métricas
         const diasComAtividade = atividades.length;
         const totalDocinhos = atividades.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
         const mediaPorDia = diasComAtividade > 0 ? totalDocinhos / diasComAtividade : 0;
+        // Busca atividades do vendedor no mês anterior
+        const atividadesMesAnterior = yield atividadeRepo.obterPorVendedorEData(vendedorId, mesAnteriorInicio, mesAnteriorFim);
+        const totalDocinhosMesAnterior = atividadesMesAnterior.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
+        // Busca meta da equipe do mês anterior
+        const metaAnterior = yield metaRepo.obterPorEquipeEData(equipe.id, mesAnteriorInicio, mesAnteriorFim);
+        // Busca todos os vendedores da equipe para calcular média
+        const vendedoresEquipe = yield vendedorRepo.obterPorEquipeId(equipe.id);
+        const totalVendedores = vendedoresEquipe.length;
+        // Calcula total de vendas da equipe no mês anterior
+        const vendasEquipeMesAnterior = yield Promise.all(vendedoresEquipe.map((v) => __awaiter(void 0, void 0, void 0, function* () {
+            const atividadesVendedor = yield atividadeRepo.obterPorVendedorEData(v.id, mesAnteriorInicio, mesAnteriorFim);
+            const totalVendedor = atividadesVendedor.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
+            return totalVendedor;
+        })));
+        const totalVendasEquipeMesAnterior = vendasEquipeMesAnterior.reduce((total, valor) => total + valor, 0);
+        const mediaEquipeVendas = totalVendasEquipeMesAnterior / totalVendedores;
+        console.log('Dados do mês anterior:', {
+            periodo: {
+                inicio: mesAnteriorInicio.toISOString(),
+                fim: mesAnteriorFim.toISOString()
+            },
+            vendasVendedor: totalDocinhosMesAnterior,
+            vendasEquipe: totalVendasEquipeMesAnterior,
+            metaAnterior: (metaAnterior === null || metaAnterior === void 0 ? void 0 : metaAnterior.objetivo) || 0
+        });
         // Calcula FEA e IAP
         const frequencia = yield frequenciaVendasService.calcularFrequencia(equipe.id, dataInicio, dataFim);
         const fea = yield atividadeService.calcularFEA(equipe.id, frequencia.totalDiasDisponiveis, frequencia.diasComAtividade);
         const iap = mediaPorDia * (frequencia.totalDiasDisponiveis - diasComAtividade);
+        // Prepara histórico de vendas por mês
+        const historicoVendas = atividades.reduce((acc, atividade) => {
+            const mes = atividade.data.toLocaleString('pt-BR', { month: 'long' });
+            const mesExistente = acc.find(item => item.mes === mes);
+            if (mesExistente) {
+                mesExistente.valor += atividade.docinhosCoco;
+                mesExistente.count += 1;
+            }
+            else {
+                acc.push({
+                    mes: mes.charAt(0).toUpperCase() + mes.slice(1),
+                    valor: atividade.docinhosCoco,
+                    count: 1
+                });
+            }
+            return acc;
+        }, []);
+        // Calcula a média por mês e remove o count
+        const historicoFinal = historicoVendas.map(item => ({
+            mes: item.mes,
+            valor: item.valor / item.count
+        }));
+        // Ordena histórico por mês
+        const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        historicoFinal.sort((a, b) => meses.indexOf(a.mes) - meses.indexOf(b.mes));
         // Prepara dados para análise
         const vendorInfo = {
             resultado: {
@@ -66,10 +138,23 @@ router.get('/vendor-insights/:vendedorId', (req, res) => __awaiter(void 0, void 
                     iapVendedor: iap,
                     numeroDiasComAtividade: diasComAtividade,
                     somaDocinhos: totalDocinhos,
-                    mediaAtividadePorDia: mediaPorDia
+                    mediaAtividadePorDia: mediaPorDia,
+                    historicoVendas: historicoFinal,
+                    vendasMesAnterior: totalDocinhosMesAnterior,
+                    mediaEquipeMesAnterior: mediaEquipeVendas,
+                    totalVendedores: totalVendedores,
+                    totalVendasEquipeMesAnterior: totalVendasEquipeMesAnterior,
+                    periodoAnalise: {
+                        inicio: dataInicio.toISOString(),
+                        fim: dataFim.toISOString()
+                    }
                 },
                 equipe: {
-                    meta: (meta === null || meta === void 0 ? void 0 : meta.objetivo) || 0
+                    meta: (meta === null || meta === void 0 ? void 0 : meta.objetivo) || 0,
+                    meta_anterior: (metaAnterior === null || metaAnterior === void 0 ? void 0 : metaAnterior.objetivo) || 0,
+                    totalVendedores: totalVendedores,
+                    mediaEquipe: mediaEquipeVendas,
+                    totalVendasMesAnterior: totalVendasEquipeMesAnterior
                 }
             }
         };
@@ -113,6 +198,41 @@ router.get('/vendor-insights', (req, res) => __awaiter(void 0, void 0, void 0, f
                 const frequencia = yield frequenciaVendasService.calcularFrequencia(equipe.id, dataInicio, dataFim);
                 const fea = yield atividadeService.calcularFEA(equipe.id, frequencia.totalDiasDisponiveis, frequencia.diasComAtividade);
                 const iap = mediaPorDia * (frequencia.totalDiasDisponiveis - diasComAtividade);
+                // Busca todos os vendedores da equipe para calcular média
+                const vendedoresEquipe = yield vendedorRepo.obterPorEquipeId(equipe.id);
+                const totalVendedores = vendedoresEquipe.length;
+                // Calcula média de vendas da equipe
+                const mediaEquipe = yield Promise.all(vendedoresEquipe.map((v) => __awaiter(void 0, void 0, void 0, function* () {
+                    const atividadesVendedor = yield atividadeRepo.obterPorVendedorEData(v.id, dataInicio, dataFim);
+                    const totalVendedor = atividadesVendedor.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
+                    return totalVendedor;
+                })));
+                const mediaEquipeVendas = mediaEquipe.reduce((total, valor) => total + valor, 0) / totalVendedores;
+                // Prepara histórico de vendas por mês
+                const historicoVendas = atividades.reduce((acc, atividade) => {
+                    const mes = atividade.data.toLocaleString('pt-BR', { month: 'long' });
+                    const mesExistente = acc.find(item => item.mes === mes);
+                    if (mesExistente) {
+                        mesExistente.valor += atividade.docinhosCoco;
+                        mesExistente.count += 1;
+                    }
+                    else {
+                        acc.push({
+                            mes: mes.charAt(0).toUpperCase() + mes.slice(1),
+                            valor: atividade.docinhosCoco,
+                            count: 1
+                        });
+                    }
+                    return acc;
+                }, []);
+                // Calcula a média por mês e remove o count
+                const historicoFinal = historicoVendas.map(item => ({
+                    mes: item.mes,
+                    valor: item.valor / item.count
+                }));
+                // Ordena histórico por mês
+                const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                historicoFinal.sort((a, b) => meses.indexOf(a.mes) - meses.indexOf(b.mes));
                 // Prepara dados para análise
                 const vendorInfo = {
                     resultado: {
@@ -122,10 +242,13 @@ router.get('/vendor-insights', (req, res) => __awaiter(void 0, void 0, void 0, f
                             iapVendedor: iap,
                             numeroDiasComAtividade: diasComAtividade,
                             somaDocinhos: totalDocinhos,
-                            mediaAtividadePorDia: mediaPorDia
+                            mediaAtividadePorDia: mediaPorDia,
+                            historicoVendas: historicoFinal
                         },
                         equipe: {
-                            meta: (meta === null || meta === void 0 ? void 0 : meta.objetivo) || 0
+                            meta: (meta === null || meta === void 0 ? void 0 : meta.objetivo) || 0,
+                            totalVendedores: totalVendedores,
+                            mediaEquipe: mediaEquipeVendas
                         }
                     }
                 };

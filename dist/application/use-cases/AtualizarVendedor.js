@@ -11,19 +11,36 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AtualizarVendedor = void 0;
 class AtualizarVendedor {
-    constructor(vendedorRepo) {
-        this.vendedorRepo = vendedorRepo;
+    constructor(vendedorRepository) {
+        this.vendedorRepository = vendedorRepository;
     }
     executar(id, dados) {
         return __awaiter(this, void 0, void 0, function* () {
-            //console.log("📝 Iniciando atualização de vendedor com dados:", dados);
-            if (!dados.nome || !dados.equipe_id) {
-                throw new Error('Dados inválidos para atualizar vendedor');
+            if (!id) {
+                throw new Error('ID do vendedor é obrigatório');
             }
-            const vendedorAtualizado = yield this.vendedorRepo.atualizar(id, dados);
-            //console.log("💾 Vendedor atualizado no banco:", vendedorAtualizado);
-            return vendedorAtualizado;
+            // Verifica se o vendedor existe
+            const vendedorExistente = yield this.vendedorRepository.obterPorId(id);
+            if (!vendedorExistente) {
+                throw new Error('Vendedor não encontrado');
+            }
+            // Filtra apenas os campos que foram fornecidos
+            const dadosAtualizacao = {};
+            if (dados.nome !== undefined)
+                dadosAtualizacao.nome = dados.nome;
+            if (dados.equipeId !== undefined)
+                dadosAtualizacao.equipeId = dados.equipeId;
+            if (dados.email !== undefined)
+                dadosAtualizacao.email = dados.email;
+            if (dados.telefone !== undefined)
+                dadosAtualizacao.telefone = dados.telefone;
+            if (dados.meta !== undefined)
+                dadosAtualizacao.meta = dados.meta;
+            if (dados.cargo !== undefined)
+                dadosAtualizacao.cargo = dados.cargo;
+            return yield this.vendedorRepository.atualizar(id, dadosAtualizacao);
         });
     }
 }
 exports.AtualizarVendedor = AtualizarVendedor;
+//# sourceMappingURL=AtualizarVendedor.js.map

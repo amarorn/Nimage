@@ -61,7 +61,7 @@ export class OllamaTrainer {
                     const vendedor = await this.vendedorRepo.obterPorId(atividade.vendedorId);
                     if (!vendedor) continue;
 
-                    const equipe = await this.equipeRepo.obterPorId(vendedor.equipe_id);
+                    const equipe = await this.equipeRepo.obterPorId(vendedor.equipeId);
                     if (!equipe) continue;
 
                     const meta = await this.metaRepo.obterPorEquipe(equipe.id);

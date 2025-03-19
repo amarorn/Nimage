@@ -21,3 +21,4 @@ class ObterAtividadesPorVendedorEData {
     }
 }
 exports.ObterAtividadesPorVendedorEData = ObterAtividadesPorVendedorEData;
+//# sourceMappingURL=ObterAtividadesPorVendedorEData.js.map

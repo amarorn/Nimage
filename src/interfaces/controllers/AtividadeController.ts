@@ -134,7 +134,7 @@ export class AtividadeController {
             }
 
             const equipeRepo = new EquipeRepositoryImpl();
-            const equipe = await equipeRepo.obterPorId(vendedor.equipe_id);
+            const equipe = await equipeRepo.obterPorId(vendedor.equipeId);
             if (!equipe) {
                 // //console.log("⚠️ Equipe não encontrada");
                 return res.status(404).json({ erro: 'Equipe não encontrada' });
@@ -155,7 +155,7 @@ export class AtividadeController {
                 vendedor: {
                     id: vendedor.id,
                     nome: vendedor.nome,
-                    equipe_id: vendedor.equipe_id
+                    equipeId: vendedor.equipeId
                 },
                 equipe: {
                     id: equipe.id,

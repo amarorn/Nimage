@@ -27,3 +27,4 @@ class AtualizarEquipe {
     }
 }
 exports.AtualizarEquipe = AtualizarEquipe;
+//# sourceMappingURL=AtualizarEquipe.js.map

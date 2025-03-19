@@ -42,3 +42,4 @@ const AtividadeSchema = new mongoose_1.Schema({
     docinhosCoco: { type: Number, required: true }
 });
 exports.AtividadeModel = mongoose_1.default.model("Atividade", AtividadeSchema);
+//# sourceMappingURL=AtividadeModel.js.map

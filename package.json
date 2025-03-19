@@ -15,13 +15,16 @@
     "generate-activities": "ts-node src/scripts/generateActivities.ts",
     "prepare-training": "ts-node src/scripts/prepareTrainingData.ts",
     "train-model": "ts-node src/domain/models/trainModel.ts",
-    "train-ollama": "ts-node src/domain/models/ollamaTrainer.ts"
+    "train-ollama": "ts-node src/domain/models/ollamaTrainer.ts",
+    "train-ollama-simple": "ts-node src/scripts/trainOllamaSimple.ts"
   },
   "dependencies": {
     "@tensorflow/tfjs": "^4.17.0",
+    "@types/dotenv": "^8.2.3",
     "@types/uuid": "^10.0.0",
     "badge-maker": "^4.1.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.18.2",
     "flatted": "^3.3.2",
     "mongodb": "^6.13.0",

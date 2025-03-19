@@ -8,115 +8,135 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const VendedorRepositoryImpl_1 = require("../infrastructure/repositories/VendedorRepositoryImpl");
-const AtividadeRepositoryImpl_1 = require("../infrastructure/repositories/AtividadeRepositoryImpl");
-const EquipeRepositoryImpl_1 = require("../infrastructure/repositories/EquipeRepositoryImpl");
-const MetaRepositoryImpl_1 = require("../infrastructure/repositories/MetaRepositoryImpl");
-const uuid_1 = require("uuid");
 const MongoDB_1 = require("../infrastructure/database/MongoDB");
+const EquipeRepositoryImpl_1 = require("../infrastructure/repositories/EquipeRepositoryImpl");
+const VendedorRepositoryImpl_1 = require("../infrastructure/repositories/VendedorRepositoryImpl");
+const MetaRepositoryImpl_1 = require("../infrastructure/repositories/MetaRepositoryImpl");
+const AtividadeRepositoryImpl_1 = require("../infrastructure/repositories/AtividadeRepositoryImpl");
 const Equipe_1 = require("../domain/entities/Equipe");
 const Vendedor_1 = require("../domain/entities/Vendedor");
 const Meta_1 = require("../domain/entities/Meta");
 const Atividade_1 = require("../domain/entities/Atividade");
-const mongoose_1 = __importDefault(require("mongoose"));
-// Configurações
-const NUM_EQUIPES = 5;
-const VENDEDORES_POR_EQUIPE = 3;
-const MESES_SIMULACAO = 12;
-const BASE_META_MENSAL = 100000; // R$ 100.000,00
-// Perfis de desempenho
-const PERFIS = {
-    ALTO: { nome: 'Alto Desempenho', multiplicador: 1.5 },
-    MEDIO: { nome: 'Médio Desempenho', multiplicador: 1.0 },
-    BAIXO: { nome: 'Baixo Desempenho', multiplicador: 0.7 }
-};
-// Variações sazonais por mês (0 = janeiro, 11 = dezembro)
-const VARIACOES_SAZONAIS = {
-    0: 0.8, // Janeiro (baixa temporada)
-    1: 0.9, // Fevereiro
-    2: 1.0, // Março
-    3: 1.0, // Abril
-    4: 1.0, // Maio
-    5: 1.0, // Junho
-    6: 1.0, // Julho
-    7: 1.0, // Agosto
-    8: 1.0, // Setembro
-    9: 1.1, // Outubro (alta temporada)
-    10: 1.2, // Novembro (alta temporada)
-    11: 1.3 // Dezembro (alta temporada)
-};
-function generateMassData() {
+const uuid_1 = require("uuid");
+const EquipeModel_1 = require("../infrastructure/database/models/EquipeModel");
+const VendedorModel_1 = require("../infrastructure/database/models/VendedorModel");
+const MetaModel_1 = require("../infrastructure/database/models/MetaModel");
+const AtividadeModel_1 = require("../infrastructure/database/models/AtividadeModel");
+function generateData() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // Conectar ao MongoDB
+            console.log('🚀 Iniciando geração de dados de massa...');
+            // Conecta ao MongoDB
             yield MongoDB_1.MongoDB.conectar();
-            console.log('Conectado ao MongoDB');
+            console.log('✅ Conectado ao MongoDB');
             const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
             const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
             const metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
             const atividadeRepo = new AtividadeRepositoryImpl_1.AtividadeRepositoryImpl();
-            // Criar equipes
-            const equipes = [];
-            for (let i = 0; i < NUM_EQUIPES; i++) {
-                const perfil = Object.values(PERFIS)[i % Object.values(PERFIS).length];
-                const equipe = new Equipe_1.Equipe((0, uuid_1.v4)(), `${perfil.nome} ${i + 1}`);
+            // Limpa dados existentes
+            console.log('🧹 Limpando dados existentes...');
+            yield EquipeModel_1.EquipeModel.deleteMany({});
+            yield VendedorModel_1.VendedorModel.deleteMany({});
+            yield MetaModel_1.MetaModel.deleteMany({});
+            yield AtividadeModel_1.AtividadeModel.deleteMany({});
+            // Cria equipes
+            console.log('👥 Criando equipes...');
+            const nomesEquipes = ['Equipe Norte', 'Equipe Sul', 'Equipe Leste', 'Equipe Oeste'];
+            for (const nome of nomesEquipes) {
+                const equipe = new Equipe_1.Equipe((0, uuid_1.v4)(), nome);
                 yield equipeRepo.criar(equipe);
-                equipes.push(equipe);
             }
-            console.log(`Criadas ${equipes.length} equipes`);
-            // Criar vendedores para cada equipe
-            const vendedores = [];
-            for (const equipe of equipes) {
-                for (let i = 0; i < VENDEDORES_POR_EQUIPE; i++) {
-                    const vendedor = new Vendedor_1.Vendedor((0, uuid_1.v4)(), `Vendedor ${i + 1} - ${equipe.nome}`, equipe.id, { id: equipe.id, nome: equipe.nome });
+            console.log('✅ 4 equipes criadas');
+            // Cria vendedores
+            console.log('👤 Criando vendedores...');
+            const equipes = yield equipeRepo.obterTodos(0, 4);
+            const nomesVendedores = [
+                'João Silva', 'Maria Santos', 'Pedro Oliveira', 'Ana Costa', 'Carlos Souza',
+                'Julia Lima', 'Roberto Alves', 'Beatriz Ferreira', 'Lucas Rodrigues', 'Mariana Silva',
+                'Rafael Costa', 'Fernanda Santos', 'Gustavo Oliveira', 'Carolina Lima', 'Daniel Alves',
+                'Amanda Ferreira', 'Bruno Rodrigues', 'Patricia Silva', 'Marcos Costa', 'Carla Santos'
+            ];
+            for (let i = 0; i < equipes.length; i++) {
+                const equipe = equipes[i];
+                for (let j = 0; j < 5; j++) {
+                    const vendedor = new Vendedor_1.Vendedor((0, uuid_1.v4)(), nomesVendedores[i * 5 + j], equipe.id);
                     yield vendedorRepo.criar(vendedor);
-                    vendedores.push(vendedor);
                 }
             }
-            console.log(`Criados ${vendedores.length} vendedores`);
-            // Gerar metas e atividades para cada mês
-            const dataAtual = new Date();
-            for (let mes = 0; mes < MESES_SIMULACAO; mes++) {
-                const dataInicio = new Date(dataAtual.getFullYear(), mes, 1);
-                const dataFim = new Date(dataAtual.getFullYear(), mes + 1, 0);
-                // Criar metas para cada equipe
-                for (const equipe of equipes) {
-                    const perfil = Object.values(PERFIS).find(p => equipe.nome.includes(p.nome));
-                    const metaValor = BASE_META_MENSAL * ((perfil === null || perfil === void 0 ? void 0 : perfil.multiplicador) || 1.0);
-                    const meta = new Meta_1.Meta((0, uuid_1.v4)(), equipe.id, metaValor, dataInicio);
+            console.log('✅ 20 vendedores criados');
+            // Cria metas
+            console.log('🎯 Criando metas...');
+            const dataInicio = new Date('2024-01-01');
+            const dataFim = new Date('2025-02-28');
+            const meses = 14;
+            for (const equipe of equipes) {
+                for (let i = 0; i < meses; i++) {
+                    const inicioMes = new Date(dataInicio.getFullYear(), dataInicio.getMonth() + i, 1);
+                    const fimMes = new Date(inicioMes.getFullYear(), inicioMes.getMonth() + 1, 0);
+                    const baseMeta = 100000;
+                    const fatorSazonal = Math.floor(Math.random() * (130 - 70 + 1) + 70) / 100;
+                    const fatorEquipe = Math.floor(Math.random() * (120 - 80 + 1) + 80) / 100;
+                    const objetivo = baseMeta * fatorSazonal * fatorEquipe;
+                    const meta = new Meta_1.Meta((0, uuid_1.v4)(), equipe.id, objetivo, inicioMes);
                     yield metaRepo.criar(meta);
                 }
-                // Gerar atividades para cada vendedor
-                for (const vendedor of vendedores) {
-                    const equipe = equipes.find(e => e.id === vendedor.equipe_id);
-                    const perfil = Object.values(PERFIS).find(p => equipe === null || equipe === void 0 ? void 0 : equipe.nome.includes(p.nome));
-                    const multiplicadorPerfil = (perfil === null || perfil === void 0 ? void 0 : perfil.multiplicador) || 1.0;
-                    const multiplicadorSazonal = VARIACOES_SAZONAIS[mes];
-                    // Gerar 20-30 atividades por mês por vendedor
-                    const numAtividades = Math.floor(Math.random() * 11) + 20;
-                    for (let i = 0; i < numAtividades; i++) {
-                        const data = new Date(dataInicio.getFullYear(), dataInicio.getMonth(), Math.floor(Math.random() * dataFim.getDate()) + 1, Math.floor(Math.random() * 24), Math.floor(Math.random() * 60));
-                        // Valor base da atividade com variações
-                        const valorBase = 5000; // R$ 5.000,00
-                        const variacao = 0.8 + Math.random() * 0.4; // 80% a 120% do valor base
-                        const valor = valorBase * variacao * multiplicadorPerfil * multiplicadorSazonal;
-                        const atividade = new Atividade_1.Atividade((0, uuid_1.v4)(), vendedor.id, data, valor, valor // total_docinhos igual ao valor base
-                        );
-                        yield atividadeRepo.criar(atividade);
-                    }
-                }
             }
-            console.log('Dados gerados com sucesso!');
+            console.log('✅ 56 metas criadas');
+            // Cria atividades
+            console.log('📊 Criando atividades...');
+            let totalAtividades = 0;
+            const vendedores = yield vendedorRepo.obterTodos(0, 20);
+            const metas = yield metaRepo.obterTodos(0, 56);
+            // Gera datas para todo o período
+            const datas = [];
+            let dataAtual = new Date(dataInicio);
+            while (dataAtual <= dataFim) {
+                datas.push(new Date(dataAtual));
+                dataAtual.setDate(dataAtual.getDate() + 1);
+            }
+            // Calcula quantas atividades cada vendedor terá (70% dos dias do período)
+            const totalDias = datas.length;
+            const diasPorVendedor = Math.floor(totalDias * 0.7);
+            for (const vendedor of vendedores) {
+                console.log(`\n👤 Processando vendedor: ${vendedor.nome}`);
+                const fatorDesempenho = Math.floor(Math.random() * (150 - 70 + 1) + 70) / 100;
+                const metasEquipe = metas.filter(meta => meta.equipeId === vendedor.equipe_id);
+                // Cria uma cópia das datas e embaralha para este vendedor
+                const datasVendedor = [...datas].sort(() => Math.random() - 0.5).slice(0, diasPorVendedor);
+                for (const data of datasVendedor) {
+                    const metaMes = metasEquipe.find(meta => meta.data.getMonth() === data.getMonth() &&
+                        meta.data.getFullYear() === data.getFullYear());
+                    if (!metaMes)
+                        continue;
+                    const mediaDiaria = metaMes.objetivo / new Date(data.getFullYear(), data.getMonth() + 1, 0).getDate();
+                    // Ajusta a quantidade de docinhos com base no dia da semana
+                    let fatorDiaSemana = 1.0;
+                    const diaSemana = data.getDay();
+                    if (diaSemana === 0 || diaSemana === 6) { // Fim de semana
+                        fatorDiaSemana = 1.3; // 30% mais vendas
+                    }
+                    else if (diaSemana === 5) { // Sexta-feira
+                        fatorDiaSemana = 1.2; // 20% mais vendas
+                    }
+                    const docinhosCoco = Math.floor(mediaDiaria *
+                        fatorDesempenho *
+                        fatorDiaSemana *
+                        (Math.floor(Math.random() * (120 - 80 + 1) + 80) / 100));
+                    const atividade = new Atividade_1.Atividade((0, uuid_1.v4)(), vendedor.id, data, docinhosCoco, docinhosCoco);
+                    yield atividadeRepo.criar(atividade);
+                    totalAtividades++;
+                }
+                console.log(`✅ Criadas ${diasPorVendedor} atividades para ${vendedor.nome}`);
+            }
+            console.log(`\n🎉 Total de atividades criadas: ${totalAtividades}`);
+            console.log('🎉 Geração de dados concluída com sucesso!');
         }
         catch (error) {
-            console.error('Erro ao gerar dados:', error);
+            console.error('❌ Erro durante a geração de dados:', error);
+            throw error;
         }
-        yield mongoose_1.default.disconnect();
     });
 }
-// Executar o script
-generateMassData();
+// Executa a geração de dados
+generateData().catch(console.error);
