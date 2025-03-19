@@ -10,16 +10,20 @@ const atividadeRoutes_1 = __importDefault(require("./interfaces/routes/atividade
 const equipeRoutes_1 = __importDefault(require("./interfaces/routes/equipeRoutes"));
 const metaRoutes_1 = __importDefault(require("./interfaces/routes/metaRoutes"));
 const desempenhoIdealRoutes_1 = __importDefault(require("./interfaces/routes/desempenhoIdealRoutes"));
+console.log('📦 Iniciando configuração do app...');
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
+console.log('🔧 Configurando CORS...');
 // Use o middleware CORS
 app.use((0, cors_1.default)({
     origin: '*'
     //methods: ['GET', 'POST', 'PUT', 'DELETE'],
     //allowedHeaders: ['Content-Type', 'Authorization']
 }));
+console.log('🛣️ Configurando rotas...');
 // Adicionando o endpoint de health check com o prefixo /api
 app.get("/api/health", (req, res) => {
+    console.log('📡 Health check solicitado');
     res.status(200).json({
         status: "UP",
         timestamp: new Date().toISOString(),
@@ -31,10 +35,12 @@ app.get("/api/health", (req, res) => {
         version: process.env.npm_package_version || '1.0.0'
     });
 });
+console.log('🔄 Registrando rotas...');
 app.use("/api", vendedorRoutes_1.default);
 app.use("/api", atividadeRoutes_1.default);
 app.use("/api", equipeRoutes_1.default);
 app.use("/api", metaRoutes_1.default);
 app.use("/api", desempenhoIdealRoutes_1.default);
+console.log('✅ App configurado com sucesso!');
 exports.default = app;
 //# sourceMappingURL=app.js.map

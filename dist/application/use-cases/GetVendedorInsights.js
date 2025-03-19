@@ -25,37 +25,48 @@ class GetVendedorInsights {
             try {
                 console.log('🔍 Iniciando busca de insights para vendedor:', vendedorId, 'mês:', mes);
                 // Busca dados do vendedor
+                console.log('🔍 Buscando dados do vendedor...');
                 const vendedor = yield this.vendedorRepository.obterPorId(vendedorId);
                 if (!vendedor) {
+                    console.error('❌ Vendedor não encontrado');
                     throw new Error('Vendedor não encontrado');
                 }
                 console.log('✅ Vendedor encontrado:', vendedor);
                 // Busca dados da equipe
+                console.log('🔍 Buscando dados da equipe...');
                 const equipe = yield this.equipeRepository.obterPorId(vendedor.equipeId);
                 if (!equipe) {
+                    console.error('❌ Equipe não encontrada');
                     throw new Error('Equipe não encontrada');
                 }
                 console.log('✅ Equipe encontrada:', equipe);
                 // Calcula datas para análise
+                console.log('📅 Calculando datas para análise...');
                 const datas = this.calcularDatasAnalise(mes);
                 console.log('📅 Datas calculadas:', datas);
                 // Busca meta da equipe
+                console.log('🔍 Buscando metas da equipe...');
                 const meta = yield this.metaRepository.obterPorEquipe(equipe.id);
                 const metaAnterior = yield this.metaRepository.obterPorEquipeEData(equipe.id, datas.mesAnteriorInicio, datas.mesAnteriorFim);
                 console.log('🎯 Metas encontradas:', { meta, metaAnterior });
                 // Busca atividades do vendedor
+                console.log('🔍 Buscando atividades do vendedor...');
                 const atividades = yield this.atividadeRepository.obterPorVendedorEData(vendedorId, datas.dataInicio, datas.dataFim);
                 console.log('📊 Atividades encontradas:', atividades.length);
                 // Busca atividades do mês anterior
+                console.log('🔍 Buscando atividades do mês anterior...');
                 const atividadesMesAnterior = yield this.atividadeRepository.obterPorVendedorEData(vendedorId, datas.mesAnteriorInicio, datas.mesAnteriorFim);
                 console.log('📊 Atividades mês anterior encontradas:', atividadesMesAnterior.length);
                 // Calcula métricas
+                console.log('📊 Calculando métricas...');
                 const metricas = yield this.calcularMetricas(vendedor, equipe, atividades, atividadesMesAnterior, meta, metaAnterior, datas);
                 console.log('📈 Métricas calculadas:', metricas);
                 // Prepara dados para análise
+                console.log('🔄 Preparando dados para análise...');
                 const vendorInfo = this.prepararDadosAnalise(metricas);
                 console.log('🔄 Dados preparados para análise:', vendorInfo);
                 // Gera insights
+                console.log('🔍 Gerando insights...');
                 const insights = yield this.ollamaService.getInsights(vendorInfo);
                 console.log('🎉 Insights gerados:', insights);
                 return insights;

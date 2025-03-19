@@ -16,12 +16,23 @@ class AtualizarEquipe {
     }
     executar(id, dados) {
         return __awaiter(this, void 0, void 0, function* () {
-            //console.log("📝 Iniciando atualização de equipe com dados:", dados);
-            if (!dados.nome) {
-                throw new Error('Dados inválidos para atualizar equipe');
+            if (!id) {
+                throw new Error('ID da equipe não fornecido');
             }
+            // Verifica se a equipe existe
+            const equipeExistente = yield this.equipeRepo.obterPorId(id);
+            if (!equipeExistente) {
+                throw new Error('Equipe não encontrada');
+            }
+            // Valida os campos fornecidos
+            if (dados.nome && dados.nome.trim().length === 0) {
+                throw new Error('Nome da equipe não pode estar vazio');
+            }
+            // Atualiza a equipe
             const equipeAtualizada = yield this.equipeRepo.atualizar(id, dados);
-            //console.log("💾 Equipe atualizada no banco:", equipeAtualizada);
+            if (!equipeAtualizada) {
+                throw new Error('Erro ao atualizar equipe');
+            }
             return equipeAtualizada;
         });
     }

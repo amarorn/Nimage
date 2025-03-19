@@ -6,9 +6,12 @@ import equipeRoutes from "./interfaces/routes/equipeRoutes";
 import metaRoutes from "./interfaces/routes/metaRoutes";
 import desempenhoIdealRoutes from "./interfaces/routes/desempenhoIdealRoutes";
 
+console.log('📦 Iniciando configuração do app...');
+
 const app = express();
 app.use(express.json());
 
+console.log('🔧 Configurando CORS...');
 // Use o middleware CORS
 app.use(cors({
     origin: '*'
@@ -16,8 +19,11 @@ app.use(cors({
     //allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+console.log('🛣️ Configurando rotas...');
+
 // Adicionando o endpoint de health check com o prefixo /api
 app.get("/api/health", (req, res) => {
+    console.log('📡 Health check solicitado');
     res.status(200).json({
         status: "UP",
         timestamp: new Date().toISOString(),
@@ -30,10 +36,13 @@ app.get("/api/health", (req, res) => {
     });
 });
 
+console.log('🔄 Registrando rotas...');
 app.use("/api", vendedorRoutes);
 app.use("/api", atividadeRoutes);
 app.use("/api", equipeRoutes);
 app.use("/api", metaRoutes);
 app.use("/api", desempenhoIdealRoutes);
+
+console.log('✅ App configurado com sucesso!');
 
 export default app;

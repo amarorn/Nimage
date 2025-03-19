@@ -59,6 +59,14 @@ class OllamaService {
                     metaEquipe: metaEquipe,
                     metaAnterior: vendorInfo.resultado.equipe.meta_anterior
                 });
+                // Log detalhado do mês anterior
+                console.log('\n📊 Dados do Mês Anterior:');
+                console.log('------------------------');
+                console.log(`🎯 Meta da Equipe: ${vendorInfo.resultado.equipe.meta_anterior}`);
+                console.log(`🍪 Total de Docinhos do Vendedor: ${vendedor.vendasMesAnterior}`);
+                console.log(`📈 Total de Vendas da Equipe: ${vendedor.totalVendasEquipeMesAnterior}`);
+                console.log(`📅 Período: ${vendorInfo.resultado.equipe.periodoMetaAnterior || 'Não especificado'}`);
+                console.log('------------------------\n');
                 // Calcula o percentual de contribuição para a meta da equipe usando dados do mês anterior
                 const vendasMesAnterior = parseFloat(vendedor.vendasMesAnterior) || 0;
                 const totalVendasEquipeMesAnterior = parseFloat(vendedor.totalVendasEquipeMesAnterior) || 1;
@@ -85,41 +93,53 @@ class OllamaService {
                     maximumFractionDigits: 2
                 }).format(percentualContribuicao_Final);
                 // Prepara dados para análise
-                const analysisPrompt = `Você é um assistente especializado em análise de vendedores, treinado para retornar APENAS respostas em formato JSON válido.
+                const analysisPrompt = `RETORNE APENAS O JSON ABAIXO PREENCHIDO COM SUA ANÁLISE.
+NÃO INCLUA NENHUM TEXTO ANTES OU DEPOIS.
+NÃO INCLUA EXPLICAÇÕES.
+NÃO INCLUA NOTAS.
+APENAS O JSON.
 
-Analise o desempenho do vendedor ${vendedor.nome} com base nos seguintes dados:
+DADOS DO VENDEDOR:
+${JSON.stringify({
+                    nome: vendedor.nome,
+                    fea: vendedor.feaVendedor,
+                    iap: vendedor.iapVendedor,
+                    dias_ativos: vendedor.numeroDiasComAtividade,
+                    total_vendas: vendedor.somaDocinhos,
+                    media_diaria: vendedor.mediaAtividadePorDia,
+                    meta_individual: metaIndividual.toFixed(2),
+                    meta_equipe: metaEquipe,
+                    contribuicao: percentualContribuicaoFormatado,
+                    historico: vendedor.historicoVendas || []
+                }, null, 2)}
 
-Métricas:
-- FEA: ${vendedor.feaVendedor} (Eficiência das atividades)
-- IAP: ${vendedor.iapVendedor} (Potencial de vendas)
-- Dias Ativos: ${vendedor.numeroDiasComAtividade}
-- Total Vendido: ${vendedor.somaDocinhos}
-- Média Diária: ${vendedor.mediaAtividadePorDia}
-- Meta Equipe: ${percentualContribuicaoFormatado}
-- Meta Individual: ${metaIndividual.toFixed(2)}
-- Meta Equipe: ${metaEquipe}
-
-Histórico de Vendas (ordenado por data):
-${vendedor.historicoVendas ? JSON.stringify(vendedor.historicoVendas.map((v) => `${v.mes} dia ${v.dia}: ${v.valor} vendas`), null, 2) : 'Não disponível'}
-
-Com base nos dados acima, forneça uma análise detalhada e específica. Considere:
-1. O FEA de ${vendedor.feaVendedor} indica ${vendedor.feaVendedor > 1.2 ? 'alta' : vendedor.feaVendedor > 0.8 ? 'média' : 'baixa'} eficiência
-2. O IAP de ${vendedor.iapVendedor} sugere ${vendedor.iapVendedor > 2000 ? 'alto' : vendedor.iapVendedor > 1000 ? 'médio' : 'baixo'} potencial
-3. A contribuição de ${percentualContribuicaoFormatado} da meta da equipe é ${percentualContribuicao > 100 ? 'excelente' : percentualContribuicao > 80 ? 'boa' : 'precisa melhorar'}
-4. O histórico mostra ${((_a = vendedor.historicoVendas) === null || _a === void 0 ? void 0 : _a.length) > 0 ? 'vendas consistentes' : 'sem histórico suficiente'}
-
-Retorne APENAS um JSON válido no formato abaixo, sem texto adicional ou explicações:
+COPIE E PREENCHA ESTE JSON:
 
 {
-    "perfil_vendas": "Descrição específica do perfil do vendedor baseada nas métricas",
-    "tendencias": ["Lista de tendências específicas identificadas no histórico"],
-    "pontos_fortes": ["Pontos fortes específicos baseados nas métricas e histórico"],
-    "pontos_fracos": ["Pontos fracos específicos baseados nas métricas e histórico"],
-    "recomendacoes": ["Recomendações específicas para melhorar o desempenho"],
-    "projecao_crescimento": "Projeção específica baseada no histórico e métricas",
-    "estrategias_personalizadas": ["Estratégias específicas para este vendedor"],
+    "perfil_vendas": "Vendedor experiente com bom desempenho",
+    "tendencias": [
+        "Crescimento constante nas vendas",
+        "Melhoria no FEA"
+    ],
+    "pontos_fortes": [
+        "Alta eficiência nas atividades",
+        "Bom relacionamento com clientes"
+    ],
+    "pontos_fracos": [
+        "Dificuldade com novos produtos",
+        "Baixa prospecção"
+    ],
+    "recomendacoes": [
+        "Focar em treinamentos",
+        "Aumentar base de clientes"
+    ],
+    "projecao_crescimento": "Crescimento esperado de 15% nos próximos 3 meses",
+    "estrategias_personalizadas": [
+        "Participar de workshops",
+        "Desenvolver networking"
+    ],
     "nova_meta_sugerida": ${metaEquipe},
-    "probabilidade_crescimento": "${vendedor.feaVendedor > 1.5 && vendedor.iapVendedor > 15000 ? '30% a 40%' : vendedor.feaVendedor > 1.2 && vendedor.iapVendedor > 10000 ? '20% a 30%' : '10% a 20%'}",
+    "probabilidade_crescimento": "70% de chance de atingir a meta",
     "fator_ajuste_meta": ${percentualContribuicao_Final.toFixed(4)},
     "dados_grafico": {
         "historico": ${JSON.stringify(vendedor.historicoVendas || [])},
@@ -130,70 +150,109 @@ Retorne APENAS um JSON válido no formato abaixo, sem texto adicional ou explica
         ]
     },
     "analise_historico": {
-        "crescimento_periodo": "Análise específica do crescimento no período",
-        "tendencias_identificadas": ["Tendências específicas identificadas no histórico"],
-        "pontos_melhoria": ["Pontos específicos que precisam de melhoria"],
-        "estrategias_historico": ["Estratégias específicas baseadas no histórico"]
+        "crescimento_periodo": "Crescimento constante no período analisado",
+        "tendencias_identificadas": [
+            "Aumento gradual nas vendas",
+            "Melhoria na performance"
+        ],
+        "pontos_melhoria": [
+            "Aumentar volume de vendas",
+            "Melhorar conversão"
+        ],
+        "estrategias_historico": [
+            "Foco em produtos principais",
+            "Atendimento personalizado"
+        ]
     }
 }`;
-                const response = yield (0, node_fetch_1.default)(`${this.baseUrl}/generate`, {
+                const response = yield (0, node_fetch_1.default)(`${this.baseUrl}/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         model: 'nimage',
-                        prompt: analysisPrompt,
+                        messages: [
+                            {
+                                role: 'system',
+                                content: 'Você é um analisador de dados de vendas que SEMPRE retorna APENAS JSON válido, sem texto adicional.'
+                            },
+                            {
+                                role: 'user',
+                                content: analysisPrompt
+                            }
+                        ],
                         stream: false,
-                        format: 'json'
+                        options: {
+                            num_ctx: 4096,
+                            temperature: 0.7,
+                            top_k: 40,
+                            top_p: 0.9
+                        }
                     }),
                 });
+                if (!response.ok) {
+                    console.error(`❌ Erro na chamada do Ollama: ${response.status} - ${response.statusText}`);
+                    throw new Error(`Erro na chamada do Ollama: ${response.status}`);
+                }
                 const result = yield response.json();
                 // Processa a resposta do Ollama
                 let analysis;
                 try {
-                    const cleanResponse = result.response
-                        .replace(/\\n/g, '\n')
+                    console.log('\n🤖 Resposta bruta do Ollama:', result);
+                    if (!((_a = result.message) === null || _a === void 0 ? void 0 : _a.content)) {
+                        console.error('❌ Resposta do Ollama está vazia');
+                        throw new Error('Resposta do Ollama está vazia');
+                    }
+                    // Remove caracteres especiais e espaços extras
+                    const cleanResponse = result.message.content
+                        .replace(/\\n/g, ' ')
                         .replace(/\\"/g, '"')
                         .replace(/\\\\/g, '\\')
-                        .replace(/\n/g, '')
-                        .replace(/\r/g, '')
+                        .replace(/\n/g, ' ')
+                        .replace(/\r/g, ' ')
+                        .replace(/\t/g, ' ')
+                        .replace(/\s+/g, ' ')
                         .trim();
+                    console.log('\n🧹 Resposta limpa:', cleanResponse);
+                    // Tenta encontrar um JSON válido na resposta
                     const jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
-                    if (jsonMatch) {
-                        const jsonStr = jsonMatch[0]
+                    if (!jsonMatch) {
+                        console.error('❌ Nenhum JSON válido encontrado na resposta');
+                        throw new Error('Resposta não contém JSON válido');
+                    }
+                    console.log('\n📝 JSON encontrado:', jsonMatch[0]);
+                    // Normaliza as chaves do JSON
+                    let jsonStr = jsonMatch[0];
+                    try {
+                        // Tenta fazer o parse direto primeiro
+                        analysis = JSON.parse(jsonStr);
+                        console.log('\n✅ JSON parseado com sucesso!');
+                    }
+                    catch (parseError) {
+                        console.log('\n⚠️ Erro no parse direto, tentando normalizar o JSON...');
+                        // Se falhar, tenta normalizar o JSON
+                        jsonStr = jsonStr
                             .replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":')
                             .replace(/:\s*'([^']*)'/g, ':"$1"')
-                            .replace(/,\s*}/g, '}')
-                            .replace(/,\s*]/g, ']');
-                        analysis = JSON.parse(jsonStr);
+                            .replace(/,(\s*[}\]])/g, '$1');
+                        console.log('\n🔄 JSON normalizado:', jsonStr);
+                        try {
+                            analysis = JSON.parse(jsonStr);
+                            console.log('\n✅ JSON parseado com sucesso após normalização!');
+                        }
+                        catch (normalizeError) {
+                            console.error('\n❌ Erro ao fazer parse do JSON normalizado:', normalizeError);
+                            throw new Error('JSON inválido após normalização');
+                        }
                     }
-                    else {
-                        throw new Error('Resposta não contém JSON válido');
+                    // Valida a estrutura do JSON
+                    if (!this.validateAnalysisStructure(analysis)) {
+                        console.error('\n❌ Estrutura do JSON inválida');
+                        throw new Error('Estrutura do JSON inválida');
                     }
                 }
                 catch (error) {
-                    console.error('Erro ao processar resposta do Ollama:', error);
-                    analysis = {
-                        perfil_vendas: "Perfil não disponível",
-                        tendencias: ["Tendências não disponíveis"],
-                        pontos_fortes: ["Pontos fortes não disponíveis"],
-                        pontos_fracos: ["Pontos fracos não disponíveis"],
-                        recomendacoes: ["Recomendações não disponíveis"],
-                        projecao_crescimento: "Projeção não disponível",
-                        probabilidade_crescimento: "10% a 20%",
-                        fator_ajuste_meta: "0.0000",
-                        estrategias_personalizadas: ["Estratégias não disponíveis"],
-                        nova_meta_sugerida: metaEquipeNumerico,
-                        dados_grafico: {
-                            historico: [],
-                            previsao: []
-                        },
-                        analise_historico: {
-                            crescimento_periodo: "Análise não disponível",
-                            tendencias_identificadas: [],
-                            pontos_melhoria: [],
-                            estrategias_historico: []
-                        }
-                    };
+                    console.error('\n❌ Erro ao processar resposta do Ollama:', error);
+                    analysis = this.getDefaultAnalysis(metaEquipeNumerico);
                 }
                 // Reorganiza os dados no formato desejado
                 return {
@@ -290,6 +349,70 @@ Retorne APENAS um JSON válido no formato abaixo, sem texto adicional ou explica
                 throw error;
             }
         });
+    }
+    validateAnalysisStructure(analysis) {
+        const requiredFields = [
+            'perfil_vendas',
+            'tendencias',
+            'pontos_fortes',
+            'pontos_fracos',
+            'recomendacoes',
+            'projecao_crescimento',
+            'estrategias_personalizadas',
+            'nova_meta_sugerida',
+            'probabilidade_crescimento',
+            'fator_ajuste_meta',
+            'dados_grafico'
+        ];
+        // Verifica campos obrigatórios
+        for (const field of requiredFields) {
+            if (!analysis[field]) {
+                console.error(`❌ Campo obrigatório ausente: ${field}`);
+                return false;
+            }
+        }
+        // Verifica arrays
+        const arrayFields = ['tendencias', 'pontos_fortes', 'pontos_fracos', 'recomendacoes', 'estrategias_personalizadas'];
+        for (const field of arrayFields) {
+            if (!Array.isArray(analysis[field]) || analysis[field].length === 0) {
+                console.error(`❌ Campo ${field} deve ser um array não vazio`);
+                return false;
+            }
+        }
+        // Verifica dados do gráfico
+        if (!analysis.dados_grafico.historico || !Array.isArray(analysis.dados_grafico.historico)) {
+            console.error('❌ dados_grafico.historico deve ser um array');
+            return false;
+        }
+        if (!analysis.dados_grafico.previsao || !Array.isArray(analysis.dados_grafico.previsao)) {
+            console.error('❌ dados_grafico.previsao deve ser um array');
+            return false;
+        }
+        return true;
+    }
+    getDefaultAnalysis(metaEquipe) {
+        return {
+            perfil_vendas: "Perfil não disponível",
+            tendencias: ["Tendências não disponíveis"],
+            pontos_fortes: ["Pontos fortes não disponíveis"],
+            pontos_fracos: ["Pontos fracos não disponíveis"],
+            recomendacoes: ["Recomendações não disponíveis"],
+            projecao_crescimento: "Projeção não disponível",
+            probabilidade_crescimento: "10% a 20%",
+            fator_ajuste_meta: "0.0000",
+            estrategias_personalizadas: ["Estratégias não disponíveis"],
+            nova_meta_sugerida: metaEquipe,
+            dados_grafico: {
+                historico: [],
+                previsao: []
+            },
+            analise_historico: {
+                crescimento_periodo: "Análise não disponível",
+                tendencias_identificadas: ["Tendências não identificadas"],
+                pontos_melhoria: ["Pontos de melhoria não disponíveis"],
+                estrategias_historico: ["Estratégias não disponíveis"]
+            }
+        };
     }
 }
 exports.OllamaService = OllamaService;

@@ -1,9 +1,15 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
+const express_1 = require("express");
 const AtividadeRepositoryImpl_1 = require("../../infrastructure/repositories/AtividadeRepositoryImpl");
 const VendedorRepositoryImpl_1 = require("../../infrastructure/repositories/VendedorRepositoryImpl");
 const EquipeRepositoryImpl_1 = require("../../infrastructure/repositories/EquipeRepositoryImpl");
@@ -16,7 +22,7 @@ const AtividadeController_1 = require("../controllers/AtividadeController");
 const CriarAtividade_1 = require("../../application/use-cases/CriarAtividade");
 const FrequenciaVendasService_1 = require("../../application/services/FrequenciaVendasService");
 const ObterEquipeDadosFull_1 = require("../../application/use-cases/ObterEquipeDadosFull");
-const router = express_1.default.Router();
+const router = (0, express_1.Router)();
 // Repositories
 const atividadeRepo = new AtividadeRepositoryImpl_1.AtividadeRepositoryImpl();
 const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
@@ -34,12 +40,26 @@ const obterAtividadesPorVendedorEData = new ObterAtividadesPorVendedorEData_1.Ob
 // Controller
 const atividadeController = new AtividadeController_1.AtividadeController(criarAtividade, obterAtividade, atualizarAtividade, atividadeService, obterAtividadesPorVendedorEData, frequenciaVendasService);
 // Routes
-router.post("/atividades", atividadeController.criar);
-router.get("/atividades/all", atividadeController.obterTodos);
-router.get("/atividades/:id", atividadeController.obterPorId);
-router.get("/atividades/:id/detalhes", atividadeController.obterDetalhes);
-router.put("/atividades/:id", atividadeController.atualizar);
-router.get("/atividades/vendedor/:vendedorId", atividadeController.getAtividadesByVendedorAndDate);
-router.get("/atividades/equipe/:equipeId/frequencia-vendas", atividadeController.calcularFrequenciaVendas);
+router.post("/atividades", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    return atividadeController.criar(req, res);
+}));
+router.get("/atividades/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    return atividadeController.obterTodos(req, res);
+}));
+router.get("/atividades/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    return atividadeController.obterPorId(req, res);
+}));
+router.get("/atividades/:id/detalhes", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    return atividadeController.obterDetalhes(req, res);
+}));
+router.put("/atividades/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    return atividadeController.atualizar(req, res);
+}));
+router.get("/atividades/vendedor/:vendedorId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    return atividadeController.getAtividadesByVendedorAndDate(req, res);
+}));
+router.get("/atividades/equipe/:equipeId/frequencia-vendas", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    return atividadeController.calcularFrequenciaVendas(req, res);
+}));
 exports.default = router;
 //# sourceMappingURL=atividadeRoutes.js.map

@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import { AtividadeRepositoryImpl } from "../../infrastructure/repositories/AtividadeRepositoryImpl";
 import { VendedorRepositoryImpl } from "../../infrastructure/repositories/VendedorRepositoryImpl";
 import { EquipeRepositoryImpl } from "../../infrastructure/repositories/EquipeRepositoryImpl";
@@ -12,7 +12,7 @@ import { CriarAtividade } from "../../application/use-cases/CriarAtividade";
 import { FrequenciaVendasService } from "../../application/services/FrequenciaVendasService";
 import { ObterEquipeDadosFull } from "../../application/use-cases/ObterEquipeDadosFull";
 
-const router = express.Router();
+const router = Router();
 
 // Repositories
 const atividadeRepo = new AtividadeRepositoryImpl();
@@ -48,12 +48,32 @@ const atividadeController = new AtividadeController(
 );
 
 // Routes
-router.post("/atividades", atividadeController.criar);
-router.get("/atividades/all", atividadeController.obterTodos);
-router.get("/atividades/:id", atividadeController.obterPorId);
-router.get("/atividades/:id/detalhes", atividadeController.obterDetalhes);
-router.put("/atividades/:id", atividadeController.atualizar);
-router.get("/atividades/vendedor/:vendedorId", atividadeController.getAtividadesByVendedorAndDate);
-router.get("/atividades/equipe/:equipeId/frequencia-vendas", atividadeController.calcularFrequenciaVendas);
+router.post("/atividades", async (req, res) => {
+    return atividadeController.criar(req, res);
+});
+
+router.get("/atividades/all", async (req, res) => {
+    return atividadeController.obterTodos(req, res);
+});
+
+router.get("/atividades/:id", async (req, res) => {
+    return atividadeController.obterPorId(req, res);
+});
+
+router.get("/atividades/:id/detalhes", async (req, res) => {
+    return atividadeController.obterDetalhes(req, res);
+});
+
+router.put("/atividades/:id", async (req, res) => {
+    return atividadeController.atualizar(req, res);
+});
+
+router.get("/atividades/vendedor/:vendedorId", async (req, res) => {
+    return atividadeController.getAtividadesByVendedorAndDate(req, res);
+});
+
+router.get("/atividades/equipe/:equipeId/frequencia-vendas", async (req, res) => {
+    return atividadeController.calcularFrequenciaVendas(req, res);
+});
 
 export default router;
