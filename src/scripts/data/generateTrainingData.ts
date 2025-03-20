@@ -1,95 +1,100 @@
-import { VendedorRepositoryImpl } from "@/infrastructure/repositories/VendedorRepositoryImpl";
-import { AtividadeRepositoryImpl } from "@/infrastructure/repositories/AtividadeRepositoryImpl";
+import { MongoDB } from '../../infrastructure/database/MongoDB';
+import { Equipe } from '../../domain/entities/Equipe';
+import { Vendedor } from '../../domain/entities/Vendedor';
+import { Meta } from '../../domain/entities/Meta';
+import { Atividade } from '../../domain/entities/Atividade';
+import { EquipeModel } from '../../infrastructure/database/models/EquipeModel';
+import { VendedorModel } from '../../infrastructure/database/models/VendedorModel';
+import { MetaModel } from '../../infrastructure/database/models/MetaModel';
+import { AtividadeModel } from '../../infrastructure/database/models/AtividadeModel';
+import { EquipeRepositoryImpl } from '../../infrastructure/repositories/EquipeRepositoryImpl';
+import { VendedorRepositoryImpl } from '../../infrastructure/repositories/VendedorRepositoryImpl';
+import { MetaRepositoryImpl } from '../../infrastructure/repositories/MetaRepositoryImpl';
+import { AtividadeRepositoryImpl } from '../../infrastructure/repositories/AtividadeRepositoryImpl';
 import { v4 as uuidv4 } from 'uuid';
-import { MongoDB } from "@/infrastructure/database/MongoDB";
 
 async function generateTrainingData() {
     try {
+        console.log('🚀 Iniciando geração de dados de treinamento...');
+        
         // Conectar ao MongoDB
         await MongoDB.conectar();
-        console.log('Conectado ao MongoDB');
+        console.log('✅ Conectado ao MongoDB');
 
+        const equipeRepo = new EquipeRepositoryImpl();
         const vendedorRepo = new VendedorRepositoryImpl();
+        const metaRepo = new MetaRepositoryImpl();
         const atividadeRepo = new AtividadeRepositoryImpl();
 
-        // Buscar todos os vendedores
-        const vendedores = await vendedorRepo.obterTodos(0, 1000);
-        console.log(`Encontrados ${vendedores.length} vendedores`);
+        // Limpar dados existentes
+        console.log('🧹 Limpando dados existentes...');
+        await EquipeModel.deleteMany({});
+        await VendedorModel.deleteMany({});
+        await MetaModel.deleteMany({});
+        await AtividadeModel.deleteMany({});
 
-        // Configurar período de 6 meses
-        const hoje = new Date();
-        const seisMesesAtras = new Date(hoje);
-        seisMesesAtras.setMonth(hoje.getMonth() - 6);
-        const atividades = [];
+        // Criar equipes
+        console.log('👥 Criando equipes...');
+        const equipes = [
+            new Equipe(uuidv4(), 'Equipe Norte', 'PDV Norte', 'São Paulo', 'SP', 'João Silva', '(11) 99999-9999', 'Maria Santos', '(11) 98888-8888'),
+            new Equipe(uuidv4(), 'Equipe Sul', 'PDV Sul', 'Rio de Janeiro', 'RJ', 'Pedro Oliveira', '(11) 97777-7777', 'Ana Costa', '(11) 96666-6666'),
+            new Equipe(uuidv4(), 'Equipe Leste', 'PDV Leste', 'Belo Horizonte', 'MG', 'Carlos Souza', '(11) 95555-5555', 'Julia Lima', '(11) 94444-4444')
+        ];
+
+        for (const equipe of equipes) {
+            await equipeRepo.criar(equipe);
+        }
+
+        // Criar vendedores
+        console.log('👤 Criando vendedores...');
+        const vendedores = [
+            new Vendedor(uuidv4(), 'João Silva', equipes[0].id, 'joao@email.com', '(11) 99999-9999', 100000, 'Vendedor Sênior'),
+            new Vendedor(uuidv4(), 'Maria Santos', equipes[0].id, 'maria@email.com', '(11) 98888-8888', 80000, 'Vendedor Pleno'),
+            new Vendedor(uuidv4(), 'Pedro Oliveira', equipes[1].id, 'pedro@email.com', '(11) 97777-7777', 90000, 'Vendedor Sênior'),
+            new Vendedor(uuidv4(), 'Ana Costa', equipes[1].id, 'ana@email.com', '(11) 96666-6666', 70000, 'Vendedor Júnior'),
+            new Vendedor(uuidv4(), 'Carlos Souza', equipes[2].id, 'carlos@email.com', '(11) 95555-5555', 95000, 'Vendedor Sênior'),
+            new Vendedor(uuidv4(), 'Julia Lima', equipes[2].id, 'julia@email.com', '(11) 94444-4444', 75000, 'Vendedor Pleno')
+        ];
 
         for (const vendedor of vendedores) {
-            // Gerar entre 60 e 120 atividades por vendedor (média de 10-20 por mês)
-            const numAtividades = Math.floor(Math.random() * 61) + 60;
-
-            for (let i = 0; i < numAtividades; i++) {
-                // Gerar data aleatória nos últimos 6 meses
-                const data = new Date(
-                    seisMesesAtras.getTime() + 
-                    Math.random() * (hoje.getTime() - seisMesesAtras.getTime())
-                );
-
-                // Gerar quantidade aleatória de docinhos com variação sazonal
-                // Mais vendas em fins de semana e feriados
-                const diaDaSemana = data.getDay(); // 0 = Domingo, 6 = Sábado
-                const baseQuantidade = Math.floor(Math.random() * 51) + 30; // Base entre 30 e 80
-                let docinhosCoco = baseQuantidade;
-
-                // Aumento nas vendas nos fins de semana
-                if (diaDaSemana === 0 || diaDaSemana === 6) {
-                    docinhosCoco += Math.floor(baseQuantidade * 0.3); // 30% a mais
-                }
-
-                // Variação mensal (mais vendas em datas festivas)
-                const mes = data.getMonth();
-                if (mes === 5 || mes === 11) { // Junho e Dezembro
-                    docinhosCoco += Math.floor(baseQuantidade * 0.2); // 20% a mais
-                }
-
-                const atividade = {
-                    id: uuidv4(),
-                    vendedorId: vendedor.id,
-                    data: data,
-                    docinhosCoco: docinhosCoco
-                };
-
-                atividades.push(atividade);
-            }
-
-            console.log(`Geradas ${numAtividades} atividades para o vendedor ${vendedor.nome}`);
+            await vendedorRepo.criar(vendedor);
         }
 
-        // Ordenar atividades por data
-        atividades.sort((a, b) => a.data.getTime() - b.data.getTime());
+        // Criar metas
+        console.log('🎯 Criando metas...');
+        const dataInicio = new Date('2024-01-01');
+        const dataFim = new Date('2024-03-01');
 
-        // Inserir todas as atividades
-        let atividadesInseridas = 0;
-        for (const atividade of atividades) {
-            await atividadeRepo.criar(atividade);
-            atividadesInseridas++;
-            if (atividadesInseridas % 100 === 0) {
-                console.log(`Progresso: ${atividadesInseridas}/${atividades.length} atividades inseridas`);
-            }
+        for (const equipe of equipes) {
+            const meta = new Meta(uuidv4(), equipe.id, 300000, dataInicio);
+            await metaRepo.criar(meta);
         }
 
-        console.log(`\nResumo da geração de dados:`);
-        console.log(`Total de vendedores: ${vendedores.length}`);
-        console.log(`Total de atividades geradas: ${atividades.length}`);
-        console.log(`Período: ${seisMesesAtras.toLocaleDateString()} até ${hoje.toLocaleDateString()}`);
-        console.log('Dados de treinamento gerados com sucesso!');
+        // Criar atividades
+        console.log('📊 Criando atividades...');
+        let dataAtual = new Date(dataInicio);
 
-        // Fechar conexão com o MongoDB
-        process.exit(0);
+        while (dataAtual <= dataFim) {
+            if (dataAtual.getDay() !== 0) { // Excluir domingos
+                for (const vendedor of vendedores) {
+                    const atividade = new Atividade(
+                        uuidv4(),
+                        vendedor.id,
+                        dataAtual,
+                        Math.floor(Math.random() * 5000) + 1000, // Entre 1000 e 6000 docinhos
+                        Math.floor(Math.random() * 5000) + 1000
+                    );
+                    await atividadeRepo.criar(atividade);
+                }
+            }
+            dataAtual.setDate(dataAtual.getDate() + 1);
+        }
 
+        console.log('🎉 Geração de dados de treinamento concluída com sucesso!');
     } catch (error) {
-        console.error('Erro ao gerar dados de treinamento:', error);
-        process.exit(1);
+        console.error('❌ Erro durante a geração de dados:', error);
+        throw error;
     }
 }
 
-// Executar o script
-generateTrainingData(); 
+generateTrainingData().catch(console.error); 

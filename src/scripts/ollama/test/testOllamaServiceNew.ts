@@ -1,4 +1,4 @@
-import { OllamaService } from '@/application/services/OllamaService';
+import { OllamaService } from '../../../application/services/OllamaService';
 
 async function testOllamaService() {
     try {
@@ -16,6 +16,10 @@ async function testOllamaService() {
                     numeroDiasComAtividade: 120,
                     somaDocinhos: 150000,
                     mediaAtividadePorDia: 1250,
+                    vendasMesAnterior: "12000",
+                    mediaEquipeMesAnterior: "10000",
+                    totalVendedores: 5,
+                    totalVendasEquipeMesAnterior: "50000",
                     historicoVendas: [
                         { mes: "Janeiro", valor: 37500 },
                         { mes: "Fevereiro", valor: 37500 },
@@ -26,7 +30,9 @@ async function testOllamaService() {
                     ]
                 },
                 equipe: {
-                    meta: 100000
+                    meta: "60000",
+                    meta_anterior: "50000",
+                    periodoMetaAnterior: "Janeiro/2024"
                 }
             }
         };
@@ -55,6 +61,7 @@ async function testOllamaService() {
         console.log('\n📈 Métricas de Performance:');
         console.log('---------------------------');
         console.log(`Percentual de Contribuição: ${vendedor.percentual_contribuicao?.toFixed(2)}%`);
+        console.log(`Percentual de Crescimento: ${vendedor.percentualCrescimento}%`);
         console.log(`Peso na Equipe: ${(vendedor.peso_vendedor * 100)?.toFixed(2)}%`);
         console.log(`Distribuição da Meta: ${vendedor.distribuicao_meta?.toLocaleString('pt-BR')}`);
         console.log(`Desempenho Diário Ideal: ${vendedor.desempenho_diario_ideal?.toLocaleString('pt-BR')}`);

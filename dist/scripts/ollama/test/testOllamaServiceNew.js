@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const OllamaService_1 = require("@/application/services/OllamaService");
+const OllamaService_1 = require("../../../application/services/OllamaService");
 function testOllamaService() {
     return __awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
@@ -26,6 +26,10 @@ function testOllamaService() {
                         numeroDiasComAtividade: 120,
                         somaDocinhos: 150000,
                         mediaAtividadePorDia: 1250,
+                        vendasMesAnterior: "12000",
+                        mediaEquipeMesAnterior: "10000",
+                        totalVendedores: 5,
+                        totalVendasEquipeMesAnterior: "50000",
                         historicoVendas: [
                             { mes: "Janeiro", valor: 37500 },
                             { mes: "Fevereiro", valor: 37500 },
@@ -36,7 +40,9 @@ function testOllamaService() {
                         ]
                     },
                     equipe: {
-                        meta: 100000
+                        meta: "60000",
+                        meta_anterior: "50000",
+                        periodoMetaAnterior: "Janeiro/2024"
                     }
                 }
             };
@@ -59,6 +65,7 @@ function testOllamaService() {
             console.log('\n📈 Métricas de Performance:');
             console.log('---------------------------');
             console.log(`Percentual de Contribuição: ${(_a = vendedor.percentual_contribuicao) === null || _a === void 0 ? void 0 : _a.toFixed(2)}%`);
+            console.log(`Percentual de Crescimento: ${vendedor.percentualCrescimento}%`);
             console.log(`Peso na Equipe: ${(_b = (vendedor.peso_vendedor * 100)) === null || _b === void 0 ? void 0 : _b.toFixed(2)}%`);
             console.log(`Distribuição da Meta: ${(_c = vendedor.distribuicao_meta) === null || _c === void 0 ? void 0 : _c.toLocaleString('pt-BR')}`);
             console.log(`Desempenho Diário Ideal: ${(_d = vendedor.desempenho_diario_ideal) === null || _d === void 0 ? void 0 : _d.toLocaleString('pt-BR')}`);

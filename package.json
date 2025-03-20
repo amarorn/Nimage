@@ -19,6 +19,7 @@
     "train-ollama-simple": "ts-node src/scripts/trainOllamaSimple.ts"
   },
   "dependencies": {
+    "@tensorflow-models/coco-ssd": "^2.2.3",
     "@tensorflow/tfjs": "^4.17.0",
     "@types/dotenv": "^8.2.3",
     "@types/uuid": "^10.0.0",

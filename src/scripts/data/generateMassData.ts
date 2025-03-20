@@ -27,15 +27,7 @@ interface PerfilVendedor {
 
 interface PerfilEquipe {
     fatorMetaBase: number;
-    distribuicaoVendedores: number[];
-}
-
-interface EquipeComPerfil extends Equipe {
-    perfil: PerfilDesempenho;
-}
-
-interface VendedorComPerfil extends Vendedor {
-    perfil: PerfilDesempenho;
+    distribuicaoVendedores: number[]; // [alto, medio, baixo]
 }
 
 const PERFIS_VENDEDOR: Record<PerfilDesempenho, PerfilVendedor> = {
@@ -73,6 +65,14 @@ const PERFIS_EQUIPE: Record<PerfilDesempenho, PerfilEquipe> = {
         distribuicaoVendedores: [1, 1, 2] // 1 alto, 1 médio, 2 baixo
     }
 };
+
+interface EquipeComPerfil extends Equipe {
+    perfil: PerfilDesempenho;
+}
+
+interface VendedorComPerfil extends Vendedor {
+    perfil: PerfilDesempenho;
+}
 
 async function generateData() {
     try {
@@ -137,21 +137,22 @@ async function generateData() {
         for (const equipe of equipes) {
             const perfilEquipe = PERFIS_EQUIPE[equipe.perfil];
             const distribuicao = perfilEquipe.distribuicaoVendedores;
-            
+
             // Cria vendedores com diferentes perfis conforme a distribuição
             let vendedorIndex = 0;
             for (let i = 0; i < distribuicao.length; i++) {
                 const quantidade = distribuicao[i];
-                const perfilVendedor: PerfilDesempenho = i === 0 ? 'ALTO_DESEMPENHO' : 
-                                   i === 1 ? 'MEDIO_DESEMPENHO' : 
-                                   'BAIXO_DESEMPENHO';
-                
+                const perfilVendedor = i === 0 ? 'ALTO_DESEMPENHO' : 
+                                     i === 1 ? 'MEDIO_DESEMPENHO' : 
+                                     'BAIXO_DESEMPENHO';
+
                 for (let j = 0; j < quantidade; j++) {
                     const nome = nomesVendedores[nomeIndex++];
                     const email = `${nome.toLowerCase().replace(' ', '.')}@nimage.com`;
                     const telefone = `(11) 9${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`;
-                    const meta = META_BASE * perfilEquipe.fatorMetaBase * (perfilVendedor === 'ALTO_DESEMPENHO' ? 1.2 : 
-                                                                          perfilVendedor === 'MEDIO_DESEMPENHO' ? 1.0 : 0.8);
+                    const meta = META_BASE * perfilEquipe.fatorMetaBase * 
+                               (perfilVendedor === 'ALTO_DESEMPENHO' ? 1.2 : 
+                                perfilVendedor === 'MEDIO_DESEMPENHO' ? 1.0 : 0.8);
                     const cargo = perfilVendedor === 'ALTO_DESEMPENHO' ? 'Vendedor Sênior' :
                                 perfilVendedor === 'MEDIO_DESEMPENHO' ? 'Vendedor Pleno' : 'Vendedor Júnior';
                     
@@ -205,8 +206,11 @@ async function generateData() {
         console.log('📊 Criando atividades...');
         let totalAtividades = 0;
 
+        // Busca todas as metas
+        const metas = await metaRepo.obterTodos(0, 1000);
+
         // Gera datas para todo o período
-        const datas: Date[] = [];
+        const datas = [];
         let dataAtual = new Date(dataInicio);
         while (dataAtual <= dataFim) {
             if (dataAtual.getDay() !== 0) { // Exclui domingos
@@ -218,38 +222,41 @@ async function generateData() {
         for (const vendedor of vendedores) {
             console.log(`\n👤 Processando vendedor: ${vendedor.nome} (${vendedor.perfil})`);
             const perfilVendedor = PERFIS_VENDEDOR[vendedor.perfil];
-            
+
             // Determina os dias que o vendedor terá atividade
             const frequencia = perfilVendedor.frequenciaMin + 
                              (Math.random() * (perfilVendedor.frequenciaMax - perfilVendedor.frequenciaMin));
             const diasComAtividade = Math.floor(datas.length * frequencia);
-            
+
             // Seleciona dias aleatórios para ter atividade
             const datasVendedor = [...datas]
                 .sort(() => Math.random() - 0.5)
                 .slice(0, diasComAtividade);
 
             for (const data of datasVendedor) {
-                const equipeVendedor = equipes.find(e => e.id === vendedor.equipeId);
-                if (!equipeVendedor) continue;
+                const metaMes = metas.find((meta: Meta) => 
+                    meta.equipeId === vendedor.equipeId &&
+                    meta.data.getMonth() === data.getMonth() &&
+                    meta.data.getFullYear() === data.getFullYear()
+                );
 
-                const perfilEquipe = PERFIS_EQUIPE[equipeVendedor.perfil];
-                
-                // Calcula a meta diária base
-                const metaDiaria = (META_BASE * perfilEquipe.fatorMetaBase) / 22; // 22 dias úteis por mês
-                
-                // Fatores que influenciam o desempenho
-                const fatorDesempenho = perfilVendedor.fatorDesempenhoMin + 
-                                      (Math.random() * (perfilVendedor.fatorDesempenhoMax - perfilVendedor.fatorDesempenhoMin));
-                
-                // Ajusta com base no dia da semana
+                if (!metaMes) continue;
+
+                const diasNoMes = new Date(data.getFullYear(), data.getMonth() + 1, 0).getDate();
+                const metaDiaria = metaMes.objetivo / diasNoMes;
+
+                // Ajusta a quantidade de docinhos com base no dia da semana
                 let fatorDiaSemana = 1.0;
                 const diaSemana = data.getDay();
-                if (diaSemana === 6) { // Sábado
-                    fatorDiaSemana = 1.3;
-                } else if (diaSemana === 5) { // Sexta
-                    fatorDiaSemana = 1.2;
+                if (diaSemana === 0 || diaSemana === 6) { // Fim de semana
+                    fatorDiaSemana = 1.3; // 30% mais vendas
+                } else if (diaSemana === 5) { // Sexta-feira
+                    fatorDiaSemana = 1.2; // 20% mais vendas
                 }
+
+                // Calcula fator de desempenho baseado no perfil do vendedor
+                const fatorDesempenho = perfilVendedor.fatorDesempenhoMin + 
+                                      (Math.random() * (perfilVendedor.fatorDesempenhoMax - perfilVendedor.fatorDesempenhoMin));
 
                 // Calcula quantidade de docinhos vendidos
                 const docinhosCoco = Math.floor(

@@ -18,16 +18,23 @@ export interface AnaliseHistorico {
 }
 
 export interface AnaliseVendedor {
-    perfil_vendas: string;
+    perfilVendas: string;
     tendencias: string[];
-    pontos_fortes: string[];
-    pontos_fracos: string[];
+    pontosFortes: string[];
+    pontosFracos: string[];
     recomendacoes: string[];
-    projecao_crescimento: string;
-    estrategias_personalizadas: string[];
-    nova_meta_sugerida: number;
-    probabilidade_crescimento: string;
-    fator_ajuste_meta: string;
-    dados_grafico: DadosGrafico;
+    projecaoCrescimento: string;
+    estrategiasPersonalizadas: string[];
+    novaMeta: number;
+    probabilidadeCrescimento: string;
+    fatorAjusteMeta: number;
+    historico: Array<{
+        mes: string;
+        valor: number;
+    }>;
+    previsao: Array<{
+        mes: string;
+        valor: number;
+    }>;
     analise_historico: AnaliseHistorico;
 } 

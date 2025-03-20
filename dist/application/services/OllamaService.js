@@ -92,12 +92,24 @@ class OllamaService {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 }).format(percentualContribuicao_Final);
+                // Calcula o percentual de crescimento
+                const iapVendedor = parseFloat(vendedor.iapVendedor) || 0;
+                // Ajusta o percentual de crescimento para ficar abaixo do percentual de contribuição
+                let percentualCrescimento = 0;
+                if (vendasMesAnterior > 0) {
+                    percentualCrescimento = ((iapVendedor - vendasMesAnterior) / vendasMesAnterior) * 100;
+                    // Limita o percentual de crescimento ao percentual de contribuição
+                    if (Math.abs(percentualCrescimento) > percentualContribuicao * 100) {
+                        percentualCrescimento = percentualCrescimento > 0 ?
+                            percentualContribuicao * 100 * 0.9 : // Se positivo, 90% do percentual de contribuição
+                            -percentualContribuicao * 100 * 0.9; // Se negativo, -90% do percentual de contribuição
+                    }
+                }
+                // Atualiza o objeto vendedor original com os valores calculados
+                vendedor.percentualContribuicao = percentualContribuicaoFormatado.replace('%', '').replace(',', '.') + '%';
+                vendedor.percentualCrescimento = percentualCrescimento.toFixed(2);
                 // Prepara dados para análise
-                const analysisPrompt = `RETORNE APENAS O JSON ABAIXO PREENCHIDO COM SUA ANÁLISE.
-NÃO INCLUA NENHUM TEXTO ANTES OU DEPOIS.
-NÃO INCLUA EXPLICAÇÕES.
-NÃO INCLUA NOTAS.
-APENAS O JSON.
+                const analysisPrompt = `Você é um assistente especializado em análise de dados de vendas.
 
 DADOS DO VENDEDOR:
 ${JSON.stringify({
@@ -110,61 +122,49 @@ ${JSON.stringify({
                     meta_individual: metaIndividual.toFixed(2),
                     meta_equipe: metaEquipe,
                     contribuicao: percentualContribuicaoFormatado,
-                    historico: vendedor.historicoVendas || []
+                    historico: vendedor.historicoVendas || [],
+                    percentualCrescimento: vendedor.percentualCrescimento
                 }, null, 2)}
 
-COPIE E PREENCHA ESTE JSON:
+RETORNE EXATAMENTE ESTE JSON PREENCHIDO (MANTENHA A ESTRUTURA EXATA):
 
 {
-    "perfil_vendas": "Vendedor experiente com bom desempenho",
-    "tendencias": [
-        "Crescimento constante nas vendas",
-        "Melhoria no FEA"
-    ],
-    "pontos_fortes": [
-        "Alta eficiência nas atividades",
-        "Bom relacionamento com clientes"
-    ],
-    "pontos_fracos": [
-        "Dificuldade com novos produtos",
-        "Baixa prospecção"
-    ],
-    "recomendacoes": [
-        "Focar em treinamentos",
-        "Aumentar base de clientes"
-    ],
-    "projecao_crescimento": "Crescimento esperado de 15% nos próximos 3 meses",
-    "estrategias_personalizadas": [
-        "Participar de workshops",
-        "Desenvolver networking"
-    ],
-    "nova_meta_sugerida": ${metaEquipe},
-    "probabilidade_crescimento": "70% de chance de atingir a meta",
-    "fator_ajuste_meta": ${percentualContribuicao_Final.toFixed(4)},
-    "dados_grafico": {
-        "historico": ${JSON.stringify(vendedor.historicoVendas || [])},
-        "previsao": [
-            {"mes": "Julho", "valor": ${vendedor.mediaAtividadePorDia * 30}},
-            {"mes": "Agosto", "valor": ${vendedor.mediaAtividadePorDia * 30 * 1.1}},
-            {"mes": "Setembro", "valor": ${vendedor.mediaAtividadePorDia * 30 * 1.2}}
-        ]
-    },
-    "analise_historico": {
-        "crescimento_periodo": "Crescimento constante no período analisado",
-        "tendencias_identificadas": [
-            "Aumento gradual nas vendas",
-            "Melhoria na performance"
-        ],
-        "pontos_melhoria": [
-            "Aumentar volume de vendas",
-            "Melhorar conversão"
-        ],
-        "estrategias_historico": [
-            "Foco em produtos principais",
-            "Atendimento personalizado"
-        ]
-    }
-}`;
+  "perfilVendas": "Vendedor experiente com alto FEA",
+  "tendencias": ["Crescimento constante nas vendas", "Aumento na média diária"],
+  "pontosFracos": ["Baixa conversão", "Poucos clientes novos"],
+  "pontosFortes": ["Alta eficiência", "Bom relacionamento"],
+  "recomendacoes": ["Aumentar base de clientes", "Focar em produtos premium"],
+  "projecaoCrescimento": "Crescimento de 15% esperado",
+  "probabilidadeCrescimento": "75%",
+  "fatorAjusteMeta": 0.8,
+  "novaMeta": 65000,
+  "estrategiasPersonalizadas": ["Visitar clientes VIP", "Oferecer pacotes especiais"],
+  "historico": [
+    {"mes": "Janeiro", "valor": 37500},
+    {"mes": "Fevereiro", "valor": 37500},
+    {"mes": "Março", "valor": 37500},
+    {"mes": "Abril", "valor": 37500}
+  ],
+  "previsao": [
+    {"mes": "Maio", "valor": 43125},
+    {"mes": "Junho", "valor": 49594}
+  ],
+  "analise_historico": {
+    "crescimento_periodo": "Crescimento constante no período analisado",
+    "tendencias_identificadas": ["Aumento gradual nas vendas", "Melhoria na performance"],
+    "pontos_melhoria": ["Aumentar volume de vendas", "Melhorar conversão"],
+    "estrategias_historico": ["Foco em produtos principais", "Atendimento personalizado"]
+  }
+}
+
+IMPORTANTE:
+1. MANTENHA EXATAMENTE A MESMA ESTRUTURA DO JSON ACIMA
+2. APENAS ALTERE OS VALORES, NÃO MUDE OS CAMPOS
+3. NÃO ADICIONE CAMPOS NOVOS
+4. NÃO REMOVA CAMPOS EXISTENTES
+5. NÃO INCLUA NENHUM TEXTO ANTES OU DEPOIS DO JSON
+6. O CAMPO "tendencias" DEVE SER UM ARRAY COM PELO MENOS UM ITEM
+7. TODOS OS ARRAYS DEVEM TER PELO MENOS UM ITEM`;
                 const response = yield (0, node_fetch_1.default)(`${this.baseUrl}/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -244,64 +244,74 @@ COPIE E PREENCHA ESTE JSON:
                             throw new Error('JSON inválido após normalização');
                         }
                     }
-                    // Valida a estrutura do JSON
-                    if (!this.validateAnalysisStructure(analysis)) {
-                        console.error('\n❌ Estrutura do JSON inválida');
-                        throw new Error('Estrutura do JSON inválida');
-                    }
+                    // Calcular percentual de contribuição
+                    const totalVendasEquipe = Number(vendedor.totalVendasEquipeMesAnterior);
+                    const vendasVendedor = Number(vendedor.vendasMesAnterior);
+                    const percentualContribuicao = (vendasVendedor / totalVendasEquipe) * 100;
+                    // Calcular percentual de crescimento
+                    const percentualCrescimento = Number(vendedor.percentualCrescimento);
+                    // Calcular peso na equipe
+                    const totalVendedores = Number(vendedor.totalVendedores);
+                    const pesoNaEquipe = (1 / totalVendedores) * 100;
+                    // Calcular distribuição da meta
+                    const metaEquipe = Number(vendorInfo.resultado.equipe.meta);
+                    const distribuicaoMeta = metaEquipe / totalVendedores;
+                    // Calcular desempenho diário ideal
+                    const diasUteis = 22; // Média de dias úteis por mês
+                    const desempenhoDiarioIdeal = distribuicaoMeta / diasUteis;
+                    const vendedorReorganizado = {
+                        nome: vendedor.nome,
+                        feaVendedor: vendedor.feaVendedor,
+                        iapVendedor: vendedor.iapVendedor,
+                        numeroDiasComAtividade: vendedor.numeroDiasComAtividade,
+                        somaDocinhos: vendedor.somaDocinhos,
+                        mediaAtividadePorDia: vendedor.mediaAtividadePorDia,
+                        percentualContribuicao: percentualContribuicao.toFixed(2),
+                        percentualCrescimento: percentualCrescimento.toFixed(2),
+                        pesoNaEquipe: pesoNaEquipe.toFixed(2),
+                        distribuicaoMeta: distribuicaoMeta.toFixed(2),
+                        desempenhoDiarioIdeal: desempenhoDiarioIdeal.toFixed(2),
+                        dadosGrafico: {
+                            historico: vendedor.historicoVendas,
+                            previsao: analysis.previsao
+                        },
+                        analiseHistorico: {
+                            crescimentoPeriodo: analysis.analise_historico.crescimento_periodo,
+                            tendenciasIdentificadas: analysis.analise_historico.tendencias_identificadas,
+                            pontosMelhoria: analysis.analise_historico.pontos_melhoria,
+                            estrategiasHistorico: analysis.analise_historico.estrategias_historico
+                        }
+                    };
+                    console.log('\n✅ Resultado da análise:');
+                    console.log('=========================\n');
+                    console.log('👤 Informações do Vendedor:');
+                    console.log('---------------------------');
+                    console.log(`Nome: ${vendedor.nome}`);
+                    console.log(`FEA: ${vendedor.feaVendedor}`);
+                    console.log(`IAP: ${vendedor.iapVendedor}`);
+                    console.log(`Dias com Atividade: ${vendedor.numeroDiasComAtividade}`);
+                    console.log(`Total de Docinhos: ${vendedor.somaDocinhos.toLocaleString()}`);
+                    console.log(`Média por Dia: ${vendedor.mediaAtividadePorDia.toLocaleString()}\n`);
+                    console.log('📈 Métricas de Performance:');
+                    console.log('---------------------------');
+                    console.log(`Percentual de Contribuição: ${vendedorReorganizado.percentualContribuicao}%`);
+                    console.log(`Percentual de Crescimento: ${vendedorReorganizado.percentualCrescimento}%`);
+                    console.log(`Peso na Equipe: ${vendedorReorganizado.pesoNaEquipe}%`);
+                    console.log(`Distribuição da Meta: ${vendedorReorganizado.distribuicaoMeta}`);
+                    console.log(`Desempenho Diário Ideal: ${vendedorReorganizado.desempenhoDiarioIdeal}\n`);
+                    return {
+                        resultado: {
+                            vendedor: vendedorReorganizado
+                        }
+                    };
                 }
                 catch (error) {
                     console.error('\n❌ Erro ao processar resposta do Ollama:', error);
-                    analysis = this.getDefaultAnalysis(metaEquipeNumerico);
+                    throw error;
                 }
-                // Reorganiza os dados no formato desejado
-                return {
-                    resultado: {
-                        vendedor: {
-                            nome: vendedor.nome,
-                            feaVendedor: Number(vendedor.feaVendedor.toFixed(2)),
-                            iapVendedor: vendedor.iapVendedor,
-                            percentualContribuicao: percentualContribuicaoFormatado,
-                            numeroDiasComAtividade: vendedor.numeroDiasComAtividade,
-                            somaDocinhos: vendedor.somaDocinhos,
-                            mediaAtividadePorDia: vendedor.mediaAtividadePorDia,
-                            metaIndividual: metaIndividualFormatada,
-                            vendasMesAnterior: vendedor.vendasMesAnterior,
-                            mediaEquipeMesAnterior: vendedor.mediaEquipeMesAnterior,
-                            totalVendedores: vendedor.totalVendedores,
-                            totalVendasEquipeMesAnterior: vendedor.totalVendasEquipeMesAnterior,
-                            equipe: {
-                                novaMetaSugerida: Math.round(metaEquipeNumerico),
-                                meta: Math.round(metaEquipeNumerico),
-                                metaAnterior: Math.round(metaAnterior),
-                                totalVendedores: vendedor.totalVendedores,
-                                mediaEquipe: vendedor.mediaEquipeMesAnterior,
-                                totalVendasMesAnterior: vendedor.totalVendasEquipeMesAnterior,
-                                periodoMetaAnterior: vendorInfo.resultado.equipe.periodoMetaAnterior
-                            },
-                            periodoAnalise: vendedor.periodoAnalise,
-                            perfilVendas: analysis.perfil_vendas,
-                            tendencias: analysis.tendencias,
-                            pontosFortes: analysis.pontos_fortes,
-                            pontosFracos: analysis.pontos_fracos,
-                            recomendacoes: analysis.recomendacoes,
-                            historicoVendas: vendedor.historicoVendas,
-                            dadosGrafico: {
-                                historico: vendedor.historicoVendas,
-                                previsao: analysis.dados_grafico.previsao
-                            },
-                            analiseHistorico: {
-                                crescimentoPeriodo: analysis.analise_historico.crescimento_periodo,
-                                tendenciasIdentificadas: analysis.analise_historico.tendencias_identificadas,
-                                pontosMelhoria: analysis.analise_historico.pontos_melhoria,
-                                estrategiasHistorico: analysis.analise_historico.estrategias_historico
-                            }
-                        }
-                    }
-                };
             }
             catch (error) {
-                console.error('Error fetching insights from Ollama:', error);
+                console.error('\n❌ Erro ao gerar insights:', error);
                 throw error;
             }
         });
@@ -352,17 +362,18 @@ COPIE E PREENCHA ESTE JSON:
     }
     validateAnalysisStructure(analysis) {
         const requiredFields = [
-            'perfil_vendas',
+            'perfilVendas',
             'tendencias',
-            'pontos_fortes',
-            'pontos_fracos',
+            'pontosFracos',
+            'pontosFortes',
             'recomendacoes',
-            'projecao_crescimento',
-            'estrategias_personalizadas',
-            'nova_meta_sugerida',
-            'probabilidade_crescimento',
-            'fator_ajuste_meta',
-            'dados_grafico'
+            'projecaoCrescimento',
+            'probabilidadeCrescimento',
+            'fatorAjusteMeta',
+            'novaMeta',
+            'estrategiasPersonalizadas',
+            'historico',
+            'previsao'
         ];
         // Verifica campos obrigatórios
         for (const field of requiredFields) {
@@ -372,7 +383,7 @@ COPIE E PREENCHA ESTE JSON:
             }
         }
         // Verifica arrays
-        const arrayFields = ['tendencias', 'pontos_fortes', 'pontos_fracos', 'recomendacoes', 'estrategias_personalizadas'];
+        const arrayFields = ['tendencias', 'pontosFracos', 'pontosFortes', 'recomendacoes', 'estrategiasPersonalizadas'];
         for (const field of arrayFields) {
             if (!Array.isArray(analysis[field]) || analysis[field].length === 0) {
                 console.error(`❌ Campo ${field} deve ser um array não vazio`);
@@ -380,32 +391,38 @@ COPIE E PREENCHA ESTE JSON:
             }
         }
         // Verifica dados do gráfico
-        if (!analysis.dados_grafico.historico || !Array.isArray(analysis.dados_grafico.historico)) {
-            console.error('❌ dados_grafico.historico deve ser um array');
+        if (!analysis.historico || !Array.isArray(analysis.historico)) {
+            console.error('❌ historico deve ser um array');
             return false;
         }
-        if (!analysis.dados_grafico.previsao || !Array.isArray(analysis.dados_grafico.previsao)) {
-            console.error('❌ dados_grafico.previsao deve ser um array');
+        if (!analysis.previsao || !Array.isArray(analysis.previsao)) {
+            console.error('❌ previsao deve ser um array');
             return false;
         }
         return true;
     }
     getDefaultAnalysis(metaEquipe) {
         return {
-            perfil_vendas: "Perfil não disponível",
+            perfilVendas: "Perfil não disponível",
             tendencias: ["Tendências não disponíveis"],
-            pontos_fortes: ["Pontos fortes não disponíveis"],
-            pontos_fracos: ["Pontos fracos não disponíveis"],
+            pontosFortes: ["Pontos fortes não disponíveis"],
+            pontosFracos: ["Pontos fracos não disponíveis"],
             recomendacoes: ["Recomendações não disponíveis"],
-            projecao_crescimento: "Projeção não disponível",
-            probabilidade_crescimento: "10% a 20%",
-            fator_ajuste_meta: "0.0000",
-            estrategias_personalizadas: ["Estratégias não disponíveis"],
-            nova_meta_sugerida: metaEquipe,
-            dados_grafico: {
-                historico: [],
-                previsao: []
-            },
+            projecaoCrescimento: "Projeção não disponível",
+            probabilidadeCrescimento: "10% a 20%",
+            fatorAjusteMeta: 0,
+            novaMeta: metaEquipe,
+            estrategiasPersonalizadas: ["Estratégias não disponíveis"],
+            historico: [
+                { "mes": "Janeiro", "valor": 0 },
+                { "mes": "Fevereiro", "valor": 0 },
+                { "mes": "Março", "valor": 0 },
+                { "mes": "Abril", "valor": 0 }
+            ],
+            previsao: [
+                { "mes": "Maio", "valor": 0 },
+                { "mes": "Junho", "valor": 0 }
+            ],
             analise_historico: {
                 crescimento_periodo: "Análise não disponível",
                 tendencias_identificadas: ["Tendências não identificadas"],
