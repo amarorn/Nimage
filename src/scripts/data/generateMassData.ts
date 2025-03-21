@@ -12,280 +12,259 @@ import { EquipeRepositoryImpl } from '../../infrastructure/repositories/EquipeRe
 import { VendedorRepositoryImpl } from '../../infrastructure/repositories/VendedorRepositoryImpl';
 import { MetaRepositoryImpl } from '../../infrastructure/repositories/MetaRepositoryImpl';
 import { AtividadeRepositoryImpl } from '../../infrastructure/repositories/AtividadeRepositoryImpl';
+import { CriarEquipe } from '../../application/use-cases/CriarEquipe';
+import { CriarVendedor } from '../../application/use-cases/CriarVendedor';
+import { CriarAtividade } from '../../application/use-cases/CriarAtividade';
+import { CriarMeta } from '../../application/use-cases/CriarMeta';
+
+// Tipos
+type PerfilEquipe = 'ALTA' | 'MEDIA' | 'BAIXA';
+type PerfilVendedor = 'EXCELENTE' | 'BOM' | 'MEDIO' | 'BAIXO';
+
+interface PerfilEquipeConfig {
+    peso: number;
+    mediaMeta: number;
+    variacao: number;
+}
+
+interface PerfilVendedorConfig {
+    peso: number;
+    mediaVendas: number;
+    variacao: number;
+}
+
+interface SazonalidadeDias {
+    [key: number]: number;
+}
+
+interface SazonalidadeMeses {
+    [key: number]: number;
+}
+
+interface Sazonalidade {
+    dias: SazonalidadeDias;
+    meses: SazonalidadeMeses;
+}
 
 // Constantes
-const META_BASE = 100000; // Meta base mensal por equipe
-
-type PerfilDesempenho = 'ALTO_DESEMPENHO' | 'MEDIO_DESEMPENHO' | 'BAIXO_DESEMPENHO';
-
-interface PerfilVendedor {
-    frequenciaMin: number;
-    frequenciaMax: number;
-    fatorDesempenhoMin: number;
-    fatorDesempenhoMax: number;
-}
-
-interface PerfilEquipe {
-    fatorMetaBase: number;
-    distribuicaoVendedores: number[]; // [alto, medio, baixo]
-}
-
-const PERFIS_VENDEDOR: Record<PerfilDesempenho, PerfilVendedor> = {
-    'ALTO_DESEMPENHO': {
-        frequenciaMin: 0.85,
-        frequenciaMax: 0.95,
-        fatorDesempenhoMin: 1.1,
-        fatorDesempenhoMax: 1.3
+const perfisEquipe: Record<PerfilEquipe, PerfilEquipeConfig> = {
+    ALTA: {
+        peso: 0.3,
+        mediaMeta: 120000,
+        variacao: 0.20
     },
-    'MEDIO_DESEMPENHO': {
-        frequenciaMin: 0.70,
-        frequenciaMax: 0.85,
-        fatorDesempenhoMin: 0.9,
-        fatorDesempenhoMax: 1.1
+    MEDIA: {
+        peso: 0.4,
+        mediaMeta: 100000,
+        variacao: 0.15
     },
-    'BAIXO_DESEMPENHO': {
-        frequenciaMin: 0.50,
-        frequenciaMax: 0.70,
-        fatorDesempenhoMin: 0.6,
-        fatorDesempenhoMax: 0.9
+    BAIXA: {
+        peso: 0.3,
+        mediaMeta: 80000,
+        variacao: 0.25
     }
 };
 
-const PERFIS_EQUIPE: Record<PerfilDesempenho, PerfilEquipe> = {
-    'ALTO_DESEMPENHO': {
-        fatorMetaBase: 1.2,
-        distribuicaoVendedores: [2, 1, 1] // 2 alto, 1 médio, 1 baixo
+const perfisVendedor: Record<PerfilVendedor, PerfilVendedorConfig> = {
+    EXCELENTE: {
+        peso: 0.2,
+        mediaVendas: 1500,
+        variacao: 0.15
     },
-    'MEDIO_DESEMPENHO': {
-        fatorMetaBase: 1.0,
-        distribuicaoVendedores: [1, 2, 1] // 1 alto, 2 médio, 1 baixo
+    BOM: {
+        peso: 0.4,
+        mediaVendas: 1200,
+        variacao: 0.20
     },
-    'BAIXO_DESEMPENHO': {
-        fatorMetaBase: 0.8,
-        distribuicaoVendedores: [1, 1, 2] // 1 alto, 1 médio, 2 baixo
+    MEDIO: {
+        peso: 0.3,
+        mediaVendas: 900,
+        variacao: 0.25
+    },
+    BAIXO: {
+        peso: 0.1,
+        mediaVendas: 600,
+        variacao: 0.30
     }
 };
 
-interface EquipeComPerfil extends Equipe {
-    perfil: PerfilDesempenho;
+const sazonalidade: Sazonalidade = {
+    dias: {
+        0: 0.50, // Domingo
+        1: 0.80, // Segunda
+        2: 0.90, // Terça
+        3: 1.00, // Quarta
+        4: 1.00, // Quinta
+        5: 0.90, // Sexta
+        6: 0.70  // Sábado
+    },
+    meses: {
+        0: 0.80,  // Janeiro
+        1: 0.90,  // Fevereiro
+        2: 1.00,  // Março
+        3: 1.00,  // Abril
+        4: 0.90,  // Maio
+        5: 0.80,  // Junho
+        6: 0.70,  // Julho
+        7: 0.80,  // Agosto
+        8: 0.90,  // Setembro
+        9: 1.00,  // Outubro
+        10: 1.00, // Novembro
+        11: 0.90  // Dezembro
+    }
+};
+
+// Função para gerar número com distribuição normal
+function gerarNumeroNormal(media: number, desvioPadrao: number): number {
+    const u1 = Math.random();
+    const u2 = Math.random();
+    const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    return media + z * desvioPadrao;
 }
 
-interface VendedorComPerfil extends Vendedor {
-    perfil: PerfilDesempenho;
+// Função para selecionar perfil baseado em pesos
+function selecionarPerfil<T extends string>(perfis: Record<T, { peso: number }>): T {
+    const rand = Math.random();
+    let acumulado = 0;
+    
+    for (const [perfil, config] of Object.entries(perfis)) {
+        acumulado += (config as { peso: number }).peso;
+        if (rand <= acumulado) {
+            return perfil as T;
+        }
+    }
+    
+    return Object.keys(perfis)[0] as T;
 }
 
-async function generateData() {
+async function generateMassData() {
     try {
-        console.log('🚀 Iniciando geração de dados de massa...');
+        console.log('🚀 Iniciando geração de massa de dados...');
         
-        // Conecta ao MongoDB
+        // Conectar ao MongoDB
         await MongoDB.conectar();
         console.log('✅ Conectado ao MongoDB');
 
+        // Inicializar repositórios
         const equipeRepo = new EquipeRepositoryImpl();
         const vendedorRepo = new VendedorRepositoryImpl();
-        const metaRepo = new MetaRepositoryImpl();
         const atividadeRepo = new AtividadeRepositoryImpl();
+        const metaRepo = new MetaRepositoryImpl();
 
-        // Limpa dados existentes
+        // Inicializar use cases
+        const criarEquipe = new CriarEquipe(equipeRepo);
+        const criarVendedor = new CriarVendedor(vendedorRepo);
+        const criarAtividade = new CriarAtividade(atividadeRepo);
+        const criarMeta = new CriarMeta(metaRepo);
+
+        // Limpar dados existentes
         console.log('🧹 Limpando dados existentes...');
-        await EquipeModel.deleteMany({});
-        await VendedorModel.deleteMany({});
-        await MetaModel.deleteMany({});
-        await AtividadeModel.deleteMany({});
+        await equipeRepo.deletarTodos();
+        await vendedorRepo.deletarTodos();
+        await atividadeRepo.deletarTodos();
+        await metaRepo.deletarTodos();
+        console.log('✅ Dados limpos');
 
-        // Cria equipes
+        // Definir período
+        const dataInicio = new Date(2024, 0, 1); // 01/01/2024
+        const dataFim = new Date(2025, 2, 30);   // 30/03/2025
+
+        // Criar equipes
         console.log('👥 Criando equipes...');
-        const nomesEquipes: Array<{ nome: string; perfil: PerfilDesempenho }> = [
-            { nome: 'Equipe Norte', perfil: 'ALTO_DESEMPENHO' },
-            { nome: 'Equipe Sul', perfil: 'MEDIO_DESEMPENHO' },
-            { nome: 'Equipe Leste', perfil: 'MEDIO_DESEMPENHO' },
-            { nome: 'Equipe Oeste', perfil: 'BAIXO_DESEMPENHO' }
-        ];
-
-        const equipes: EquipeComPerfil[] = [];
-        for (const { nome, perfil } of nomesEquipes) {
-            const id = uuidv4();
-            const equipe = new Equipe(
-                id,
-                nome,
-                `PDV ${nome}`,
-                'São Paulo',
-                'SP',
-                `Gerente ${nome}`,
-                `(11) 9${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`,
-                `Capitão ${nome}`,
-                `(11) 9${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`
-            );
-            await equipeRepo.criar(equipe);
+        const equipes = [];
+        for (let i = 1; i <= 4; i++) {
+            const perfil = selecionarPerfil(perfisEquipe);
+            const equipe = await criarEquipe.executar({
+                id: uuidv4(),
+                nome: `Equipe ${i}`,
+                nomepdv: `PDV ${i}`,
+                cidade: `Cidade ${i}`,
+                estado: 'SP',
+                gerente: `Gerente ${i}`,
+                contato_gerente: `(11) 9999-${i.toString().padStart(4, '0')}`,
+                capitao: `Capitão ${i}`,
+                contato_capitao: `(11) 9888-${i.toString().padStart(4, '0')}`
+            });
             equipes.push({ ...equipe, perfil });
         }
-        console.log('✅ 4 equipes criadas');
+        console.log('✅ Equipes criadas');
 
-        // Cria vendedores
-        console.log('👤 Criando vendedores...');
-        const nomesVendedores = [
-            'João Silva', 'Maria Santos', 'Pedro Oliveira', 'Ana Costa',
-            'Carlos Souza', 'Julia Lima', 'Roberto Alves', 'Beatriz Ferreira',
-            'Lucas Rodrigues', 'Mariana Silva', 'Rafael Costa', 'Fernanda Santos',
-            'Gustavo Oliveira', 'Carolina Lima', 'Daniel Alves', 'Amanda Ferreira'
-        ];
-
-        const vendedores: VendedorComPerfil[] = [];
-        let nomeIndex = 0;
-
+        // Criar metas mensais para cada equipe
+        console.log('🎯 Criando metas mensais...');
         for (const equipe of equipes) {
-            const perfilEquipe = PERFIS_EQUIPE[equipe.perfil];
-            const distribuicao = perfilEquipe.distribuicaoVendedores;
+            const perfil = equipe.perfil;
+            const mediaMeta = perfisEquipe[perfil].mediaMeta;
+            const variacao = perfisEquipe[perfil].variacao;
 
-            // Cria vendedores com diferentes perfis conforme a distribuição
-            let vendedorIndex = 0;
-            for (let i = 0; i < distribuicao.length; i++) {
-                const quantidade = distribuicao[i];
-                const perfilVendedor = i === 0 ? 'ALTO_DESEMPENHO' : 
-                                     i === 1 ? 'MEDIO_DESEMPENHO' : 
-                                     'BAIXO_DESEMPENHO';
+            let data = new Date(dataInicio);
+            while (data <= dataFim) {
+                const meta = gerarNumeroNormal(mediaMeta, mediaMeta * variacao);
+                await criarMeta.executar({
+                    id: uuidv4(),
+                    equipeId: equipe.id,
+                    objetivo: Math.max(0, meta),
+                    data: new Date(data)
+                });
+                data.setMonth(data.getMonth() + 1);
+            }
+        }
+        console.log('✅ Metas criadas');
 
-                for (let j = 0; j < quantidade; j++) {
-                    const nome = nomesVendedores[nomeIndex++];
-                    const email = `${nome.toLowerCase().replace(' ', '.')}@nimage.com`;
-                    const telefone = `(11) 9${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`;
-                    const meta = META_BASE * perfilEquipe.fatorMetaBase * 
-                               (perfilVendedor === 'ALTO_DESEMPENHO' ? 1.2 : 
-                                perfilVendedor === 'MEDIO_DESEMPENHO' ? 1.0 : 0.8);
-                    const cargo = perfilVendedor === 'ALTO_DESEMPENHO' ? 'Vendedor Sênior' :
-                                perfilVendedor === 'MEDIO_DESEMPENHO' ? 'Vendedor Pleno' : 'Vendedor Júnior';
-                    
-                    const vendedor = new Vendedor(
-                        uuidv4(),
-                        nome,
-                        equipe.id,
-                        email,
-                        telefone,
-                        meta,
-                        cargo
-                    );
-                    await vendedorRepo.criar(vendedor);
-                    vendedores.push({ ...vendedor, perfil: perfilVendedor });
-                    vendedorIndex++;
+        // Criar vendedores e suas atividades
+        console.log('👤 Criando vendedores e atividades...');
+        for (const equipe of equipes) {
+            // Criar 5 vendedores para cada equipe
+            for (let i = 1; i <= 5; i++) {
+                const perfil = selecionarPerfil(perfisVendedor);
+                const vendedor = await criarVendedor.executar({
+                    id: uuidv4(),
+                    nome: `Vendedor ${i} - ${equipe.nome}`,
+                    equipeId: equipe.id,
+                    email: `vendedor${i}@${equipe.nome.toLowerCase().replace(' ', '')}.com`,
+                    telefone: `(11) 9777-${i.toString().padStart(4, '0')}`,
+                    meta: perfisVendedor[perfil].mediaVendas * 30,
+                    cargo: 'Vendedor'
+                });
+
+                // Gerar atividades para o vendedor
+                let data = new Date(dataInicio);
+                while (data <= dataFim) {
+                    // Não gerar atividades aos domingos
+                    if (data.getDay() !== 0) {
+                        const mediaVendas = perfisVendedor[perfil].mediaVendas;
+                        const variacao = perfisVendedor[perfil].variacao;
+                        
+                        // Aplicar fatores de sazonalidade
+                        const fatorDia = sazonalidade.dias[data.getDay()];
+                        const fatorMes = sazonalidade.meses[data.getMonth()];
+                        
+                        // Calcular quantidade com distribuição normal e fatores de sazonalidade
+                        const quantidade = Math.round(
+                            gerarNumeroNormal(mediaVendas, mediaVendas * variacao) * 
+                            fatorDia * 
+                            fatorMes
+                        );
+
+                        await criarAtividade.executar({
+                            id: uuidv4(),
+                            vendedorId: vendedor.id,
+                            data: new Date(data),
+                            docinhosCoco: Math.max(0, quantidade)
+                        });
+                    }
+                    data.setDate(data.getDate() + 1);
                 }
             }
         }
-        console.log('✅ 16 vendedores criados');
+        console.log('✅ Vendedores e atividades criados');
 
-        // Cria metas
-        console.log('🎯 Criando metas...');
-        const dataInicio = new Date('2024-01-01');
-        const dataFim = new Date('2025-03-01');
-        const meses = 14;
-
-        for (const equipe of equipes) {
-            const perfilEquipe = PERFIS_EQUIPE[equipe.perfil];
-            
-            for (let i = 0; i < meses; i++) {
-                const inicioMes = new Date(dataInicio.getFullYear(), dataInicio.getMonth() + i, 1);
-                const fimMes = new Date(inicioMes.getFullYear(), inicioMes.getMonth() + 1, 0);
-
-                // Fatores que influenciam a meta
-                const fatorSazonal = Math.floor(Math.random() * (130 - 70 + 1) + 70) / 100; // Variação sazonal
-                const fatorEquipe = perfilEquipe.fatorMetaBase; // Fator baseado no perfil da equipe
-                const objetivo = META_BASE * fatorSazonal * fatorEquipe;
-
-                const meta = new Meta(
-                    uuidv4(),
-                    equipe.id,
-                    objetivo,
-                    inicioMes
-                );
-                await metaRepo.criar(meta);
-            }
-        }
-        console.log('✅ Metas criadas para todas as equipes');
-
-        // Cria atividades
-        console.log('📊 Criando atividades...');
-        let totalAtividades = 0;
-
-        // Busca todas as metas
-        const metas = await metaRepo.obterTodos(0, 1000);
-
-        // Gera datas para todo o período
-        const datas = [];
-        let dataAtual = new Date(dataInicio);
-        while (dataAtual <= dataFim) {
-            if (dataAtual.getDay() !== 0) { // Exclui domingos
-                datas.push(new Date(dataAtual));
-            }
-            dataAtual.setDate(dataAtual.getDate() + 1);
-        }
-
-        for (const vendedor of vendedores) {
-            console.log(`\n👤 Processando vendedor: ${vendedor.nome} (${vendedor.perfil})`);
-            const perfilVendedor = PERFIS_VENDEDOR[vendedor.perfil];
-
-            // Determina os dias que o vendedor terá atividade
-            const frequencia = perfilVendedor.frequenciaMin + 
-                             (Math.random() * (perfilVendedor.frequenciaMax - perfilVendedor.frequenciaMin));
-            const diasComAtividade = Math.floor(datas.length * frequencia);
-
-            // Seleciona dias aleatórios para ter atividade
-            const datasVendedor = [...datas]
-                .sort(() => Math.random() - 0.5)
-                .slice(0, diasComAtividade);
-
-            for (const data of datasVendedor) {
-                const metaMes = metas.find((meta: Meta) => 
-                    meta.equipeId === vendedor.equipeId &&
-                    meta.data.getMonth() === data.getMonth() &&
-                    meta.data.getFullYear() === data.getFullYear()
-                );
-
-                if (!metaMes) continue;
-
-                const diasNoMes = new Date(data.getFullYear(), data.getMonth() + 1, 0).getDate();
-                const metaDiaria = metaMes.objetivo / diasNoMes;
-
-                // Ajusta a quantidade de docinhos com base no dia da semana
-                let fatorDiaSemana = 1.0;
-                const diaSemana = data.getDay();
-                if (diaSemana === 0 || diaSemana === 6) { // Fim de semana
-                    fatorDiaSemana = 1.3; // 30% mais vendas
-                } else if (diaSemana === 5) { // Sexta-feira
-                    fatorDiaSemana = 1.2; // 20% mais vendas
-                }
-
-                // Calcula fator de desempenho baseado no perfil do vendedor
-                const fatorDesempenho = perfilVendedor.fatorDesempenhoMin + 
-                                      (Math.random() * (perfilVendedor.fatorDesempenhoMax - perfilVendedor.fatorDesempenhoMin));
-
-                // Calcula quantidade de docinhos vendidos
-                const docinhosCoco = Math.floor(
-                    metaDiaria * 
-                    fatorDesempenho * 
-                    fatorDiaSemana * 
-                    (0.8 + Math.random() * 0.4) // Variação aleatória de ±20%
-                );
-
-                const atividade = new Atividade(
-                    uuidv4(),
-                    vendedor.id,
-                    data,
-                    docinhosCoco,
-                    docinhosCoco
-                );
-                await atividadeRepo.criar(atividade);
-                totalAtividades++;
-            }
-            console.log(`✅ Criadas ${diasComAtividade} atividades para ${vendedor.nome}`);
-        }
-
-        console.log(`\n🎉 Total de atividades criadas: ${totalAtividades}`);
-        console.log('🎉 Geração de dados concluída com sucesso!');
+        console.log('🎉 Geração de massa de dados concluída com sucesso!');
     } catch (error) {
-        console.error('❌ Erro durante a geração de dados:', error);
-        throw error;
+        console.error('❌ Erro ao gerar massa de dados:', error);
     }
 }
 
 // Executa a geração de dados
-generateData().catch(console.error); 
+generateMassData().catch(console.error); 
+generateMassData().catch(console.error); 
+generateMassData().catch(console.error); 

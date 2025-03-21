@@ -47,6 +47,11 @@ class EquipeRepositoryImpl {
             yield EquipeModel_1.EquipeModel.deleteOne({ id });
         });
     }
+    deletarTodos() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield EquipeModel_1.EquipeModel.deleteMany({});
+        });
+    }
 }
 exports.EquipeRepositoryImpl = EquipeRepositoryImpl;
 //# sourceMappingURL=EquipeRepositoryImpl.js.map

@@ -7,4 +7,6 @@ export interface AtividadeRepository {
     obterTodos(skip: number, limit: number): Promise<Atividade[]>;
     obterPorVendedorId(vendedorId: string): Promise<Atividade[]>;
     obterPorVendedorEData(vendedorId: string, dataInicio: Date, dataFim: Date): Promise<Atividade[]>;
+    deletar(id: string): Promise<void>;
+    deletarTodos(): Promise<void>;
 }

@@ -87,4 +87,8 @@ export class VendedorRepositoryImpl implements VendedorRepository {
     async deletar(id: string): Promise<void> {
         await VendedorModel.deleteOne({ id });
     }
+
+    async deletarTodos(): Promise<void> {
+        await VendedorModel.deleteMany({});
+    }
 }

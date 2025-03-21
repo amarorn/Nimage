@@ -17,7 +17,7 @@ export class MetaRepositoryImpl implements MetaRepository {
     }
 
     async obterPorId(id: string): Promise<Meta | null> {
-        return await MetaModel.findOne({ id }).lean();
+        return await MetaModel.findById(id);
     }
 
     async obterPorEquipeEData(equipeId: string, dataInicio: Date, dataFim: Date): Promise<Meta | null> {
@@ -31,20 +31,28 @@ export class MetaRepositoryImpl implements MetaRepository {
     }
 
     async obterTodos(skip: number, limit: number): Promise<Meta[]> {
-        return await MetaModel.find().skip(skip).limit(limit).lean();
+        return await MetaModel.find().skip(skip).limit(limit);
     }
 
     async atualizar(id: string, dados: { equipeId: string; objetivo: number; data: Date }): Promise<Meta | null> {
-        const metaAtualizada = await MetaModel.findOneAndUpdate(
-            { id },
+        const metaAtualizada = await MetaModel.findByIdAndUpdate(
+            id,
             { equipeId: dados.equipeId, objetivo: dados.objetivo, data: dados.data },
             { new: true }
-        ).lean();
+        );
 
         if (metaAtualizada) {
             return new Meta(metaAtualizada.id, metaAtualizada.equipeId, metaAtualizada.objetivo, metaAtualizada.data);
         }
         return null;
+    }
+
+    async deletar(id: string): Promise<void> {
+        await MetaModel.findByIdAndDelete(id);
+    }
+
+    async deletarTodos(): Promise<void> {
+        await MetaModel.deleteMany({});
     }
 
     private toDomain(meta: any): Meta {

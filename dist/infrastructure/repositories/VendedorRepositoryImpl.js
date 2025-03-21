@@ -59,6 +59,11 @@ class VendedorRepositoryImpl {
             yield VendedorModel_1.VendedorModel.deleteOne({ id });
         });
     }
+    deletarTodos() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield VendedorModel_1.VendedorModel.deleteMany({});
+        });
+    }
 }
 exports.VendedorRepositoryImpl = VendedorRepositoryImpl;
 //# sourceMappingURL=VendedorRepositoryImpl.js.map

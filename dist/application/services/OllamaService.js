@@ -157,14 +157,24 @@ RETORNE EXATAMENTE ESTE JSON PREENCHIDO (MANTENHA A ESTRUTURA EXATA):
   }
 }
 
+- Use os dados de histórico de vendas para detectar padrões de crescimento
+- Identifique tendências de vendas (ex: aumento de ticket médio, vendas em dias específicos)
+- Aponte pontos de melhoria com base em atividades e metas
+- Sugira estratégias com base nos padrões do histórico
+- NÃO escreva nada além do JSON de saída
+
 IMPORTANTE:
-1. MANTENHA EXATAMENTE A MESMA ESTRUTURA DO JSON ACIMA
-2. APENAS ALTERE OS VALORES, NÃO MUDE OS CAMPOS
-3. NÃO ADICIONE CAMPOS NOVOS
-4. NÃO REMOVA CAMPOS EXISTENTES
-5. NÃO INCLUA NENHUM TEXTO ANTES OU DEPOIS DO JSON
-6. O CAMPO "tendencias" DEVE SER UM ARRAY COM PELO MENOS UM ITEM
-7. TODOS OS ARRAYS DEVEM TER PELO MENOS UM ITEM`;
+1. Use os dados de histórico de vendas para detectar padrões de crescimento
+2. Identifique tendências de vendas (ex: aumento de ticket médio, vendas em dias específicos)
+3. Aponte pontos de melhoria com base em atividades e metas
+4. Sugira estratégias com base nos padrões do histórico
+5. MANTENHA EXATAMENTE A MESMA ESTRUTURA DO JSON ACIMA
+6. APENAS ALTERE OS VALORES, NÃO MUDE OS CAMPOS
+7. NÃO ADICIONE CAMPOS NOVOS
+8. NÃO REMOVA CAMPOS EXISTENTES
+9. NÃO INCLUA NENHUM TEXTO ANTES OU DEPOIS DO JSON
+10. O CAMPO "tendencias" DEVE SER UM ARRAY COM PELO MENOS UM ITEM
+11. TODOS OS ARRAYS DEVEM TER PELO MENOS UM ITEM`;
                 const response = yield (0, node_fetch_1.default)(`${this.baseUrl}/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -341,22 +351,48 @@ IMPORTANTE:
     trainModel(_a) {
         return __awaiter(this, arguments, void 0, function* ({ prompt, completion }) {
             try {
-                const response = yield (0, node_fetch_1.default)(`${this.baseUrl}/tune`, {
+                const response = yield (0, node_fetch_1.default)(`${this.baseUrl}/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        name: 'nimage',
-                        prompt,
-                        response: completion
-                    })
+                        model: 'nimage',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: 'Você é um analisador de dados de vendas que SEMPRE retorna APENAS JSON válido, sem texto adicional.'
+                            },
+                            {
+                                role: 'user',
+                                content: prompt
+                            },
+                            {
+                                role: 'assistant',
+                                content: completion
+                            }
+                        ],
+                        stream: false,
+                        options: {
+                            num_ctx: 8192,
+                            temperature: 0.8,
+                            top_k: 50,
+                            top_p: 0.95,
+                            num_thread: 8,
+                            repeat_last_n: 128,
+                            seed: 42
+                        }
+                    }),
                 });
                 if (!response.ok) {
                     throw new Error(`Erro ao treinar modelo: ${response.statusText}`);
                 }
+                const result = yield response.json();
+                console.log('Resposta do treinamento:', result);
+                // Aguarda um pouco antes do próximo treinamento
+                yield this.delay(1000);
             }
             catch (error) {
                 console.error('Erro ao treinar modelo:', error);
-                throw error;
+                throw new Error(`Erro ao treinar modelo: ${error.message}`);
             }
         });
     }

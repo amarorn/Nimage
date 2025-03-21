@@ -76,4 +76,8 @@ export class EquipeRepositoryImpl implements EquipeRepository {
     async deletar(id: string): Promise<void> {
         await EquipeModel.deleteOne({ id });
     }
+
+    async deletarTodos(): Promise<void> {
+        await EquipeModel.deleteMany({});
+    }
 }

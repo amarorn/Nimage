@@ -14,4 +14,5 @@ export interface VendedorRepository {
     obterTodos(skip: number, limit: number): Promise<Vendedor[]>;
     obterPorEquipeId(equipeId: string): Promise<Vendedor[]>;
     deletar(id: string): Promise<void>;
+    deletarTodos(): Promise<void>;
 }

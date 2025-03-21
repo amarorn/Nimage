@@ -62,6 +62,16 @@ class AtividadeRepositoryImpl {
             return resultado;
         });
     }
+    deletar(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield AtividadeModel_1.AtividadeModel.findByIdAndDelete(id);
+        });
+    }
+    deletarTodos() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield AtividadeModel_1.AtividadeModel.deleteMany({});
+        });
+    }
 }
 exports.AtividadeRepositoryImpl = AtividadeRepositoryImpl;
 //# sourceMappingURL=AtividadeRepositoryImpl.js.map

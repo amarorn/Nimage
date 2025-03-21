@@ -15,4 +15,5 @@ export interface EquipeRepository {
     obterPorId(id: string): Promise<Equipe | null>;
     obterTodos(skip: number, limit: number): Promise<Equipe[]>;
     deletar(id: string): Promise<void>;
+    deletarTodos(): Promise<void>;
 }

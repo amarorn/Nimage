@@ -31,7 +31,7 @@ class MetaRepositoryImpl {
     }
     obterPorId(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield MetaModel_1.MetaModel.findOne({ id }).lean();
+            return yield MetaModel_1.MetaModel.findById(id);
         });
     }
     obterPorEquipeEData(equipeId, dataInicio, dataFim) {
@@ -47,16 +47,26 @@ class MetaRepositoryImpl {
     }
     obterTodos(skip, limit) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield MetaModel_1.MetaModel.find().skip(skip).limit(limit).lean();
+            return yield MetaModel_1.MetaModel.find().skip(skip).limit(limit);
         });
     }
     atualizar(id, dados) {
         return __awaiter(this, void 0, void 0, function* () {
-            const metaAtualizada = yield MetaModel_1.MetaModel.findOneAndUpdate({ id }, { equipeId: dados.equipeId, objetivo: dados.objetivo, data: dados.data }, { new: true }).lean();
+            const metaAtualizada = yield MetaModel_1.MetaModel.findByIdAndUpdate(id, { equipeId: dados.equipeId, objetivo: dados.objetivo, data: dados.data }, { new: true });
             if (metaAtualizada) {
                 return new Meta_1.Meta(metaAtualizada.id, metaAtualizada.equipeId, metaAtualizada.objetivo, metaAtualizada.data);
             }
             return null;
+        });
+    }
+    deletar(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield MetaModel_1.MetaModel.findByIdAndDelete(id);
+        });
+    }
+    deletarTodos() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield MetaModel_1.MetaModel.deleteMany({});
         });
     }
     toDomain(meta) {
