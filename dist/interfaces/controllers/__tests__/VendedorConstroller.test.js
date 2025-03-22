@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const VendedorController_1 = require("../VendedorController");
 const CriarVendedor_1 = require("../../../application/use-cases/CriarVendedor");
@@ -44,16 +35,16 @@ describe('VendedorController', () => {
             json: jest.fn(),
         };
     });
-    it('should create a new vendedor', () => __awaiter(void 0, void 0, void 0, function* () {
+    it('should create a new vendedor', async () => {
         req.body = { id: '1', nome: 'Vendedor Teste', equipeId: 'equipe1' };
-        yield vendedorController.criar(req, res);
+        await vendedorController.criar(req, res);
         expect(res.status).toHaveBeenCalledWith(201);
         expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
             id: '1',
             nome: 'Vendedor Teste',
             equipeId: 'equipe1',
         }));
-    }), 10000);
+    }, 10000);
     // Add more tests for other methods like obterTodos, obterPorId, atualizar, etc.
 });
 //# sourceMappingURL=VendedorConstroller.test.js.map

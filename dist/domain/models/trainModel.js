@@ -32,15 +32,6 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModelTrainer = void 0;
 const tf = __importStar(require("@tensorflow/tfjs"));
@@ -56,35 +47,33 @@ class ModelTrainer {
         this.equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
         this.metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
     }
-    prepareTrainingData() {
-        return __awaiter(this, void 0, void 0, function* () {
-            // Buscar todas as atividades
-            const atividades = yield this.atividadeRepo.obterTodos(0, 1000); // Limitando a 1000 registros para teste
-            const features = [];
-            const labels = [];
-            for (const atividade of atividades) {
-                const vendedor = yield this.vendedorRepo.obterPorId(atividade.vendedorId);
-                if (!vendedor)
-                    continue;
-                const equipe = yield this.equipeRepo.obterPorId(vendedor.equipeId);
-                if (!equipe)
-                    continue;
-                const meta = yield this.metaRepo.obterPorEquipe(equipe.id);
-                if (!meta)
-                    continue;
-                // Features simplificadas
-                const featureVector = [
-                    atividade.data.getDay(), // dia da semana (0-6)
-                    atividade.data.getMonth() + 1, // mês (1-12)
-                    meta.objetivo / 10000, // meta normalizada
-                    atividade.data.getDay() === 0 ? 1 : 0, // é domingo?
-                    atividade.data.getDay() === 6 ? 1 : 0, // é sábado?
-                ];
-                features.push(featureVector);
-                labels.push(atividade.docinhosCoco / 1000); // normalização dos docinhos
-            }
-            return { features, labels };
-        });
+    async prepareTrainingData() {
+        // Buscar todas as atividades
+        const atividades = await this.atividadeRepo.obterTodos(0, 1000); // Limitando a 1000 registros para teste
+        const features = [];
+        const labels = [];
+        for (const atividade of atividades) {
+            const vendedor = await this.vendedorRepo.obterPorId(atividade.vendedorId);
+            if (!vendedor)
+                continue;
+            const equipe = await this.equipeRepo.obterPorId(vendedor.equipeId);
+            if (!equipe)
+                continue;
+            const meta = await this.metaRepo.obterPorEquipe(equipe.id);
+            if (!meta)
+                continue;
+            // Features simplificadas
+            const featureVector = [
+                atividade.data.getDay(), // dia da semana (0-6)
+                atividade.data.getMonth() + 1, // mês (1-12)
+                meta.objetivo / 10000, // meta normalizada
+                atividade.data.getDay() === 0 ? 1 : 0, // é domingo?
+                atividade.data.getDay() === 6 ? 1 : 0, // é sábado?
+            ];
+            features.push(featureVector);
+            labels.push(atividade.docinhosCoco / 1000); // normalização dos docinhos
+        }
+        return { features, labels };
     }
     createModel() {
         const model = tf.sequential();
@@ -107,61 +96,59 @@ class ModelTrainer {
         });
         return model;
     }
-    trainModel() {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                // Conectar ao MongoDB
-                console.log('Conectando ao MongoDB...');
-                yield MongoDB_1.MongoDB.conectar();
-                console.log('Conectado ao MongoDB com sucesso!');
-                console.log('Preparando dados de treinamento...');
-                const { features, labels } = yield this.prepareTrainingData();
-                console.log(`Carregados ${features.length} registros de treinamento`);
-                // Converter para tensores
-                const xs = tf.tensor2d(features);
-                const ys = tf.tensor2d(labels, [labels.length, 1]);
-                // Criar e treinar o modelo
-                const model = this.createModel();
-                console.log('Iniciando treinamento...');
-                yield model.fit(xs, ys, {
-                    epochs: 50,
-                    batchSize: 32,
-                    validationSplit: 0.2,
-                    callbacks: {
-                        onEpochEnd: (epoch, logs) => {
-                            if (logs) {
-                                console.log(`Época ${epoch + 1} - Loss: ${logs.loss.toFixed(4)} - Val Loss: ${logs.val_loss.toFixed(4)}`);
-                            }
+    async trainModel() {
+        try {
+            // Conectar ao MongoDB
+            console.log('Conectando ao MongoDB...');
+            await MongoDB_1.MongoDB.conectar();
+            console.log('Conectado ao MongoDB com sucesso!');
+            console.log('Preparando dados de treinamento...');
+            const { features, labels } = await this.prepareTrainingData();
+            console.log(`Carregados ${features.length} registros de treinamento`);
+            // Converter para tensores
+            const xs = tf.tensor2d(features);
+            const ys = tf.tensor2d(labels, [labels.length, 1]);
+            // Criar e treinar o modelo
+            const model = this.createModel();
+            console.log('Iniciando treinamento...');
+            await model.fit(xs, ys, {
+                epochs: 50,
+                batchSize: 32,
+                validationSplit: 0.2,
+                callbacks: {
+                    onEpochEnd: (epoch, logs) => {
+                        if (logs) {
+                            console.log(`Época ${epoch + 1} - Loss: ${logs.loss.toFixed(4)} - Val Loss: ${logs.val_loss.toFixed(4)}`);
                         }
                     }
-                });
-                // Salvar o modelo
-                yield model.save('indexeddb://nimage_model');
-                console.log('Modelo salvo com sucesso!');
-                // Testar o modelo
-                console.log('\nTestando o modelo com alguns exemplos:');
-                const testData = xs.slice([0, 5]);
-                const predictions = model.predict(testData);
-                const actualValues = ys.slice([0, 5]);
-                const predArray = yield predictions.array();
-                const actualArray = yield actualValues.array();
-                for (let i = 0; i < 5; i++) {
-                    console.log(`Exemplo ${i + 1}:`);
-                    console.log(`Previsto: ${(predArray[i][0] * 1000).toFixed(0)}`);
-                    console.log(`Real: ${(actualArray[i][0] * 1000).toFixed(0)}`);
-                    console.log(`Erro: ${Math.abs((predArray[i][0] - actualArray[i][0]) * 1000).toFixed(0)}`);
-                    console.log('---');
                 }
-                // Limpar memória
-                xs.dispose();
-                ys.dispose();
-                model.dispose();
+            });
+            // Salvar o modelo
+            await model.save('indexeddb://nimage_model');
+            console.log('Modelo salvo com sucesso!');
+            // Testar o modelo
+            console.log('\nTestando o modelo com alguns exemplos:');
+            const testData = xs.slice([0, 5]);
+            const predictions = model.predict(testData);
+            const actualValues = ys.slice([0, 5]);
+            const predArray = await predictions.array();
+            const actualArray = await actualValues.array();
+            for (let i = 0; i < 5; i++) {
+                console.log(`Exemplo ${i + 1}:`);
+                console.log(`Previsto: ${(predArray[i][0] * 1000).toFixed(0)}`);
+                console.log(`Real: ${(actualArray[i][0] * 1000).toFixed(0)}`);
+                console.log(`Erro: ${Math.abs((predArray[i][0] - actualArray[i][0]) * 1000).toFixed(0)}`);
+                console.log('---');
             }
-            catch (error) {
-                console.error('Erro durante o treinamento:', error);
-                throw error;
-            }
-        });
+            // Limpar memória
+            xs.dispose();
+            ys.dispose();
+            model.dispose();
+        }
+        catch (error) {
+            console.error('Erro durante o treinamento:', error);
+            throw error;
+        }
     }
 }
 exports.ModelTrainer = ModelTrainer;

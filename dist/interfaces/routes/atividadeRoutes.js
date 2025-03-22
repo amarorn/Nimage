@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const AtividadeRepositoryImpl_1 = require("../../infrastructure/repositories/AtividadeRepositoryImpl");
@@ -40,26 +31,26 @@ const obterAtividadesPorVendedorEData = new ObterAtividadesPorVendedorEData_1.Ob
 // Controller
 const atividadeController = new AtividadeController_1.AtividadeController(criarAtividade, obterAtividade, atualizarAtividade, atividadeService, obterAtividadesPorVendedorEData, frequenciaVendasService);
 // Routes
-router.post("/atividades", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/atividades", async (req, res) => {
     return atividadeController.criar(req, res);
-}));
-router.get("/atividades/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/atividades/all", async (req, res) => {
     return atividadeController.obterTodos(req, res);
-}));
-router.get("/atividades/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/atividades/:id", async (req, res) => {
     return atividadeController.obterPorId(req, res);
-}));
-router.get("/atividades/:id/detalhes", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/atividades/:id/detalhes", async (req, res) => {
     return atividadeController.obterDetalhes(req, res);
-}));
-router.put("/atividades/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.put("/atividades/:id", async (req, res) => {
     return atividadeController.atualizar(req, res);
-}));
-router.get("/atividades/vendedor/:vendedorId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/atividades/vendedor/:vendedorId", async (req, res) => {
     return atividadeController.getAtividadesByVendedorAndDate(req, res);
-}));
-router.get("/atividades/equipe/:equipeId/frequencia-vendas", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/atividades/equipe/:equipeId/frequencia-vendas", async (req, res) => {
     return atividadeController.calcularFrequenciaVendas(req, res);
-}));
+});
 exports.default = router;
 //# sourceMappingURL=atividadeRoutes.js.map

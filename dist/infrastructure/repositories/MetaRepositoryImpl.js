@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetaRepositoryImpl = void 0;
 const Meta_1 = require("../../domain/entities/Meta");
@@ -16,58 +7,42 @@ class MetaRepositoryImpl {
     constructor() {
         this.metas = [];
     }
-    criar(meta) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield MetaModel_1.MetaModel.create(meta);
-        });
+    async criar(meta) {
+        await MetaModel_1.MetaModel.create(meta);
     }
-    obterPorEquipe(equipeId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log('Buscando meta por equipe:', equipeId);
-            const meta = yield MetaModel_1.MetaModel.findOne({ equipeId: equipeId });
-            console.log('Meta encontrada:', meta);
-            return meta ? this.toDomain(meta) : null;
-        });
+    async obterPorEquipe(equipeId) {
+        console.log('Buscando meta por equipe:', equipeId);
+        const meta = await MetaModel_1.MetaModel.findOne({ equipeId: equipeId });
+        console.log('Meta encontrada:', meta);
+        return meta ? this.toDomain(meta) : null;
     }
-    obterPorId(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield MetaModel_1.MetaModel.findById(id);
-        });
+    async obterPorId(id) {
+        return await MetaModel_1.MetaModel.findById(id);
     }
-    obterPorEquipeEData(equipeId, dataInicio, dataFim) {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log('Buscando meta por equipe e data:', { equipeId, dataInicio, dataFim });
-            const meta = yield MetaModel_1.MetaModel.findOne({
-                equipeId: equipeId,
-                data: { $gte: dataInicio, $lte: dataFim }
-            });
-            console.log('Meta encontrada:', meta);
-            return meta ? this.toDomain(meta) : null;
+    async obterPorEquipeEData(equipeId, dataInicio, dataFim) {
+        console.log('Buscando meta por equipe e data:', { equipeId, dataInicio, dataFim });
+        const meta = await MetaModel_1.MetaModel.findOne({
+            equipeId: equipeId,
+            data: { $gte: dataInicio, $lte: dataFim }
         });
+        console.log('Meta encontrada:', meta);
+        return meta ? this.toDomain(meta) : null;
     }
-    obterTodos(skip, limit) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield MetaModel_1.MetaModel.find().skip(skip).limit(limit);
-        });
+    async obterTodos(skip, limit) {
+        return await MetaModel_1.MetaModel.find().skip(skip).limit(limit);
     }
-    atualizar(id, dados) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const metaAtualizada = yield MetaModel_1.MetaModel.findByIdAndUpdate(id, { equipeId: dados.equipeId, objetivo: dados.objetivo, data: dados.data }, { new: true });
-            if (metaAtualizada) {
-                return new Meta_1.Meta(metaAtualizada.id, metaAtualizada.equipeId, metaAtualizada.objetivo, metaAtualizada.data);
-            }
-            return null;
-        });
+    async atualizar(id, dados) {
+        const metaAtualizada = await MetaModel_1.MetaModel.findByIdAndUpdate(id, { equipeId: dados.equipeId, objetivo: dados.objetivo, data: dados.data }, { new: true });
+        if (metaAtualizada) {
+            return new Meta_1.Meta(metaAtualizada.id, metaAtualizada.equipeId, metaAtualizada.objetivo, metaAtualizada.data);
+        }
+        return null;
     }
-    deletar(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield MetaModel_1.MetaModel.findByIdAndDelete(id);
-        });
+    async deletar(id) {
+        await MetaModel_1.MetaModel.findByIdAndDelete(id);
     }
-    deletarTodos() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield MetaModel_1.MetaModel.deleteMany({});
-        });
+    async deletarTodos() {
+        await MetaModel_1.MetaModel.deleteMany({});
     }
     toDomain(meta) {
         return new Meta_1.Meta(meta.id || meta._id.toString(), meta.equipeId, meta.objetivo, meta.data);

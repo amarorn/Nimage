@@ -2,6 +2,7 @@ export class FormatterService {
     formatVendorData(vendorData: any): any {
         const equipe = vendorData.resultado.equipe;
         const vendedor = vendorData.resultado.vendedor;
+        const mesRequisicao = vendorData.mesRequisicao || '2024-02'; // Pega o mês da requisição ou usa um valor padrão
 
         const formattedData = {
             "meta_anterior": this.formatCurrency(equipe.meta),
@@ -54,11 +55,7 @@ export class FormatterService {
                         { mes: "Maio", valor: vendedor.somaDocinhos / 6 },
                         { mes: "Junho", valor: vendedor.somaDocinhos / 6 }
                     ],
-                    "previsao": [
-                        { mes: "Julho", valor: vendedor.somaDocinhos / 6 * 1.2 },
-                        { mes: "Agosto", valor: vendedor.somaDocinhos / 6 * 1.2 },
-                        { mes: "Setembro", valor: vendedor.somaDocinhos / 6 * 1.2 }
-                    ]
+                    "previsao": this.generateDailyForecast(vendedor.somaDocinhos / 6 * 1.2, mesRequisicao)
                 }
             }]
         };
@@ -217,5 +214,61 @@ export class FormatterService {
         } else {
             return "Iniciante";
         }
+    }
+
+    private generateDailyForecast(monthlyValue: number, mesRequisicao: string): any[] {
+        // Converte o mês da requisição (formato: YYYY-MM) para Date
+        const [ano, mes] = mesRequisicao.split('-').map(Number);
+        
+        // Cria datas para os próximos dois meses a partir do mês da requisição
+        const nextMonth = new Date(ano, mes, 1);
+        const followingMonth = new Date(ano, mes + 1, 1);
+        
+        interface DailyForecast {
+            mes: string;
+            dia: number;
+            valor: number;
+        }
+        
+        const forecast: DailyForecast[] = [];
+        
+        // Função auxiliar para verificar se é dia útil
+        const isWorkingDay = (date: Date): boolean => {
+            const day = date.getDay();
+            return day !== 0 && day !== 6; // Exclui sábados e domingos
+        };
+        
+        // Função para obter o nome do mês
+        const getMonthName = (date: Date): string => {
+            return date.toLocaleString('pt-BR', { month: 'long' });
+        };
+        
+        // Função para gerar previsão de um mês
+        const generateMonthForecast = (startDate: Date, value: number) => {
+            const daysInMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).getDate();
+            const workingDays = Array.from({ length: daysInMonth }, (_, i) => {
+                const date = new Date(startDate.getFullYear(), startDate.getMonth(), i + 1);
+                return isWorkingDay(date);
+            }).filter(Boolean).length;
+            
+            const dailyValue = value / workingDays;
+            
+            for (let i = 1; i <= daysInMonth; i++) {
+                const date = new Date(startDate.getFullYear(), startDate.getMonth(), i);
+                if (isWorkingDay(date)) {
+                    forecast.push({
+                        mes: getMonthName(date),
+                        dia: i,
+                        valor: dailyValue
+                    });
+                }
+            }
+        };
+        
+        // Gera previsão para os próximos dois meses
+        generateMonthForecast(nextMonth, monthlyValue);
+        generateMonthForecast(followingMonth, monthlyValue);
+        
+        return forecast;
     }
 }

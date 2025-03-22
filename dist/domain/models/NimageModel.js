@@ -32,15 +32,6 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NimageModel = void 0;
 const tf = __importStar(require("@tensorflow/tfjs"));
@@ -259,114 +250,106 @@ class NimageModel {
             });
         });
     }
-    train(examples) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.model)
-                throw new Error('Modelo não inicializado');
-            // Criar encoders
-            const equipes = new Set(examples.map(e => e.input.equipe));
-            const vendedores = new Set(examples.map(e => e.input.vendedor));
-            Array.from(equipes).forEach((equipe, index) => {
-                this.equipeEncoder.set(equipe, index);
-            });
-            Array.from(vendedores).forEach((vendedor, index) => {
-                this.vendedorEncoder.set(vendedor, index);
-            });
-            // Calcular estatísticas
-            this.calculateStatistics(examples);
-            // Preparar dados
-            const inputs = examples.map(e => this.encodeInput(e.input));
-            const outputs = tf.tensor2d(examples.map(e => [e.output.docinhosCoco / this.maxDocinhos]));
-            // Early stopping
-            let bestValLoss = Infinity;
-            let patience = 15;
-            let patienceCount = 0;
-            // Treinar
-            yield this.model.fit(tf.concat(inputs, 0), outputs, {
-                epochs: 150,
-                batchSize: 32,
-                validationSplit: 0.2,
-                shuffle: true,
-                callbacks: {
-                    onEpochEnd: (epoch, logs) => __awaiter(this, void 0, void 0, function* () {
-                        var _a;
-                        if (logs) {
-                            console.log(`Época ${epoch + 1}: loss = ${logs.loss.toFixed(4)}, val_loss = ${((_a = logs.val_loss) === null || _a === void 0 ? void 0 : _a.toFixed(4)) || 'N/A'}`);
-                            if (logs.val_loss < bestValLoss) {
-                                bestValLoss = logs.val_loss;
-                                patienceCount = 0;
-                            }
-                            else {
-                                patienceCount++;
-                                if (patienceCount >= patience && this.model) {
-                                    console.log('Early stopping triggered');
-                                    this.model.stopTraining = true;
-                                }
+    async train(examples) {
+        if (!this.model)
+            throw new Error('Modelo não inicializado');
+        // Criar encoders
+        const equipes = new Set(examples.map(e => e.input.equipe));
+        const vendedores = new Set(examples.map(e => e.input.vendedor));
+        Array.from(equipes).forEach((equipe, index) => {
+            this.equipeEncoder.set(equipe, index);
+        });
+        Array.from(vendedores).forEach((vendedor, index) => {
+            this.vendedorEncoder.set(vendedor, index);
+        });
+        // Calcular estatísticas
+        this.calculateStatistics(examples);
+        // Preparar dados
+        const inputs = examples.map(e => this.encodeInput(e.input));
+        const outputs = tf.tensor2d(examples.map(e => [e.output.docinhosCoco / this.maxDocinhos]));
+        // Early stopping
+        let bestValLoss = Infinity;
+        let patience = 15;
+        let patienceCount = 0;
+        // Treinar
+        await this.model.fit(tf.concat(inputs, 0), outputs, {
+            epochs: 150,
+            batchSize: 32,
+            validationSplit: 0.2,
+            shuffle: true,
+            callbacks: {
+                onEpochEnd: async (epoch, logs) => {
+                    var _a;
+                    if (logs) {
+                        console.log(`Época ${epoch + 1}: loss = ${logs.loss.toFixed(4)}, val_loss = ${((_a = logs.val_loss) === null || _a === void 0 ? void 0 : _a.toFixed(4)) || 'N/A'}`);
+                        if (logs.val_loss < bestValLoss) {
+                            bestValLoss = logs.val_loss;
+                            patienceCount = 0;
+                        }
+                        else {
+                            patienceCount++;
+                            if (patienceCount >= patience && this.model) {
+                                console.log('Early stopping triggered');
+                                this.model.stopTraining = true;
                             }
                         }
-                    })
+                    }
                 }
-            });
-            // Limpar tensores
-            inputs.forEach(t => t.dispose());
-            outputs.dispose();
+            }
         });
+        // Limpar tensores
+        inputs.forEach(t => t.dispose());
+        outputs.dispose();
     }
-    predict(input) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.model)
-                throw new Error('Modelo não inicializado');
-            const inputTensor = this.encodeInput(input);
-            const prediction = this.model.predict(inputTensor);
-            const value = yield prediction.data();
-            inputTensor.dispose();
-            prediction.dispose();
-            // Desnormalizar
-            const denormalizedValue = value[0] * this.maxDocinhos;
-            return { docinhosCoco: Math.round(Math.max(0, denormalizedValue)) };
-        });
+    async predict(input) {
+        if (!this.model)
+            throw new Error('Modelo não inicializado');
+        const inputTensor = this.encodeInput(input);
+        const prediction = this.model.predict(inputTensor);
+        const value = await prediction.data();
+        inputTensor.dispose();
+        prediction.dispose();
+        // Desnormalizar
+        const denormalizedValue = value[0] * this.maxDocinhos;
+        return { docinhosCoco: Math.round(Math.max(0, denormalizedValue)) };
     }
-    save(filePath) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.model)
-                throw new Error('Modelo não inicializado');
-            const modelJson = this.model.toJSON();
-            fs.writeFileSync(filePath, JSON.stringify(modelJson));
-            const metadata = {
-                equipe: Object.fromEntries(this.equipeEncoder),
-                vendedor: Object.fromEntries(this.vendedorEncoder),
-                maxMeta: this.maxMeta,
-                minMeta: this.minMeta,
-                maxDocinhos: this.maxDocinhos,
-                minDocinhos: this.minDocinhos,
-                meanDocinhos: this.meanDocinhos,
-                stdDocinhos: this.stdDocinhos,
-                meanMeta: this.meanMeta,
-                stdMeta: this.stdMeta,
-                vendedorStats: Object.fromEntries(this.vendedorStats),
-                equipeStats: Object.fromEntries(this.equipeStats)
-            };
-            fs.writeFileSync(filePath.replace('.json', '_metadata.json'), JSON.stringify(metadata, null, 2));
-        });
+    async save(filePath) {
+        if (!this.model)
+            throw new Error('Modelo não inicializado');
+        const modelJson = this.model.toJSON();
+        fs.writeFileSync(filePath, JSON.stringify(modelJson));
+        const metadata = {
+            equipe: Object.fromEntries(this.equipeEncoder),
+            vendedor: Object.fromEntries(this.vendedorEncoder),
+            maxMeta: this.maxMeta,
+            minMeta: this.minMeta,
+            maxDocinhos: this.maxDocinhos,
+            minDocinhos: this.minDocinhos,
+            meanDocinhos: this.meanDocinhos,
+            stdDocinhos: this.stdDocinhos,
+            meanMeta: this.meanMeta,
+            stdMeta: this.stdMeta,
+            vendedorStats: Object.fromEntries(this.vendedorStats),
+            equipeStats: Object.fromEntries(this.equipeStats)
+        };
+        fs.writeFileSync(filePath.replace('.json', '_metadata.json'), JSON.stringify(metadata, null, 2));
     }
-    load(filePath) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const modelJson = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-            this.model = yield tf.models.modelFromJSON(modelJson);
-            const metadata = JSON.parse(fs.readFileSync(filePath.replace('.json', '_metadata.json'), 'utf-8'));
-            this.equipeEncoder = new Map(Object.entries(metadata.equipe));
-            this.vendedorEncoder = new Map(Object.entries(metadata.vendedor));
-            this.maxMeta = metadata.maxMeta;
-            this.minMeta = metadata.minMeta;
-            this.maxDocinhos = metadata.maxDocinhos;
-            this.minDocinhos = metadata.minDocinhos;
-            this.meanDocinhos = metadata.meanDocinhos;
-            this.stdDocinhos = metadata.stdDocinhos;
-            this.meanMeta = metadata.meanMeta;
-            this.stdMeta = metadata.stdMeta;
-            this.vendedorStats = new Map(Object.entries(metadata.vendedorStats));
-            this.equipeStats = new Map(Object.entries(metadata.equipeStats));
-        });
+    async load(filePath) {
+        const modelJson = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        this.model = await tf.models.modelFromJSON(modelJson);
+        const metadata = JSON.parse(fs.readFileSync(filePath.replace('.json', '_metadata.json'), 'utf-8'));
+        this.equipeEncoder = new Map(Object.entries(metadata.equipe));
+        this.vendedorEncoder = new Map(Object.entries(metadata.vendedor));
+        this.maxMeta = metadata.maxMeta;
+        this.minMeta = metadata.minMeta;
+        this.maxDocinhos = metadata.maxDocinhos;
+        this.minDocinhos = metadata.minDocinhos;
+        this.meanDocinhos = metadata.meanDocinhos;
+        this.stdDocinhos = metadata.stdDocinhos;
+        this.meanMeta = metadata.meanMeta;
+        this.stdMeta = metadata.stdMeta;
+        this.vendedorStats = new Map(Object.entries(metadata.vendedorStats));
+        this.equipeStats = new Map(Object.entries(metadata.equipeStats));
     }
 }
 exports.NimageModel = NimageModel;

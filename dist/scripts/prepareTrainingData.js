@@ -32,15 +32,6 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const VendedorRepositoryImpl_1 = require("../infrastructure/repositories/VendedorRepositoryImpl");
 const AtividadeRepositoryImpl_1 = require("../infrastructure/repositories/AtividadeRepositoryImpl");
@@ -49,78 +40,76 @@ const MetaRepositoryImpl_1 = require("../infrastructure/repositories/MetaReposit
 const MongoDB_1 = require("../infrastructure/database/MongoDB");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
-function prepareTrainingData() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            // Conectar ao MongoDB
-            yield MongoDB_1.MongoDB.conectar();
-            console.log('Conectado ao MongoDB');
-            const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
-            const atividadeRepo = new AtividadeRepositoryImpl_1.AtividadeRepositoryImpl();
-            const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
-            const metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
-            // Buscar todos os dados necessários
-            const vendedores = yield vendedorRepo.obterTodos(0, 1000);
-            const equipes = yield equipeRepo.obterTodos(0, 1000);
-            const atividades = yield atividadeRepo.obterTodos(0, 10000);
-            const metas = yield metaRepo.obterTodos(0, 1000);
-            console.log(`Encontrados:
+async function prepareTrainingData() {
+    try {
+        // Conectar ao MongoDB
+        await MongoDB_1.MongoDB.conectar();
+        console.log('Conectado ao MongoDB');
+        const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
+        const atividadeRepo = new AtividadeRepositoryImpl_1.AtividadeRepositoryImpl();
+        const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
+        const metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
+        // Buscar todos os dados necessários
+        const vendedores = await vendedorRepo.obterTodos(0, 1000);
+        const equipes = await equipeRepo.obterTodos(0, 1000);
+        const atividades = await atividadeRepo.obterTodos(0, 10000);
+        const metas = await metaRepo.obterTodos(0, 1000);
+        console.log(`Encontrados:
             - ${vendedores.length} vendedores
             - ${equipes.length} equipes
             - ${atividades.length} atividades
             - ${metas.length} metas`);
-            // Criar mapas para acesso rápido
-            const vendedorMap = new Map(vendedores.map(v => [v.id, v]));
-            const equipeMap = new Map(equipes.map(e => [e.id, e]));
-            const metaMap = new Map(metas.map(m => [m.equipeId + '_' + m.data.getMonth() + '_' + m.data.getFullYear(), m]));
-            // Preparar dados de treinamento
-            const trainingData = [];
-            for (const atividade of atividades) {
-                const vendedor = vendedorMap.get(atividade.vendedorId);
-                if (!vendedor)
-                    continue;
-                const equipe = equipeMap.get(vendedor.equipeId);
-                if (!equipe)
-                    continue;
-                const data = new Date(atividade.data);
-                const metaKey = `${vendedor.equipeId}_${data.getMonth()}_${data.getFullYear()}`;
-                const meta = metaMap.get(metaKey);
-                if (!meta)
-                    continue;
-                // Calcular características da data
-                const diaSemana = data.getDay();
-                const mes = data.getMonth() + 1;
-                const diaMes = data.getDate();
-                const feriado = isFeriado(data);
-                trainingData.push({
-                    data: data.toISOString(),
-                    equipe: equipe.nome,
-                    vendedor: vendedor.nome,
-                    docinhosCoco: atividade.docinhosCoco,
-                    meta: meta.objetivo,
-                    diaSemana,
-                    mes,
-                    diaMes,
-                    feriado
-                });
-            }
-            // Salvar dados de treinamento
-            const outputDir = path.join(__dirname, '../../data');
-            if (!fs.existsSync(outputDir)) {
-                fs.mkdirSync(outputDir, { recursive: true });
-            }
-            const outputFile = path.join(outputDir, 'training_data.json');
-            fs.writeFileSync(outputFile, JSON.stringify(trainingData, null, 2));
-            console.log(`\nDados de treinamento preparados com sucesso!`);
-            console.log(`Total de registros: ${trainingData.length}`);
-            console.log(`Arquivo salvo em: ${outputFile}`);
-            process.exit(0);
+        // Criar mapas para acesso rápido
+        const vendedorMap = new Map(vendedores.map(v => [v.id, v]));
+        const equipeMap = new Map(equipes.map(e => [e.id, e]));
+        const metaMap = new Map(metas.map(m => [m.equipeId + '_' + m.data.getMonth() + '_' + m.data.getFullYear(), m]));
+        // Preparar dados de treinamento
+        const trainingData = [];
+        for (const atividade of atividades) {
+            const vendedor = vendedorMap.get(atividade.vendedorId);
+            if (!vendedor)
+                continue;
+            const equipe = equipeMap.get(vendedor.equipeId);
+            if (!equipe)
+                continue;
+            const data = new Date(atividade.data);
+            const metaKey = `${vendedor.equipeId}_${data.getMonth()}_${data.getFullYear()}`;
+            const meta = metaMap.get(metaKey);
+            if (!meta)
+                continue;
+            // Calcular características da data
+            const diaSemana = data.getDay();
+            const mes = data.getMonth() + 1;
+            const diaMes = data.getDate();
+            const feriado = isFeriado(data);
+            trainingData.push({
+                data: data.toISOString(),
+                equipe: equipe.nome,
+                vendedor: vendedor.nome,
+                docinhosCoco: atividade.docinhosCoco,
+                meta: meta.objetivo,
+                diaSemana,
+                mes,
+                diaMes,
+                feriado
+            });
         }
-        catch (error) {
-            console.error('Erro ao preparar dados de treinamento:', error);
-            process.exit(1);
+        // Salvar dados de treinamento
+        const outputDir = path.join(__dirname, '../../data');
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, { recursive: true });
         }
-    });
+        const outputFile = path.join(outputDir, 'training_data.json');
+        fs.writeFileSync(outputFile, JSON.stringify(trainingData, null, 2));
+        console.log(`\nDados de treinamento preparados com sucesso!`);
+        console.log(`Total de registros: ${trainingData.length}`);
+        console.log(`Arquivo salvo em: ${outputFile}`);
+        process.exit(0);
+    }
+    catch (error) {
+        console.error('Erro ao preparar dados de treinamento:', error);
+        process.exit(1);
+    }
 }
 function isFeriado(data) {
     // Lista de feriados nacionais (pode ser expandida)

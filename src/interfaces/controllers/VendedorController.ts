@@ -136,6 +136,7 @@ export class VendedorController {
         try {
             const { id } = req.params;
             const { mes } = req.query;
+            console.log("🚀 ~ VendedorController ~ obterInsights ~ mes:", mes)
             const insights = await this.getVendedorInsights.execute(id, mes as string);
             return res.json(insights);
         } catch (error) {

@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const VendedorRepositoryImpl_1 = require("../../infrastructure/repositories/VendedorRepositoryImpl");
@@ -43,25 +34,25 @@ const getVendedorInsights = new GetVendedorInsights_1.GetVendedorInsights(vended
 // Controller
 const vendedorController = new VendedorController_1.VendedorController(criarVendedor, obterVendedor, atualizarVendedor, getVendedorInsights);
 //console.log("🚀vendedorController Routes");
-router.post("/vendedores", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/vendedores", async (req, res) => {
     //console.log("📨 Nova requisição POST /vendedores");
     return vendedorController.criar(req, res);
-}));
-router.get("/vendedores/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/vendedores/all", async (req, res) => {
     //console.log("📨 Nova requisição GET /vendedores");
-    const vendedores = yield vendedorController.obterTodos(req, res);
+    const vendedores = await vendedorController.obterTodos(req, res);
     return res.json(vendedores);
-}));
-router.get("/vendedores/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/vendedores/:id", async (req, res) => {
     //console.log("📨 Nova requisição GET /vendedores/:id");
     return vendedorController.obterPorId(req, res);
-}));
-router.put("/vendedores/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.put("/vendedores/:id", async (req, res) => {
     //console.log("📨 Nova requisição PUT /vendedores/:id");
     return vendedorController.atualizar(req, res);
-}));
-router.get("/vendedores/:id/insights", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/vendedores/:id/insights", async (req, res) => {
     return vendedorController.obterInsights(req, res);
-}));
+});
 exports.default = router;
 //# sourceMappingURL=vendedorRoutes.js.map

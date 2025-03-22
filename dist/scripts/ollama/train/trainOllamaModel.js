@@ -1,23 +1,13 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const OllamaService_1 = require("../../../application/services/OllamaService");
-function trainOllamaModel() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            console.log('🚀 Iniciando treinamento do modelo...');
-            const ollamaService = new OllamaService_1.OllamaService();
-            // Exemplo de treinamento 1 - Vendedor com crescimento consistente
-            const example1 = {
-                prompt: `Analise o histórico de vendas do vendedor João Silva:
+async function trainOllamaModel() {
+    try {
+        console.log('🚀 Iniciando treinamento do modelo...');
+        const ollamaService = new OllamaService_1.OllamaService();
+        // Exemplo de treinamento 1 - Vendedor com crescimento consistente
+        const example1 = {
+            prompt: `Analise o histórico de vendas do vendedor João Silva:
 
 Métricas:
 - FEA: 1.2
@@ -42,7 +32,7 @@ Histórico de Vendas:
 ]
 
 Responda APENAS com um JSON válido no formato abaixo. Não inclua texto adicional ou explicações:`,
-                completion: `{
+            completion: `{
     "perfil_vendas": "Vendedor com crescimento consistente e forte performance",
     "tendencias": [
         "Crescimento médio de 12% ao mês",
@@ -107,10 +97,10 @@ Responda APENAS com um JSON válido no formato abaixo. Não inclua texto adicion
         ]
     }
 }`
-            };
-            // Exemplo de treinamento 2 - Vendedor com performance instável
-            const example2 = {
-                prompt: `Analise o histórico de vendas do vendedor Maria Santos:
+        };
+        // Exemplo de treinamento 2 - Vendedor com performance instável
+        const example2 = {
+            prompt: `Analise o histórico de vendas do vendedor Maria Santos:
 
 Métricas:
 - FEA: 0.8
@@ -134,7 +124,7 @@ Histórico de Vendas:
 ]
 
 Responda APENAS com um JSON válido no formato abaixo. Não inclua texto adicional ou explicações:`,
-                completion: `{
+            completion: `{
     "perfil_vendas": "Vendedora com performance instável e potencial de crescimento",
     "tendencias": [
         "Variação significativa nas vendas mensais",
@@ -198,10 +188,10 @@ Responda APENAS com um JSON válido no formato abaixo. Não inclua texto adicion
         ]
     }
 }`
-            };
-            // Exemplo de treinamento 3 - Vendedor com performance estagnada
-            const example3 = {
-                prompt: `Analise o histórico de vendas do vendedor Pedro Oliveira:
+        };
+        // Exemplo de treinamento 3 - Vendedor com performance estagnada
+        const example3 = {
+            prompt: `Analise o histórico de vendas do vendedor Pedro Oliveira:
 
 Métricas:
 - FEA: 0.9
@@ -226,7 +216,7 @@ Histórico de Vendas:
 ]
 
 Responda APENAS com um JSON válido no formato abaixo. Não inclua texto adicional ou explicações:`,
-                completion: `{
+            completion: `{
     "perfil_vendas": "Vendedor com performance estável mas sem crescimento",
     "tendencias": [
         "Vendas consistentes sem variação",
@@ -291,20 +281,19 @@ Responda APENAS com um JSON válido no formato abaixo. Não inclua texto adicion
         ]
     }
 }`
-            };
-            // Treina o modelo com os exemplos
-            console.log('\n📚 Treinando exemplo 1...');
-            yield ollamaService.trainModel(example1);
-            console.log('\n📚 Treinando exemplo 2...');
-            yield ollamaService.trainModel(example2);
-            console.log('\n📚 Treinando exemplo 3...');
-            yield ollamaService.trainModel(example3);
-            console.log('\n✅ Treinamento concluído com sucesso!');
-        }
-        catch (error) {
-            console.error('❌ Erro durante o treinamento:', error);
-        }
-    });
+        };
+        // Treina o modelo com os exemplos
+        console.log('\n📚 Treinando exemplo 1...');
+        await ollamaService.trainModel(example1);
+        console.log('\n📚 Treinando exemplo 2...');
+        await ollamaService.trainModel(example2);
+        console.log('\n📚 Treinando exemplo 3...');
+        await ollamaService.trainModel(example3);
+        console.log('\n✅ Treinamento concluído com sucesso!');
+    }
+    catch (error) {
+        console.error('❌ Erro durante o treinamento:', error);
+    }
 }
 trainOllamaModel().catch(console.error);
 //# sourceMappingURL=trainOllamaModel.js.map

@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const MetaController_1 = require("../MetaController");
 const CriarMeta_1 = require("../../../application/use-cases/CriarMeta");
@@ -52,15 +43,15 @@ describe('MetaController', () => {
             json: jest.fn(),
         };
     });
-    it('should create a new meta', () => __awaiter(void 0, void 0, void 0, function* () {
+    it('should create a new meta', async () => {
         jest.spyOn(metaRepo, 'criar').mockResolvedValue();
-        yield metaController.criar(req, res);
+        await metaController.criar(req, res);
         expect(res.status).toHaveBeenCalledWith(201);
         expect(res.json).toHaveBeenCalledWith({
             id: '3',
             equipeId: 'equipe3',
             objetivo: 3
         });
-    }));
+    });
 });
 //# sourceMappingURL=MetaController.test.js.map

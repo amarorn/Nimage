@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetVendedorInsights = void 0;
 class GetVendedorInsights {
@@ -20,62 +11,60 @@ class GetVendedorInsights {
         this.atividadeService = atividadeService;
         this.frequenciaVendasService = frequenciaVendasService;
     }
-    execute(vendedorId, mes) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                console.log('🔍 Iniciando busca de insights para vendedor:', vendedorId, 'mês:', mes);
-                // Busca dados do vendedor
-                console.log('🔍 Buscando dados do vendedor...');
-                const vendedor = yield this.vendedorRepository.obterPorId(vendedorId);
-                if (!vendedor) {
-                    console.error('❌ Vendedor não encontrado');
-                    throw new Error('Vendedor não encontrado');
-                }
-                console.log('✅ Vendedor encontrado:', vendedor);
-                // Busca dados da equipe
-                console.log('🔍 Buscando dados da equipe...');
-                const equipe = yield this.equipeRepository.obterPorId(vendedor.equipeId);
-                if (!equipe) {
-                    console.error('❌ Equipe não encontrada');
-                    throw new Error('Equipe não encontrada');
-                }
-                console.log('✅ Equipe encontrada:', equipe);
-                // Calcula datas para análise
-                console.log('📅 Calculando datas para análise...');
-                const datas = this.calcularDatasAnalise(mes);
-                console.log('📅 Datas calculadas:', datas);
-                // Busca meta da equipe
-                console.log('🔍 Buscando metas da equipe...');
-                const meta = yield this.metaRepository.obterPorEquipe(equipe.id);
-                const metaAnterior = yield this.metaRepository.obterPorEquipeEData(equipe.id, datas.mesAnteriorInicio, datas.mesAnteriorFim);
-                console.log('🎯 Metas encontradas:', { meta, metaAnterior });
-                // Busca atividades do vendedor
-                console.log('🔍 Buscando atividades do vendedor...');
-                const atividades = yield this.atividadeRepository.obterPorVendedorEData(vendedorId, datas.dataInicio, datas.dataFim);
-                console.log('📊 Atividades encontradas:', atividades.length);
-                // Busca atividades do mês anterior
-                console.log('🔍 Buscando atividades do mês anterior...');
-                const atividadesMesAnterior = yield this.atividadeRepository.obterPorVendedorEData(vendedorId, datas.mesAnteriorInicio, datas.mesAnteriorFim);
-                console.log('📊 Atividades mês anterior encontradas:', atividadesMesAnterior.length);
-                // Calcula métricas
-                console.log('📊 Calculando métricas...');
-                const metricas = yield this.calcularMetricas(vendedor, equipe, atividades, atividadesMesAnterior, meta, metaAnterior, datas);
-                console.log('📈 Métricas calculadas:', metricas);
-                // Prepara dados para análise
-                console.log('🔄 Preparando dados para análise...');
-                const vendorInfo = this.prepararDadosAnalise(metricas);
-                console.log('🔄 Dados preparados para análise:', vendorInfo);
-                // Gera insights
-                console.log('🔍 Gerando insights...');
-                const insights = yield this.ollamaService.getInsights(vendorInfo);
-                console.log('🎉 Insights gerados:', insights);
-                return insights;
+    async execute(vendedorId, mes) {
+        try {
+            console.log('🔍 Iniciando busca de insights para vendedor:', vendedorId, 'mês:', mes);
+            // Busca dados do vendedor
+            console.log('🔍 Buscando dados do vendedor...');
+            const vendedor = await this.vendedorRepository.obterPorId(vendedorId);
+            if (!vendedor) {
+                console.error('❌ Vendedor não encontrado');
+                throw new Error('Vendedor não encontrado');
             }
-            catch (error) {
-                console.error('❌ Erro ao gerar insights:', error);
-                throw error;
+            console.log('✅ Vendedor encontrado:', vendedor);
+            // Busca dados da equipe
+            console.log('🔍 Buscando dados da equipe...');
+            const equipe = await this.equipeRepository.obterPorId(vendedor.equipeId);
+            if (!equipe) {
+                console.error('❌ Equipe não encontrada');
+                throw new Error('Equipe não encontrada');
             }
-        });
+            console.log('✅ Equipe encontrada:', equipe);
+            // Calcula datas para análise
+            console.log('📅 Calculando datas para análise...');
+            const datas = this.calcularDatasAnalise(mes);
+            console.log('📅 Datas calculadas:', datas);
+            // Busca meta da equipe
+            console.log('🔍 Buscando metas da equipe...');
+            const meta = await this.metaRepository.obterPorEquipe(equipe.id);
+            const metaAnterior = await this.metaRepository.obterPorEquipeEData(equipe.id, datas.mesAnteriorInicio, datas.mesAnteriorFim);
+            console.log('🎯 Metas encontradas:', { meta, metaAnterior });
+            // Busca atividades do vendedor
+            console.log('🔍 Buscando atividades do vendedor...');
+            const atividades = await this.atividadeRepository.obterPorVendedorEData(vendedorId, datas.dataInicio, datas.dataFim);
+            console.log('📊 Atividades encontradas:', atividades.length);
+            // Busca atividades do mês anterior
+            console.log('🔍 Buscando atividades do mês anterior...');
+            const atividadesMesAnterior = await this.atividadeRepository.obterPorVendedorEData(vendedorId, datas.mesAnteriorInicio, datas.mesAnteriorFim);
+            console.log('📊 Atividades mês anterior encontradas:', atividadesMesAnterior.length);
+            // Calcula métricas
+            console.log('📊 Calculando métricas...');
+            const metricas = await this.calcularMetricas(vendedor, equipe, atividades, atividadesMesAnterior, meta, metaAnterior, datas);
+            console.log('📈 Métricas calculadas:', metricas);
+            // Prepara dados para análise
+            console.log('🔄 Preparando dados para análise...');
+            const vendorInfo = this.prepararDadosAnalise(metricas);
+            console.log('🔄 Dados preparados para análise:', vendorInfo);
+            // Gera insights
+            console.log('🔍 Gerando insights...');
+            const insights = await this.ollamaService.getInsights(vendorInfo);
+            console.log('🎉 Insights gerados:', insights);
+            return insights;
+        }
+        catch (error) {
+            console.error('❌ Erro ao gerar insights:', error);
+            throw error;
+        }
     }
     calcularDatasAnalise(mes) {
         let dataInicio;
@@ -110,58 +99,56 @@ class GetVendedorInsights {
             mesAnteriorFim
         };
     }
-    calcularMetricas(vendedor, equipe, atividades, atividadesMesAnterior, meta, metaAnterior, datas) {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log('🔄 Iniciando cálculo de métricas');
-            const diasComAtividade = atividades.length;
-            const totalDocinhos = atividades.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
-            const mediaPorDia = diasComAtividade > 0 ? totalDocinhos / diasComAtividade : 0;
-            const totalDocinhosMesAnterior = atividadesMesAnterior.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
-            console.log('📊 Métricas básicas calculadas:', {
-                diasComAtividade,
-                totalDocinhos,
-                mediaPorDia,
-                totalDocinhosMesAnterior
-            });
-            const vendedoresEquipe = yield this.vendedorRepository.obterPorEquipeId(equipe.id);
-            const totalVendedores = vendedoresEquipe.length;
-            console.log('👥 Vendedores da equipe:', totalVendedores);
-            const vendasEquipeMesAnterior = yield Promise.all(vendedoresEquipe.map((v) => __awaiter(this, void 0, void 0, function* () {
-                const atividadesVendedor = yield this.atividadeRepository.obterPorVendedorEData(v.id, datas.mesAnteriorInicio, datas.mesAnteriorFim);
-                return atividadesVendedor.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
-            })));
-            const totalVendasEquipeMesAnterior = vendasEquipeMesAnterior.reduce((total, valor) => total + valor, 0);
-            const mediaEquipeVendas = totalVendasEquipeMesAnterior / totalVendedores;
-            console.log('📈 Métricas da equipe calculadas:', {
-                totalVendasEquipeMesAnterior,
-                mediaEquipeVendas
-            });
-            const frequencia = yield this.frequenciaVendasService.calcularFrequencia(equipe.id, datas.dataInicio, datas.dataFim);
-            const fea = yield this.atividadeService.calcularFEA(equipe.id, frequencia.totalDiasDisponiveis, frequencia.diasComAtividade);
-            const iap = mediaPorDia * (frequencia.totalDiasDisponiveis - diasComAtividade);
-            console.log('📊 Indicadores calculados:', {
-                frequencia,
-                fea,
-                iap
-            });
-            return {
-                vendedor,
-                equipe,
-                diasComAtividade,
-                totalDocinhos,
-                mediaPorDia,
-                totalDocinhosMesAnterior,
-                totalVendedores,
-                totalVendasEquipeMesAnterior,
-                mediaEquipeVendas,
-                fea,
-                iap,
-                meta,
-                metaAnterior,
-                datas,
-                atividades
-            };
+    async calcularMetricas(vendedor, equipe, atividades, atividadesMesAnterior, meta, metaAnterior, datas) {
+        console.log('🔄 Iniciando cálculo de métricas');
+        const diasComAtividade = atividades.length;
+        const totalDocinhos = atividades.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
+        const mediaPorDia = diasComAtividade > 0 ? totalDocinhos / diasComAtividade : 0;
+        const totalDocinhosMesAnterior = atividadesMesAnterior.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
+        console.log('📊 Métricas básicas calculadas:', {
+            diasComAtividade,
+            totalDocinhos,
+            mediaPorDia,
+            totalDocinhosMesAnterior
         });
+        const vendedoresEquipe = await this.vendedorRepository.obterPorEquipeId(equipe.id);
+        const totalVendedores = vendedoresEquipe.length;
+        console.log('👥 Vendedores da equipe:', totalVendedores);
+        const vendasEquipeMesAnterior = await Promise.all(vendedoresEquipe.map(async (v) => {
+            const atividadesVendedor = await this.atividadeRepository.obterPorVendedorEData(v.id, datas.mesAnteriorInicio, datas.mesAnteriorFim);
+            return atividadesVendedor.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
+        }));
+        const totalVendasEquipeMesAnterior = vendasEquipeMesAnterior.reduce((total, valor) => total + valor, 0);
+        const mediaEquipeVendas = totalVendasEquipeMesAnterior / totalVendedores;
+        console.log('📈 Métricas da equipe calculadas:', {
+            totalVendasEquipeMesAnterior,
+            mediaEquipeVendas
+        });
+        const frequencia = await this.frequenciaVendasService.calcularFrequencia(equipe.id, datas.dataInicio, datas.dataFim);
+        const fea = await this.atividadeService.calcularFEA(equipe.id, frequencia.totalDiasDisponiveis, frequencia.diasComAtividade);
+        const iap = mediaPorDia * (frequencia.totalDiasDisponiveis - diasComAtividade);
+        console.log('📊 Indicadores calculados:', {
+            frequencia,
+            fea,
+            iap
+        });
+        return {
+            vendedor,
+            equipe,
+            diasComAtividade,
+            totalDocinhos,
+            mediaPorDia,
+            totalDocinhosMesAnterior,
+            totalVendedores,
+            totalVendasEquipeMesAnterior,
+            mediaEquipeVendas,
+            fea,
+            iap,
+            meta,
+            metaAnterior,
+            datas,
+            atividades
+        };
     }
     prepararDadosAnalise(metricas) {
         var _a, _b;

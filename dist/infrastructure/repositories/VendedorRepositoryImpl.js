@@ -1,68 +1,45 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VendedorRepositoryImpl = void 0;
 const Vendedor_1 = require("../../domain/entities/Vendedor");
 const VendedorModel_1 = require("../database/models/VendedorModel");
 const EquipeModel_1 = require("../database/models/EquipeModel");
 class VendedorRepositoryImpl {
-    criar(vendedor) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield VendedorModel_1.VendedorModel.create(vendedor);
-        });
+    async criar(vendedor) {
+        await VendedorModel_1.VendedorModel.create(vendedor);
     }
-    obterPorId(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log('Debug - Repository - Buscando vendedor no banco com ID:', id);
-            const vendedor = yield VendedorModel_1.VendedorModel.findOne({ id }).lean();
-            console.log('Debug - Repository - Resultado da busca no banco:', vendedor);
-            if (vendedor) {
-                console.log('Debug - Repository - Vendedor encontrado, buscando equipe com ID:', vendedor.equipeId);
-                const equipe = yield EquipeModel_1.EquipeModel.findOne({ id: vendedor.equipeId }).lean();
-                console.log('Debug - Repository - Resultado da busca da equipe:', equipe);
-                return new Vendedor_1.Vendedor(vendedor.id, vendedor.nome, vendedor.equipeId, vendedor.email, vendedor.telefone, vendedor.meta, vendedor.cargo);
-            }
-            return null;
-        });
+    async obterPorId(id) {
+        console.log('Debug - Repository - Buscando vendedor no banco com ID:', id);
+        const vendedor = await VendedorModel_1.VendedorModel.findOne({ id }).lean();
+        console.log('Debug - Repository - Resultado da busca no banco:', vendedor);
+        if (vendedor) {
+            console.log('Debug - Repository - Vendedor encontrado, buscando equipe com ID:', vendedor.equipeId);
+            const equipe = await EquipeModel_1.EquipeModel.findOne({ id: vendedor.equipeId }).lean();
+            console.log('Debug - Repository - Resultado da busca da equipe:', equipe);
+            return new Vendedor_1.Vendedor(vendedor.id, vendedor.nome, vendedor.equipeId, vendedor.email, vendedor.telefone, vendedor.meta, vendedor.cargo);
+        }
+        return null;
     }
-    obterTodos(skip, limit) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const vendedores = yield VendedorModel_1.VendedorModel.find().skip(skip).limit(limit).lean();
-            return vendedores.map(vendedor => new Vendedor_1.Vendedor(vendedor.id, vendedor.nome, vendedor.equipeId, vendedor.email, vendedor.telefone, vendedor.meta, vendedor.cargo));
-        });
+    async obterTodos(skip, limit) {
+        const vendedores = await VendedorModel_1.VendedorModel.find().skip(skip).limit(limit).lean();
+        return vendedores.map(vendedor => new Vendedor_1.Vendedor(vendedor.id, vendedor.nome, vendedor.equipeId, vendedor.email, vendedor.telefone, vendedor.meta, vendedor.cargo));
     }
-    obterPorEquipeId(equipeId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const vendedores = yield VendedorModel_1.VendedorModel.find({ equipeId }).lean();
-            return vendedores.map(vendedor => new Vendedor_1.Vendedor(vendedor.id, vendedor.nome, vendedor.equipeId, vendedor.email, vendedor.telefone, vendedor.meta, vendedor.cargo));
-        });
+    async obterPorEquipeId(equipeId) {
+        const vendedores = await VendedorModel_1.VendedorModel.find({ equipeId }).lean();
+        return vendedores.map(vendedor => new Vendedor_1.Vendedor(vendedor.id, vendedor.nome, vendedor.equipeId, vendedor.email, vendedor.telefone, vendedor.meta, vendedor.cargo));
     }
-    atualizar(id, dados) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const vendedorAtualizado = yield VendedorModel_1.VendedorModel.findOneAndUpdate({ id }, { $set: dados }, { new: true }).lean();
-            if (vendedorAtualizado) {
-                return new Vendedor_1.Vendedor(vendedorAtualizado.id, vendedorAtualizado.nome, vendedorAtualizado.equipeId, vendedorAtualizado.email, vendedorAtualizado.telefone, vendedorAtualizado.meta, vendedorAtualizado.cargo);
-            }
-            return null;
-        });
+    async atualizar(id, dados) {
+        const vendedorAtualizado = await VendedorModel_1.VendedorModel.findOneAndUpdate({ id }, { $set: dados }, { new: true }).lean();
+        if (vendedorAtualizado) {
+            return new Vendedor_1.Vendedor(vendedorAtualizado.id, vendedorAtualizado.nome, vendedorAtualizado.equipeId, vendedorAtualizado.email, vendedorAtualizado.telefone, vendedorAtualizado.meta, vendedorAtualizado.cargo);
+        }
+        return null;
     }
-    deletar(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield VendedorModel_1.VendedorModel.deleteOne({ id });
-        });
+    async deletar(id) {
+        await VendedorModel_1.VendedorModel.deleteOne({ id });
     }
-    deletarTodos() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield VendedorModel_1.VendedorModel.deleteMany({});
-        });
+    async deletarTodos() {
+        await VendedorModel_1.VendedorModel.deleteMany({});
     }
 }
 exports.VendedorRepositoryImpl = VendedorRepositoryImpl;
