@@ -136,12 +136,25 @@ export class VendedorController {
         try {
             const { id } = req.params;
             const { mes } = req.query;
-            console.log("🚀 ~ VendedorController ~ obterInsights ~ mes:", mes)
+            console.log("🚀 Iniciando obterInsights");
+            console.log("ID do vendedor:", id);
+            console.log("Mês requisitado:", mes);
+
+            if (!id) {
+                console.error("ID do vendedor não fornecido");
+                return res.status(400).json({ error: "ID do vendedor é obrigatório" });
+            }
+
             const insights = await this.getVendedorInsights.execute(id, mes as string);
+            console.log("✅ Insights obtidos com sucesso:", insights);
             return res.json(insights);
         } catch (error) {
-            console.error('Erro ao obter insights do vendedor:', error);
-            return res.status(400).json({ error: 'Erro ao obter insights do vendedor' });
+            console.error('❌ Erro ao obter insights do vendedor:', error);
+            return res.status(500).json({ 
+                error: 'Erro ao obter insights do vendedor',
+                message: (error as Error).message,
+                stack: process.env.NODE_ENV === 'development' ? (error as Error).stack : undefined
+            });
         }
     }
 }

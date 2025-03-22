@@ -6,9 +6,9 @@ function transformarPrevisaoMensalEmDiaria(previsaoMensal) {
     const previsaoDiaria = [];
     // Mapeamento de meses em português para números
     const mesesMap = {
-        'Janeiro': 0, 'Fevereiro': 1, 'Março': 2, 'Abril': 3,
-        'Maio': 4, 'Junho': 5, 'Julho': 6, 'Agosto': 7,
-        'Setembro': 8, 'Outubro': 9, 'Novembro': 10, 'Dezembro': 11
+        'Janeiro': 1, 'Fevereiro': 2, 'Março': 3, 'Abril': 4,
+        'Maio': 5, 'Junho': 6, 'Julho': 7, 'Agosto': 8,
+        'Setembro': 9, 'Outubro': 10, 'Novembro': 11, 'Dezembro': 12
     };
     previsaoMensal.forEach(previsao => {
         const mesNumero = mesesMap[previsao.mes];

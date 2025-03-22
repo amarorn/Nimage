@@ -53,7 +53,7 @@ class GetVendedorInsights {
             console.log('📈 Métricas calculadas:', metricas);
             // Prepara dados para análise
             console.log('🔄 Preparando dados para análise...');
-            const vendorInfo = this.prepararDadosAnalise(metricas);
+            const vendorInfo = this.prepararDadosAnalise(metricas, mes);
             console.log('🔄 Dados preparados para análise:', vendorInfo);
             // Gera insights
             console.log('🔍 Gerando insights...');
@@ -150,12 +150,13 @@ class GetVendedorInsights {
             atividades
         };
     }
-    prepararDadosAnalise(metricas) {
+    prepararDadosAnalise(metricas, mesRequisicao) {
         var _a, _b;
         console.log('🔄 Iniciando preparação dos dados para análise');
         const historicoVendas = this.prepararHistoricoVendas(metricas.atividades);
         console.log('📊 Histórico de vendas preparado:', historicoVendas);
         const dadosAnalise = {
+            mesRequisicao: mesRequisicao,
             resultado: {
                 vendedor: {
                     nome: metricas.vendedor.nome,

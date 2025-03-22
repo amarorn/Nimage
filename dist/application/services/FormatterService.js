@@ -1,11 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FormatterService = void 0;
+const date_fns_1 = require("date-fns");
+const locale_1 = require("date-fns/locale");
 class FormatterService {
     formatVendorData(vendorData) {
+        console.log("🚀 ~ FormatterService ~ formatVendorData ~ vendorData:", vendorData);
+        console.log("📅 Mês da Requisição:", vendorData.mesRequisicao);
         const equipe = vendorData.resultado.equipe;
         const vendedor = vendorData.resultado.vendedor;
-        const mesRequisicao = vendorData.mesRequisicao || '2024-02'; // Pega o mês da requisição ou usa um valor padrão
+        const mesRequisicao = vendorData.mesRequisicao;
+        const [ano, mes] = mesRequisicao.split('-').map(Number);
+        console.log("📅 Ano:", ano, "Mês:", mes);
+        const nextMonthDate = new Date(ano, mes - 1 + 1, 1); // Mês seguinte
+        console.log("🚀 Próximo mês:", nextMonthDate);
+        const followingMonthDate = new Date(ano, mes - 1 + 2, 1); // Mês subsequente
+        console.log("🚀 Mês subsequente:", followingMonthDate);
+        if (!mesRequisicao) {
+            console.error("❌ Mês da requisição não fornecido!");
+            throw new Error("Mês da requisição é obrigatório");
+        }
         const formattedData = {
             "meta_anterior": this.formatCurrency(equipe.meta),
             "novaMetaEquipe": this.formatCurrency(equipe.meta),
@@ -49,15 +63,8 @@ class FormatterService {
                         "Desenvolver técnicas de vendas consultivas"
                     ],
                     "dadosGrafico": {
-                        "historico": [
-                            { mes: "Janeiro", valor: vendedor.somaDocinhos / 6 },
-                            { mes: "Fevereiro", valor: vendedor.somaDocinhos / 6 },
-                            { mes: "Março", valor: vendedor.somaDocinhos / 6 },
-                            { mes: "Abril", valor: vendedor.somaDocinhos / 6 },
-                            { mes: "Maio", valor: vendedor.somaDocinhos / 6 },
-                            { mes: "Junho", valor: vendedor.somaDocinhos / 6 }
-                        ],
-                        "previsao": this.generateDailyForecast(vendedor.somaDocinhos / 6 * 1.2, mesRequisicao)
+                        "historico": vendedor.dadosGrafico.historico || [],
+                        "previsao": this.generateDailyForecast(vendedor.somaDocinhos / 6 * 1.2, vendedor.dadosGrafico.historico, mesRequisicao)
                     }
                 }]
         };
@@ -212,45 +219,21 @@ class FormatterService {
             return "Iniciante";
         }
     }
-    generateDailyForecast(monthlyValue, mesRequisicao) {
-        // Converte o mês da requisição (formato: YYYY-MM) para Date
-        const [ano, mes] = mesRequisicao.split('-').map(Number);
-        // Cria datas para os próximos dois meses a partir do mês da requisição
-        const nextMonth = new Date(ano, mes, 1);
-        const followingMonth = new Date(ano, mes + 1, 1);
-        const forecast = [];
-        // Função auxiliar para verificar se é dia útil
-        const isWorkingDay = (date) => {
-            const day = date.getDay();
-            return day !== 0 && day !== 6; // Exclui sábados e domingos
-        };
-        // Função para obter o nome do mês
-        const getMonthName = (date) => {
-            return date.toLocaleString('pt-BR', { month: 'long' });
-        };
-        // Função para gerar previsão de um mês
-        const generateMonthForecast = (startDate, value) => {
-            const daysInMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).getDate();
-            const workingDays = Array.from({ length: daysInMonth }, (_, i) => {
-                const date = new Date(startDate.getFullYear(), startDate.getMonth(), i + 1);
-                return isWorkingDay(date);
-            }).filter(Boolean).length;
-            const dailyValue = value / workingDays;
-            for (let i = 1; i <= daysInMonth; i++) {
-                const date = new Date(startDate.getFullYear(), startDate.getMonth(), i);
-                if (isWorkingDay(date)) {
-                    forecast.push({
-                        mes: getMonthName(date),
-                        dia: i,
-                        valor: dailyValue
-                    });
-                }
+    generateDailyForecast(monthlyValue, historico, mesRequisicao) {
+        console.log("📅 Gerando previsão para o mês:", mesRequisicao);
+        const dataBase = (0, date_fns_1.parse)(mesRequisicao, 'yyyy-MM', new Date());
+        const nextMonth = (0, date_fns_1.addMonths)(dataBase, 1);
+        const followingMonth = (0, date_fns_1.addMonths)(dataBase, 2);
+        return [
+            {
+                mes: (0, date_fns_1.format)(nextMonth, 'MMMM', { locale: locale_1.ptBR }),
+                valor: Math.round(monthlyValue * 1.1)
+            },
+            {
+                mes: (0, date_fns_1.format)(followingMonth, 'MMMM', { locale: locale_1.ptBR }),
+                valor: Math.round(monthlyValue * 1.2)
             }
-        };
-        // Gera previsão para os próximos dois meses
-        generateMonthForecast(nextMonth, monthlyValue);
-        generateMonthForecast(followingMonth, monthlyValue);
-        return forecast;
+        ];
     }
 }
 exports.FormatterService = FormatterService;

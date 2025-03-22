@@ -87,13 +87,17 @@ export class GetVendedorInsights {
 
             // Prepara dados para análise
             console.log('🔄 Preparando dados para análise...');
-            const vendorInfo = this.prepararDadosAnalise(metricas);
+            const vendorInfo = this.prepararDadosAnalise(metricas, mes);
             console.log('🔄 Dados preparados para análise:', vendorInfo);
 
             // Gera insights
             console.log('🔍 Gerando insights...');
             const insights = await this.ollamaService.getInsights(vendorInfo);
             console.log('🎉 Insights gerados:', insights);
+
+            if (!insights || !insights.resultado || !insights.resultado.vendedor) {
+                throw new Error('Formato de insights inválido');
+            }
 
             return insights;
         } catch (error) {
@@ -232,13 +236,16 @@ export class GetVendedorInsights {
         };
     }
 
-    private prepararDadosAnalise(metricas: any) {
+    private prepararDadosAnalise(metricas: any, mesRequisicao?: string) {
         console.log('🔄 Iniciando preparação dos dados para análise');
 
         const historicoVendas = this.prepararHistoricoVendas(metricas.atividades);
         console.log('📊 Histórico de vendas preparado:', historicoVendas);
 
+        
+
         const dadosAnalise = {
+            mesRequisicao: mesRequisicao,
             resultado: {
                 vendedor: {
                     nome: metricas.vendedor.nome,
