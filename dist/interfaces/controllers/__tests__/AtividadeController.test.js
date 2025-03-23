@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const AtividadeController_1 = require("../AtividadeController");
 const CriarAtividade_1 = require("../../../application/use-cases/CriarAtividade");
@@ -36,12 +27,12 @@ const atividadeRepo = new AtividadeRepositoryImpl_1.AtividadeRepositoryImpl();
 const criarAtividade = new CriarAtividade_1.CriarAtividade(atividadeRepo);
 const obterAtividades = new ObterAtividades_1.ObterAtividades(atividadeRepo);
 const atualizarAtividade = new AtualizarAtividade_1.AtualizarAtividade(atividadeRepo);
-const atividadeService = new AtividadeService_1.AtividadeService(atividadeRepo);
-const obterAtividadesPorVendedorEData = new ObterAtividadesPorVendedorEData_1.ObterAtividadesPorVendedorEData(atividadeService);
 // Instantiate the necessary dependencies for FrequenciaVendasService
 const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
 const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
 const metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
+const atividadeService = new AtividadeService_1.AtividadeService(atividadeRepo, vendedorRepo, equipeRepo, metaRepo);
+const obterAtividadesPorVendedorEData = new ObterAtividadesPorVendedorEData_1.ObterAtividadesPorVendedorEData(atividadeService);
 const obterEquipeDadosFull = new ObterEquipeDadosFull_1.ObterEquipeDadosFull(equipeRepo, vendedorRepo, atividadeRepo, metaRepo);
 const frequenciaVendasService = new FrequenciaVendasService_1.FrequenciaVendasService(obterEquipeDadosFull);
 const atividadeController = new AtividadeController_1.AtividadeController(criarAtividade, obterAtividades, atualizarAtividade, atividadeService, obterAtividadesPorVendedorEData, frequenciaVendasService);
@@ -55,15 +46,16 @@ describe('AtividadeController', () => {
             json: jest.fn(),
         };
     });
-    it('should create a new atividade', () => __awaiter(void 0, void 0, void 0, function* () {
+    it('should create a new atividade', async () => {
         req.body = { id: '1', vendedorId: 'vendedor1', data: new Date().toISOString(), docinhosCoco: 10 };
-        yield atividadeController.criar(req, res);
+        await atividadeController.criar(req, res);
         expect(res.status).toHaveBeenCalledWith(201);
         expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
             id: '1',
             vendedorId: 'vendedor1',
             docinhosCoco: 10,
         }));
-    }), 10000);
+    }, 10000);
     // Add more tests for other methods like obterTodos, obterPorId, atualizar, etc.
 });
+//# sourceMappingURL=AtividadeController.test.js.map

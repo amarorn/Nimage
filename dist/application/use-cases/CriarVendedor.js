@@ -1,37 +1,25 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CriarVendedor = void 0;
 const Vendedor_1 = require("../../domain/entities/Vendedor");
 class CriarVendedor {
-    constructor(vendedorRepo) {
-        this.vendedorRepo = vendedorRepo;
+    constructor(vendedorRepository) {
+        this.vendedorRepository = vendedorRepository;
     }
-    executar(dados) {
-        return __awaiter(this, void 0, void 0, function* () {
-            //console.log("📝 Iniciando criação de vendedor com dados:", dados);
-            if (!dados.id || !dados.nome || !dados.equipe_id) {
-                throw new Error('Dados inválidos para criar vendedor');
-            }
-            const vendedor = new Vendedor_1.Vendedor(dados.id, dados.nome, dados.equipe_id);
-            //console.log("🏗️ Vendedor instanciado:", vendedor);
-            yield this.vendedorRepo.criar(vendedor);
-            //console.log("💾 Vendedor persistido no banco");
-            return vendedor;
-        });
+    async executar(dados) {
+        //console.log("📝 Iniciando criação de vendedor com dados:", dados);
+        if (!dados.id || !dados.nome || !dados.equipeId || !dados.email || !dados.telefone || !dados.meta || !dados.cargo) {
+            throw new Error('Dados inválidos para criar vendedor');
+        }
+        const vendedor = new Vendedor_1.Vendedor(dados.id, dados.nome, dados.equipeId, dados.email, dados.telefone, dados.meta, dados.cargo);
+        //console.log("🏗️ Vendedor instanciado:", vendedor);
+        await this.vendedorRepository.criar(vendedor);
+        //console.log("💾 Vendedor persistido no banco");
+        return vendedor;
     }
-    obterTodos() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.vendedorRepo.obterTodos(0, Number.MAX_SAFE_INTEGER);
-        });
+    async obterTodos() {
+        return await this.vendedorRepository.obterTodos(0, Number.MAX_SAFE_INTEGER);
     }
 }
 exports.CriarVendedor = CriarVendedor;
+//# sourceMappingURL=CriarVendedor.js.map

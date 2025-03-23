@@ -2,12 +2,7 @@ import { VendedorRepositoryImpl } from "../../infrastructure/repositories/Vended
 import { EquipeRepositoryImpl } from "../../infrastructure/repositories/EquipeRepositoryImpl";
 import { MetaRepositoryImpl } from "../../infrastructure/repositories/MetaRepositoryImpl";
 import { AtividadeRepositoryImpl } from "../../infrastructure/repositories/AtividadeRepositoryImpl";
-
-interface Vendedor {
-    id: string;
-    nome: string;
-    equipe_id: string;
-}
+import { Vendedor } from "../../domain/entities/Vendedor";
 
 interface DesempenhoIdealVendedor {
     vendedorId: string;

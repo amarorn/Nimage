@@ -14,41 +14,81 @@ export class VendedorRepositoryImpl implements VendedorRepository {
         console.log('Debug - Repository - Resultado da busca no banco:', vendedor);
         
         if (vendedor) {
-            console.log('Debug - Repository - Vendedor encontrado, buscando equipe com ID:', vendedor.equipe_id);
-            const equipe = await EquipeModel.findOne({ id: vendedor.equipe_id }).lean();
+            console.log('Debug - Repository - Vendedor encontrado, buscando equipe com ID:', vendedor.equipeId);
+            const equipe = await EquipeModel.findOne({ id: vendedor.equipeId }).lean();
             console.log('Debug - Repository - Resultado da busca da equipe:', equipe);
-            return new Vendedor(vendedor.id, vendedor.nome, vendedor.equipe_id, equipe ? { id: equipe.id, nome: equipe.nome } : null);
+            return new Vendedor(
+                vendedor.id,
+                vendedor.nome,
+                vendedor.equipeId,
+                vendedor.email,
+                vendedor.telefone,
+                vendedor.meta,
+                vendedor.cargo
+            );
         }
         return null;
     }
 
     async obterTodos(skip: number, limit: number): Promise<Vendedor[]> {
         const vendedores = await VendedorModel.find().skip(skip).limit(limit).lean();
-        return await Promise.all(vendedores.map(async (vendedor) => {
-            const equipe = await EquipeModel.findOne({ id: vendedor.equipe_id }).lean();
-            return new Vendedor(vendedor.id, vendedor.nome, vendedor.equipe_id, equipe ? { id: equipe.id, nome: equipe.nome } : null);
-        }));
+        return vendedores.map(vendedor => new Vendedor(
+            vendedor.id,
+            vendedor.nome,
+            vendedor.equipeId,
+            vendedor.email,
+            vendedor.telefone,
+            vendedor.meta,
+            vendedor.cargo
+        ));
     }
 
     async obterPorEquipeId(equipeId: string): Promise<Vendedor[]> {
-        const vendedores = await VendedorModel.find({ equipe_id: equipeId }).lean();
-        return await Promise.all(vendedores.map(async (vendedor) => {
-            const equipe = await EquipeModel.findOne({ id: vendedor.equipe_id }).lean();
-            return new Vendedor(vendedor.id, vendedor.nome, vendedor.equipe_id, equipe ? { id: equipe.id, nome: equipe.nome } : null);
-        }));
+        const vendedores = await VendedorModel.find({ equipeId }).lean();
+        return vendedores.map(vendedor => new Vendedor(
+            vendedor.id,
+            vendedor.nome,
+            vendedor.equipeId,
+            vendedor.email,
+            vendedor.telefone,
+            vendedor.meta,
+            vendedor.cargo
+        ));
     }
 
-    async atualizar(id: string, dados: { nome: string; equipe_id: string }): Promise<Vendedor | null> {
+    async atualizar(id: string, dados: {
+        nome?: string;
+        equipeId?: string;
+        email?: string;
+        telefone?: string;
+        meta?: number;
+        cargo?: string;
+    }): Promise<Vendedor | null> {
         const vendedorAtualizado = await VendedorModel.findOneAndUpdate(
             { id },
-            { nome: dados.nome, equipe_id: dados.equipe_id },
+            { $set: dados },
             { new: true }
         ).lean();
 
         if (vendedorAtualizado) {
-            const equipe = await EquipeModel.findOne({ id: vendedorAtualizado.equipe_id }).lean();
-            return new Vendedor(vendedorAtualizado.id, vendedorAtualizado.nome, vendedorAtualizado.equipe_id, equipe ? { id: equipe.id, nome: equipe.nome } : null);
+            return new Vendedor(
+                vendedorAtualizado.id,
+                vendedorAtualizado.nome,
+                vendedorAtualizado.equipeId,
+                vendedorAtualizado.email,
+                vendedorAtualizado.telefone,
+                vendedorAtualizado.meta,
+                vendedorAtualizado.cargo
+            );
         }
         return null;
+    }
+
+    async deletar(id: string): Promise<void> {
+        await VendedorModel.deleteOne({ id });
+    }
+
+    async deletarTodos(): Promise<void> {
+        await VendedorModel.deleteMany({});
     }
 }

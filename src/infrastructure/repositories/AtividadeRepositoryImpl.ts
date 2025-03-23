@@ -56,4 +56,12 @@ export class AtividadeRepositoryImpl implements AtividadeRepository {
         
         return resultado;
     }
+
+    async deletar(id: string): Promise<void> {
+        await AtividadeModel.findByIdAndDelete(id);
+    }
+
+    async deletarTodos(): Promise<void> {
+        await AtividadeModel.deleteMany({});
+    }
 }

@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AtividadeController = void 0;
 const VendedorRepositoryImpl_1 = require("../../infrastructure/repositories/VendedorRepositoryImpl");
@@ -22,249 +13,226 @@ class AtividadeController {
         this.obterAtividadesPorVendedorEData = obterAtividadesPorVendedorEData;
         this.frequenciaVendasService = frequenciaVendasService;
     }
-    criar(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                // //console.log("📥 Dados recebidos no body:", req.body);
-                if (!req.body) {
-                    return res.status(400).json({ erro: 'Body da requisição está vazio' });
-                }
-                const { id, vendedorId, data, docinhosCoco } = req.body;
-                // Validação dos campos obrigatórios
-                if (!id || !vendedorId || !data || docinhosCoco === undefined) {
-                    return res.status(400).json({
-                        erro: 'Dados inválidos',
-                        detalhes: {
-                            id: id ? 'presente' : 'ausente',
-                            vendedorId: vendedorId ? 'presente' : 'ausente',
-                            data: data ? 'presente' : 'ausente',
-                            docinhosCoco: docinhosCoco !== undefined ? 'presente' : 'ausente'
-                        }
-                    });
-                }
-                // //console.log("✨ Dados extraídos:", { id, vendedorId, data, docinhosCoco });
-                const atividade = yield this.criarAtividade.executar({
-                    id,
-                    vendedorId,
-                    data: new Date(data),
-                    docinhosCoco
-                });
-                // //console.log("✅ Atividade criada com sucesso:", atividade);
-                return res.status(201).json(atividade);
+    async criar(req, res) {
+        try {
+            // //console.log("📥 Dados recebidos no body:", req.body);
+            if (!req.body) {
+                return res.status(400).json({ erro: 'Body da requisição está vazio' });
             }
-            catch (erro) {
-                // console.error("❌ Erro ao criar atividade:", erro);
-                return res.status(500).json({
-                    erro: 'Erro interno ao criar atividade',
-                    mensagem: erro.message
+            const { id, vendedorId, data, docinhosCoco } = req.body;
+            // Validação dos campos obrigatórios
+            if (!id || !vendedorId || !data || docinhosCoco === undefined) {
+                return res.status(400).json({
+                    erro: 'Dados inválidos',
+                    detalhes: {
+                        id: id ? 'presente' : 'ausente',
+                        vendedorId: vendedorId ? 'presente' : 'ausente',
+                        data: data ? 'presente' : 'ausente',
+                        docinhosCoco: docinhosCoco !== undefined ? 'presente' : 'ausente'
+                    }
                 });
             }
-        });
+            // //console.log("✨ Dados extraídos:", { id, vendedorId, data, docinhosCoco });
+            const atividade = await this.criarAtividade.executar({
+                id,
+                vendedorId,
+                data: new Date(data),
+                docinhosCoco
+            });
+            // //console.log("✅ Atividade criada com sucesso:", atividade);
+            return res.status(201).json(atividade);
+        }
+        catch (erro) {
+            // console.error("❌ Erro ao criar atividade:", erro);
+            return res.status(500).json({
+                erro: 'Erro interno ao criar atividade',
+                mensagem: erro.message
+            });
+        }
     }
-    obterTodos(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const page = parseInt(req.query.page) || 1;
-                const limit = parseInt(req.query.limit) || 10;
-                const skip = (page - 1) * limit;
-                const atividades = yield this.obterAtividades.executar(skip, limit);
-                // //console.log("✅ Atividades obtidas com sucesso:", atividades);
-                // Criar uma resposta personalizada com paginação
-                const respostaPersonalizada = {
-                    pagina: page,
-                    limite: limit,
-                    total: atividades.length,
-                    atividades: atividades.map(atividade => ({
-                        id: atividade.id,
-                        vendedorId: atividade.vendedorId,
-                        data: atividade.data,
-                        docinhosCoco: atividade.docinhosCoco
-                    }))
-                };
-                return respostaPersonalizada;
-            }
-            catch (erro) {
-                // console.error("❌ Erro ao obter atividades:", erro);
-                return res.status(500).json({
-                    erro: 'Erro interno ao obter atividades',
-                    mensagem: erro.message
-                });
-            }
-        });
+    async obterTodos(req, res) {
+        try {
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 10;
+            const skip = (page - 1) * limit;
+            const atividades = await this.obterAtividades.executar(skip, limit);
+            // //console.log("✅ Atividades obtidas com sucesso:", atividades);
+            // Criar uma resposta personalizada com paginação
+            const respostaPersonalizada = {
+                pagina: page,
+                limite: limit,
+                total: atividades.length,
+                atividades: atividades.map(atividade => ({
+                    id: atividade.id,
+                    vendedorId: atividade.vendedorId,
+                    data: atividade.data,
+                    docinhosCoco: atividade.docinhosCoco
+                }))
+            };
+            return respostaPersonalizada;
+        }
+        catch (erro) {
+            // console.error("❌ Erro ao obter atividades:", erro);
+            return res.status(500).json({
+                erro: 'Erro interno ao obter atividades',
+                mensagem: erro.message
+            });
+        }
     }
-    obterPorId(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id } = req.params;
-                const atividade = yield this.obterAtividades.executarPorId(id);
-                // //console.log("✅ Atividade obtida com sucesso:", atividade);
-                if (!atividade) {
-                    return res.status(404).json({ erro: 'Atividade não encontrada' });
-                }
-                return res.status(200).json(atividade);
+    async obterPorId(req, res) {
+        try {
+            const { id } = req.params;
+            const atividade = await this.obterAtividades.executarPorId(id);
+            // //console.log("✅ Atividade obtida com sucesso:", atividade);
+            if (!atividade) {
+                return res.status(404).json({ erro: 'Atividade não encontrada' });
             }
-            catch (erro) {
-                // console.error("❌ Erro ao obter atividade:", erro);
-                return res.status(500).json({
-                    erro: 'Erro interno ao obter atividade',
-                    mensagem: erro.message
-                });
-            }
-        });
+            return res.status(200).json(atividade);
+        }
+        catch (erro) {
+            // console.error("❌ Erro ao obter atividade:", erro);
+            return res.status(500).json({
+                erro: 'Erro interno ao obter atividade',
+                mensagem: erro.message
+            });
+        }
     }
-    obterDetalhes(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id } = req.params;
-                // //console.log("🔍 Buscando detalhes para atividade ID:", id);
-                const atividade = yield this.obterAtividades.executarPorId(id);
-                if (!atividade) {
-                    // //console.log("⚠️ Atividade não encontrada");
-                    return res.status(404).json({ erro: 'Atividade não encontrada' });
-                }
-                const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
-                const vendedor = yield vendedorRepo.obterPorId(atividade.vendedorId);
-                if (!vendedor) {
-                    // //console.log("⚠️ Vendedor não encontrado");
-                    return res.status(404).json({ erro: 'Vendedor não encontrado' });
-                }
-                const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
-                const equipe = yield equipeRepo.obterPorId(vendedor.equipe_id);
-                if (!equipe) {
-                    // //console.log("⚠️ Equipe não encontrada");
-                    return res.status(404).json({ erro: 'Equipe não encontrada' });
-                }
-                const metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
-                const metas = yield metaRepo.obterPorEquipe(equipe.id);
-                // //console.log("✅ Detalhes obtidos com sucesso:", { atividade, vendedor, equipe, metas });
-                return res.status(200).json({
-                    atividade: {
-                        id: atividade.id,
-                        vendedorId: atividade.vendedorId,
-                        data: atividade.data,
-                        docinhosCoco: atividade.docinhosCoco
-                    },
-                    vendedor: {
-                        id: vendedor.id,
-                        nome: vendedor.nome,
-                        equipe_id: vendedor.equipe_id
-                    },
-                    equipe: {
-                        id: equipe.id,
-                        nome: equipe.nome
-                    },
-                    metas: metas ? {
-                        id: metas.id,
-                        equipeId: metas.equipeId,
-                        objetivo: metas.objetivo
-                    } : null
-                });
+    async obterDetalhes(req, res) {
+        try {
+            const { id } = req.params;
+            // //console.log("🔍 Buscando detalhes para atividade ID:", id);
+            const atividade = await this.obterAtividades.executarPorId(id);
+            if (!atividade) {
+                // //console.log("⚠️ Atividade não encontrada");
+                return res.status(404).json({ erro: 'Atividade não encontrada' });
             }
-            catch (erro) {
-                // console.error("❌ Erro ao obter detalhes da atividade:", erro);
-                return res.status(500).json({
-                    erro: 'Erro interno ao obter detalhes da atividade',
-                    mensagem: erro.message
-                });
+            const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
+            const vendedor = await vendedorRepo.obterPorId(atividade.vendedorId);
+            if (!vendedor) {
+                // //console.log("⚠️ Vendedor não encontrado");
+                return res.status(404).json({ erro: 'Vendedor não encontrado' });
             }
-        });
+            const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
+            const equipe = await equipeRepo.obterPorId(vendedor.equipeId);
+            if (!equipe) {
+                // //console.log("⚠️ Equipe não encontrada");
+                return res.status(404).json({ erro: 'Equipe não encontrada' });
+            }
+            const metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
+            const metas = await metaRepo.obterPorEquipe(equipe.id);
+            // //console.log("✅ Detalhes obtidos com sucesso:", { atividade, vendedor, equipe, metas });
+            return res.status(200).json({
+                atividade: {
+                    id: atividade.id,
+                    vendedorId: atividade.vendedorId,
+                    data: atividade.data,
+                    docinhosCoco: atividade.docinhosCoco
+                },
+                vendedor: {
+                    id: vendedor.id,
+                    nome: vendedor.nome,
+                    equipeId: vendedor.equipeId
+                },
+                equipe: {
+                    id: equipe.id,
+                    nome: equipe.nome
+                },
+                metas: metas ? {
+                    id: metas.id,
+                    equipeId: metas.equipeId,
+                    objetivo: metas.objetivo
+                } : null
+            });
+        }
+        catch (erro) {
+            // console.error("❌ Erro ao obter detalhes da atividade:", erro);
+            return res.status(500).json({
+                erro: 'Erro interno ao obter detalhes da atividade',
+                mensagem: erro.message
+            });
+        }
     }
-    atualizar(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                // //console.log("📥 Dados recebidos para atualização:", req.body);
-                const { id } = req.params;
-                const { vendedorId, data, docinhosCoco } = req.body;
-                // Validação dos campos obrigatórios
-                if (!vendedorId || !data || docinhosCoco === undefined) {
-                    return res.status(400).json({
-                        erro: 'Dados inválidos',
-                        detalhes: {
-                            vendedorId: vendedorId ? 'presente' : 'ausente',
-                            data: data ? 'presente' : 'ausente',
-                            docinhosCoco: docinhosCoco !== undefined ? 'presente' : 'ausente'
-                        }
-                    });
-                }
-                const atividadeAtualizada = yield this.atualizarAtividade.executar(id, { vendedorId, data: new Date(data), docinhosCoco });
-                // //console.log("✅ Atividade atualizada com sucesso:", atividadeAtualizada);
-                return res.status(200).json(atividadeAtualizada);
-            }
-            catch (erro) {
-                // console.error("❌ Erro ao atualizar atividade:", erro);
-                return res.status(500).json({
-                    erro: 'Erro interno ao atualizar atividade',
-                    mensagem: erro.message
+    async atualizar(req, res) {
+        try {
+            // //console.log("📥 Dados recebidos para atualização:", req.body);
+            const { id } = req.params;
+            const { vendedorId, data, docinhosCoco } = req.body;
+            // Validação dos campos obrigatórios
+            if (!vendedorId || !data || docinhosCoco === undefined) {
+                return res.status(400).json({
+                    erro: 'Dados inválidos',
+                    detalhes: {
+                        vendedorId: vendedorId ? 'presente' : 'ausente',
+                        data: data ? 'presente' : 'ausente',
+                        docinhosCoco: docinhosCoco !== undefined ? 'presente' : 'ausente'
+                    }
                 });
             }
-        });
+            const atividadeAtualizada = await this.atualizarAtividade.executar(id, { vendedorId, data: new Date(data), docinhosCoco });
+            // //console.log("✅ Atividade atualizada com sucesso:", atividadeAtualizada);
+            return res.status(200).json(atividadeAtualizada);
+        }
+        catch (erro) {
+            // console.error("❌ Erro ao atualizar atividade:", erro);
+            return res.status(500).json({
+                erro: 'Erro interno ao atualizar atividade',
+                mensagem: erro.message
+            });
+        }
     }
-    getAtividadesByVendedorAndDate(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { vendedorId } = req.params;
-                const { dataInicio, dataFim } = req.query;
-                console.log('Debug - Parâmetros recebidos:', {
-                    vendedorId,
-                    dataInicio,
-                    dataFim
-                });
-                if (!dataInicio || !dataFim) {
-                    return res.status(400).json({
-                        erro: 'Datas não fornecidas',
-                        detalhes: { dataInicio, dataFim }
-                    });
-                }
-                const dataInicioObj = new Date(dataInicio);
-                const dataFimObj = new Date(dataFim);
-                console.log('Debug - Datas convertidas:', {
-                    dataInicioObj,
-                    dataFimObj
-                });
-                const resultado = yield this.obterAtividadesPorVendedorEData.executar(vendedorId, dataInicioObj, dataFimObj);
-                console.log('Debug - Resultado obtido:', resultado);
-                // Calcula o progresso em relação à meta
-                let progresso = null;
-                if (resultado.meta && resultado.meta.objetivo > 0) {
-                    progresso = (resultado.valorTotal / resultado.meta.objetivo) * 100;
-                }
-                return res.status(200).json(Object.assign(Object.assign({}, resultado), { progresso: progresso ? `${progresso.toFixed(2)}%` : null }));
+    async getAtividadesByVendedorAndDate(req, res) {
+        try {
+            const { vendedorId } = req.params;
+            // Usa o primeiro dia do mês atual como data inicial e o último dia como data final
+            const hoje = new Date();
+            const dataInicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+            const dataFim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+            console.log('Debug - Datas calculadas:', {
+                dataInicio,
+                dataFim
+            });
+            const resultado = await this.obterAtividadesPorVendedorEData.executar(vendedorId, dataInicio, dataFim);
+            console.log('Debug - Resultado obtido:', resultado);
+            // Calcula o progresso em relação à meta
+            let progresso = null;
+            if (resultado.meta && resultado.meta.objetivo > 0) {
+                progresso = (resultado.valorTotal / resultado.meta.objetivo) * 100;
             }
-            catch (erro) {
-                console.error('Debug - Erro:', erro);
-                return res.status(500).json({
-                    erro: 'Erro interno ao obter atividades',
-                    mensagem: erro.message
-                });
-            }
-        });
+            return res.status(200).json(Object.assign(Object.assign({}, resultado), { progresso: progresso ? `${progresso.toFixed(2)}%` : null }));
+        }
+        catch (erro) {
+            console.error('Debug - Erro:', erro);
+            return res.status(500).json({
+                erro: 'Erro interno ao obter atividades',
+                mensagem: erro.message
+            });
+        }
     }
-    calcularFrequenciaVendas(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { equipeId } = req.params;
-                const { dataInicio, dataFim } = req.query;
-                if (!dataInicio || !dataFim) {
-                    return res.status(400).json({
-                        erro: 'Datas não fornecidas',
-                        detalhes: { dataInicio, dataFim }
-                    });
-                }
-                const dataInicioObj = new Date(dataInicio);
-                const dataFimObj = new Date(dataFim);
-                const resultado = yield this.frequenciaVendasService.calcularFrequencia(equipeId, dataInicioObj, dataFimObj);
-                const fea = yield this.atividadeService.calcularFEA(equipeId, resultado.totalDiasDisponiveis, resultado.diasComAtividade);
-                return res.status(200).json({
-                    resultado
+    async calcularFrequenciaVendas(req, res) {
+        try {
+            const { equipeId } = req.params;
+            const { dataInicio, dataFim } = req.query;
+            if (!dataInicio || !dataFim) {
+                return res.status(400).json({
+                    erro: 'Datas não fornecidas',
+                    detalhes: { dataInicio, dataFim }
                 });
             }
-            catch (erro) {
-                return res.status(500).json({
-                    erro: 'Erro interno ao calcular frequência de vendas',
-                    mensagem: erro.message
-                });
-            }
-        });
+            const dataInicioObj = new Date(dataInicio);
+            const dataFimObj = new Date(dataFim);
+            const resultado = await this.frequenciaVendasService.calcularFrequencia(equipeId, dataInicioObj, dataFimObj);
+            const fea = await this.atividadeService.calcularFEA(equipeId, resultado.totalDiasDisponiveis, resultado.diasComAtividade);
+            return res.status(200).json({
+                resultado
+            });
+        }
+        catch (erro) {
+            return res.status(500).json({
+                erro: 'Erro interno ao calcular frequência de vendas',
+                mensagem: erro.message
+            });
+        }
     }
 }
 exports.AtividadeController = AtividadeController;
+//# sourceMappingURL=AtividadeController.js.map

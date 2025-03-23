@@ -42,3 +42,4 @@ const MetaSchema = new mongoose_1.Schema({
     data: { type: Date, required: true }
 });
 exports.MetaModel = mongoose_1.default.model("Meta", MetaSchema);
+//# sourceMappingURL=MetaModel.js.map

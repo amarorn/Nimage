@@ -8,8 +8,12 @@ export class MongoDB {
     static async conectar() {
         //console.log("🔥 Conectado ao MongoDB com sucesso!")
         try {
-            await mongoose.connect(MONGO_URI);
-            //console.log("🔥 Conectado ao MongoDB com sucesso!");
+            await mongoose.connect(MONGO_URI, {
+                serverSelectionTimeoutMS: 60000, // Aumentado para 60 segundos
+                socketTimeoutMS: 90000, // Aumentado para 90 segundos
+                connectTimeoutMS: 60000, // Aumentado para 60 segundos
+            });
+            console.log("✅ Conectado ao MongoDB com sucesso!");
         } catch (error) {
             console.error("❌ Erro ao conectar ao MongoDB:", error);
             process.exit(1);

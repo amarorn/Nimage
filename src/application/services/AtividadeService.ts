@@ -1,8 +1,8 @@
 import { AtividadeRepository } from "../../domain/repositories/AtividadeRepository";
 import { Atividade } from "../../domain/entities/Atividade";
-import { VendedorRepositoryImpl } from "../../infrastructure/repositories/VendedorRepositoryImpl";
-import { EquipeRepositoryImpl } from "../../infrastructure/repositories/EquipeRepositoryImpl";
-import { MetaRepositoryImpl } from "../../infrastructure/repositories/MetaRepositoryImpl";
+import { VendedorRepository } from "../../domain/repositories/VendedorRepository";
+import { EquipeRepository } from "../../domain/repositories/EquipeRepository";
+import { MetaRepository } from "../../domain/repositories/MetaRepository";
 
 export interface AtividadesPorVendedorResult {
     quantidade: number;
@@ -10,7 +10,7 @@ export interface AtividadesPorVendedorResult {
     vendedor: {
         id: string;
         nome: string;
-        equipe_id: string;
+        equipeId: string;
     };
     equipe: {
         id: string;
@@ -25,14 +25,19 @@ export interface AtividadesPorVendedorResult {
 }
 
 export class AtividadeService {
-    private vendedorRepo: VendedorRepositoryImpl;
-    private equipeRepo: EquipeRepositoryImpl;
-    private metaRepo: MetaRepositoryImpl;
+    private vendedorRepo: VendedorRepository;
+    private equipeRepo: EquipeRepository;
+    private metaRepo: MetaRepository;
 
-    constructor(private atividadeRepo: AtividadeRepository) {
-        this.vendedorRepo = new VendedorRepositoryImpl();
-        this.equipeRepo = new EquipeRepositoryImpl();
-        this.metaRepo = new MetaRepositoryImpl();
+    constructor(
+        private atividadeRepo: AtividadeRepository,
+        vendedorRepo: VendedorRepository,
+        equipeRepo: EquipeRepository,
+        metaRepo: MetaRepository
+    ) {
+        this.vendedorRepo = vendedorRepo;
+        this.equipeRepo = equipeRepo;
+        this.metaRepo = metaRepo;
     }
 
     async obterAtividadesPorVendedorEData(vendedorId: string, dataInicio: Date, dataFim: Date): Promise<{ 
@@ -58,7 +63,7 @@ export class AtividadeService {
         }
 
         // Busca informações da equipe
-        const equipe = await this.equipeRepo.obterPorId(vendedor.equipe_id);
+        const equipe = await this.equipeRepo.obterPorId(vendedor.equipeId);
         if (!equipe) {
             throw new Error('Equipe não encontrada');
         }
@@ -72,7 +77,7 @@ export class AtividadeService {
             vendedor: {
                 id: vendedor.id,
                 nome: vendedor.nome,
-                equipe_id: vendedor.equipe_id
+                equipeId: vendedor.equipeId
             },
             equipe: {
                 id: equipe.id,
@@ -91,7 +96,7 @@ export class AtividadeService {
         if (diasComAtividade === 0) {
             return 0;
         }
-        const fea = ((totalDiasDisponiveis - diasComAtividade) / diasComAtividade) * 100;
+        const fea = (totalDiasDisponiveis / diasComAtividade) * 100;
         return fea;
     }
 }

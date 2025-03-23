@@ -1,0 +1,38 @@
+{
+  "equipe": {
+    "São Paulo": 0,
+    "Rio Grande do Norte": 1,
+    "Rio Grande do Sul": 2,
+    "Bahia": 3
+  },
+  "vendedor": {
+    "Paulo Cardoso": 0,
+    "Adriano Meireles": 1,
+    "Nicole Bezerra": 2,
+    "Henrique Moura": 3,
+    "Jéssica Figueiredo": 4,
+    "Gustavo Morais": 5,
+    "Sabrina Teixeira": 6,
+    "Iago Pimentel": 7,
+    "Xuxa Lima": 8,
+    "Ícaro Barros": 9,
+    "Daniela Mourão": 10,
+    "Sara Brito": 11,
+    "Leandro Farias": 12,
+    "Karina Barbosa": 13,
+    "Débora Sales": 14,
+    "Olivia Duarte": 15,
+    "Milena Teixeira": 16,
+    "Rafael Carvalho": 17,
+    "Carlos Monteiro": 18,
+    "Ulisses Franco": 19,
+    "Zilda Amaral": 20,
+    "Fernanda Mendes": 21,
+    "Tales Miranda": 22,
+    "Bruno Oliveira": 23,
+    "Natanael Freire": 24,
+    "João Pereira": 25,
+    "Alice Albuquerque": 26,
+    "Gabriel Almeida": 27
+  }
+}

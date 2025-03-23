@@ -33,7 +33,7 @@ export class ObterEquipeDadosFull {
                 return {
                     id: vendedor.id,
                     nome: vendedor.nome,
-                    equipe_id: vendedor.equipe_id,
+                    equipeId: vendedor.equipeId,
                     atividades: atividades.map(atividade => ({
                         id: atividade.id,
                         data: atividade.data,

@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const MetaRepositoryImpl_1 = require("../../infrastructure/repositories/MetaRepositoryImpl");
@@ -25,26 +16,27 @@ const atualizarMeta = new AtualizarMeta_1.AtualizarMeta(metaRepo);
 const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
 const obterEquipePorId = new ObterEquipePorId_1.ObterEquipePorId(equipeRepo);
 const metaController = new MetaController_1.MetaController(criarMeta, obterMeta, atualizarMeta, obterEquipePorId);
-router.post("/metas", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/metas", async (req, res) => {
     //console.log("📨 Nova requisição POST /metas");
     return metaController.criar(req, res);
-}));
-router.get("/metas/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/metas/all", async (req, res) => {
     //console.log("📨 Nova requisição GET /metas");
-    const metas = yield metaController.obterTodos(req, res);
+    const metas = await metaController.obterTodos(req, res);
     return res.json(metas);
-}));
-router.get("/metas/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/metas/:id", async (req, res) => {
     //console.log("📨 Nova requisição GET /metas/:id");
     return metaController.obterPorId(req, res);
-}));
-router.get("/metas/equipe/:equipeId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/metas/equipe/:equipeId", async (req, res) => {
     //console.log("📨 Nova requisição GET /metas/equipe/:equipeId");
     const equipeId = req.params.equipeId;
     return metaController.obterPorEquipe(req, res);
-}));
-router.put("/metas/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.put("/metas/:id", async (req, res) => {
     //console.log("📨 Nova requisição PUT /metas/:id");
     return metaController.atualizar(req, res);
-}));
+});
 exports.default = router;
+//# sourceMappingURL=metaRoutes.js.map

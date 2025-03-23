@@ -1,0 +1,401 @@
+{
+  "resultado": {
+    "vendedor": {
+      "nome": "Lucas Rodrigues",
+      "feaVendedor": 120,
+      "iapVendedor": 48261,
+      "numeroDiasComAtividade": 20,
+      "somaDocinhos": 96522,
+      "mediaAtividadePorDia": 4826.1,
+      "percentualContribuicao": "30.76%",
+      "percentualCrescimento": "-27.68",
+      "pesoNaEquipe": "25.00",
+      "distribuicaoMeta": "32602.62",
+      "desempenhoDiarioIdeal": "1481.94",
+      "equipe": {
+        "meta": 106000,
+        "meta_anterior": 119000,
+        "totalVendedores": 4,
+        "mediaEquipe": 107648,
+        "totalVendasMesAnterior": 430592,
+        "crescimentoMeta": "-10.92%",
+        "crescimentoVendas": "-27.12%",
+        "diferenca": "-13000.00",
+        "periodoMetaAnterior": {
+          "inicio": "2024-01-01T03:00:00.000Z",
+          "fim": "2024-02-01T02:59:59.999Z"
+        }
+      },
+      "dadosGrafico": {
+        "historico": [
+          {
+            "mes": "Fevereiro",
+            "dia": 1,
+            "valor": 3479
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 2,
+            "valor": 4391
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 3,
+            "valor": 5366
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 5,
+            "valor": 4294
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 6,
+            "valor": 4183
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 7,
+            "valor": 4689
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 8,
+            "valor": 5130
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 9,
+            "valor": 5424
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 10,
+            "valor": 5177
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 12,
+            "valor": 4385
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 13,
+            "valor": 4454
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 14,
+            "valor": 4844
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 15,
+            "valor": 4747
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 16,
+            "valor": 6155
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 17,
+            "valor": 5376
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 19,
+            "valor": 4792
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 21,
+            "valor": 5534
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 22,
+            "valor": 5025
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 26,
+            "valor": 4455
+          },
+          {
+            "mes": "Fevereiro",
+            "dia": 28,
+            "valor": 4622
+          }
+        ],
+        "previsao": [
+          {
+            "mes": "Março",
+            "valor": 135266,
+            "detalhes": [
+              {
+                "dia": 1,
+                "valor": 4826
+              },
+              {
+                "dia": 2,
+                "valor": 4804
+              },
+              {
+                "dia": 3,
+                "valor": 4782
+              },
+              {
+                "dia": 4,
+                "valor": 4760
+              },
+              {
+                "dia": 5,
+                "valor": 4739
+              },
+              {
+                "dia": 6,
+                "valor": 4717
+              },
+              {
+                "dia": 7,
+                "valor": 4695
+              },
+              {
+                "dia": 8,
+                "valor": 4673
+              },
+              {
+                "dia": 9,
+                "valor": 4651
+              },
+              {
+                "dia": 10,
+                "valor": 4629
+              },
+              {
+                "dia": 11,
+                "valor": 4607
+              },
+              {
+                "dia": 12,
+                "valor": 4585
+              },
+              {
+                "dia": 13,
+                "valor": 4564
+              },
+              {
+                "dia": 14,
+                "valor": 4542
+              },
+              {
+                "dia": 15,
+                "valor": 4520
+              },
+              {
+                "dia": 16,
+                "valor": 4498
+              },
+              {
+                "dia": 17,
+                "valor": 4476
+              },
+              {
+                "dia": 18,
+                "valor": 4454
+              },
+              {
+                "dia": 19,
+                "valor": 4432
+              },
+              {
+                "dia": 20,
+                "valor": 4410
+              },
+              {
+                "dia": 21,
+                "valor": 4389
+              },
+              {
+                "dia": 22,
+                "valor": 4367
+              },
+              {
+                "dia": 23,
+                "valor": 4345
+              },
+              {
+                "dia": 24,
+                "valor": 4323
+              },
+              {
+                "dia": 25,
+                "valor": 4301
+              },
+              {
+                "dia": 26,
+                "valor": 4279
+              },
+              {
+                "dia": 27,
+                "valor": 4257
+              },
+              {
+                "dia": 28,
+                "valor": 4235
+              },
+              {
+                "dia": 29,
+                "valor": 4214
+              },
+              {
+                "dia": 30,
+                "valor": 4192
+              }
+            ]
+          },
+          {
+            "mes": "Abril",
+            "valor": 129943,
+            "detalhes": [
+              {
+                "dia": 1,
+                "valor": 4826
+              },
+              {
+                "dia": 2,
+                "valor": 4792
+              },
+              {
+                "dia": 3,
+                "valor": 4758
+              },
+              {
+                "dia": 4,
+                "valor": 4724
+              },
+              {
+                "dia": 5,
+                "valor": 4690
+              },
+              {
+                "dia": 6,
+                "valor": 4656
+              },
+              {
+                "dia": 7,
+                "valor": 4621
+              },
+              {
+                "dia": 8,
+                "valor": 4587
+              },
+              {
+                "dia": 9,
+                "valor": 4553
+              },
+              {
+                "dia": 10,
+                "valor": 4519
+              },
+              {
+                "dia": 11,
+                "valor": 4485
+              },
+              {
+                "dia": 12,
+                "valor": 4451
+              },
+              {
+                "dia": 13,
+                "valor": 4417
+              },
+              {
+                "dia": 14,
+                "valor": 4383
+              },
+              {
+                "dia": 15,
+                "valor": 4348
+              },
+              {
+                "dia": 16,
+                "valor": 4314
+              },
+              {
+                "dia": 17,
+                "valor": 4280
+              },
+              {
+                "dia": 18,
+                "valor": 4246
+              },
+              {
+                "dia": 19,
+                "valor": 4212
+              },
+              {
+                "dia": 20,
+                "valor": 4178
+              },
+              {
+                "dia": 21,
+                "valor": 4144
+              },
+              {
+                "dia": 22,
+                "valor": 4110
+              },
+              {
+                "dia": 23,
+                "valor": 4076
+              },
+              {
+                "dia": 24,
+                "valor": 4041
+              },
+              {
+                "dia": 25,
+                "valor": 4007
+              },
+              {
+                "dia": 26,
+                "valor": 3973
+              },
+              {
+                "dia": 27,
+                "valor": 3939
+              },
+              {
+                "dia": 28,
+                "valor": 3905
+              },
+              {
+                "dia": 29,
+                "valor": 3871
+              },
+              {
+                "dia": 30,
+                "valor": 3837
+              }
+            ]
+          }
+        ]
+      },
+      "analiseHistorico": {
+        "crescimentoPeriodo": "Crescimento constante no período analisado",
+        "tendenciasIdentificadas": [
+          "Aumento gradual nas vendas"
+        ],
+        "pontosMelhoria": [
+          "Aumentar volume de vendas"
+        ],
+        "estrategiasHistorico": [
+          "Foco em produtos principais"
+        ]
+      }
+    }
+  }
+}

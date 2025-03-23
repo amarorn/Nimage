@@ -134,7 +134,7 @@ export class AtividadeController {
             }
 
             const equipeRepo = new EquipeRepositoryImpl();
-            const equipe = await equipeRepo.obterPorId(vendedor.equipe_id);
+            const equipe = await equipeRepo.obterPorId(vendedor.equipeId);
             if (!equipe) {
                 // //console.log("⚠️ Equipe não encontrada");
                 return res.status(404).json({ erro: 'Equipe não encontrada' });
@@ -155,7 +155,7 @@ export class AtividadeController {
                 vendedor: {
                     id: vendedor.id,
                     nome: vendedor.nome,
-                    equipe_id: vendedor.equipe_id
+                    equipeId: vendedor.equipeId
                 },
                 equipe: {
                     id: equipe.id,
@@ -210,33 +210,21 @@ export class AtividadeController {
     async getAtividadesByVendedorAndDate(req: Request, res: Response) {
         try {
             const { vendedorId } = req.params;
-            const { dataInicio, dataFim } = req.query;
             
-            console.log('Debug - Parâmetros recebidos:', {
-                vendedorId,
+            // Usa o primeiro dia do mês atual como data inicial e o último dia como data final
+            const hoje = new Date();
+            const dataInicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+            const dataFim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+
+            console.log('Debug - Datas calculadas:', {
                 dataInicio,
                 dataFim
             });
 
-            if (!dataInicio || !dataFim) {
-                return res.status(400).json({
-                    erro: 'Datas não fornecidas',
-                    detalhes: { dataInicio, dataFim }
-                });
-            }
-
-            const dataInicioObj = new Date(dataInicio as string);
-            const dataFimObj = new Date(dataFim as string);
-
-            console.log('Debug - Datas convertidas:', {
-                dataInicioObj,
-                dataFimObj
-            });
-
             const resultado = await this.obterAtividadesPorVendedorEData.executar(
                 vendedorId, 
-                dataInicioObj, 
-                dataFimObj
+                dataInicio, 
+                dataFim
             );
 
             console.log('Debug - Resultado obtido:', resultado);

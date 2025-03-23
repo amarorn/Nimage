@@ -16,33 +16,54 @@ export class EquipeController {
 
     async criar(req: Request, res: Response) {
         try {
-            // //console.log("📥 Dados recebidos no body:", req.body);
-            
             if (!req.body) {
                 return res.status(400).json({ erro: 'Body da requisição está vazio' });
             }
 
-            const { id, nome } = req.body;
+            const { 
+                id, 
+                nome, 
+                nomepdv, 
+                cidade, 
+                estado, 
+                gerente, 
+                contato_gerente, 
+                capitao, 
+                contato_capitao 
+            } = req.body;
 
             // Validação dos campos obrigatórios
-            if (!id || !nome) {
+            if (!id || !nome || !nomepdv || !cidade || !estado || 
+                !gerente || !contato_gerente || !capitao || !contato_capitao) {
                 return res.status(400).json({
                     erro: 'Dados inválidos',
                     detalhes: {
                         id: id ? 'presente' : 'ausente',
-                        nome: nome ? 'presente' : 'ausente'
+                        nome: nome ? 'presente' : 'ausente',
+                        nomepdv: nomepdv ? 'presente' : 'ausente',
+                        cidade: cidade ? 'presente' : 'ausente',
+                        estado: estado ? 'presente' : 'ausente',
+                        gerente: gerente ? 'presente' : 'ausente',
+                        contato_gerente: contato_gerente ? 'presente' : 'ausente',
+                        capitao: capitao ? 'presente' : 'ausente',
+                        contato_capitao: contato_capitao ? 'presente' : 'ausente'
                     }
                 });
             }
 
-            // //console.log("✨ Dados extraídos:", { id, nome });
-
-            const equipe = await this.criarEquipe.executar({ id, nome });
-            // //console.log("✅ Equipe criada com sucesso:", equipe);
-            
+            const equipe = await this.criarEquipe.executar({ 
+                id, 
+                nome, 
+                nomepdv, 
+                cidade, 
+                estado, 
+                gerente, 
+                contato_gerente, 
+                capitao, 
+                contato_capitao 
+            });
             return res.status(201).json(equipe);
         } catch (erro) {
-            // console.error("❌ Erro ao criar equipe:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao criar equipe',
                 mensagem: (erro as Error).message 
@@ -57,22 +78,26 @@ export class EquipeController {
             const skip = (page - 1) * limit;
 
             const equipes = await this.obterEquipe.executar(skip, limit);
-            // //console.log("✅ Equipes obtidas com sucesso:", equipes);
 
-            // Criar uma resposta personalizada com paginação
             const respostaPersonalizada = {
                 pagina: page,
                 limite: limit,
                 total: equipes.length,
                 equipes: equipes.map(equipe => ({
                     id: equipe.id,
-                    nome: equipe.nome
+                    nome: equipe.nome,
+                    nomepdv: equipe.nomepdv,
+                    cidade: equipe.cidade,
+                    estado: equipe.estado,
+                    gerente: equipe.gerente,
+                    contato_gerente: equipe.contato_gerente,
+                    capitao: equipe.capitao,
+                    contato_capitao: equipe.contato_capitao
                 }))
             };
 
             return respostaPersonalizada;
         } catch (erro) {
-            // console.error("❌ Erro ao obter equipes:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao obter equipes',
                 mensagem: (erro as Error).message 
@@ -84,15 +109,23 @@ export class EquipeController {
         try {
             const { id } = req.params;
             const equipe = await this.obterEquipe.executarPorId(id);
-            // //console.log("✅ Equipe obtida com sucesso:", equipe);
 
             if (!equipe) {
                 return res.status(404).json({ erro: 'Equipe não encontrada' });
             }
 
-            return res.status(200).json(equipe);
+            return res.status(200).json({
+                id: equipe.id,
+                nome: equipe.nome,
+                nomepdv: equipe.nomepdv,
+                cidade: equipe.cidade,
+                estado: equipe.estado,
+                gerente: equipe.gerente,
+                contato_gerente: equipe.contato_gerente,
+                capitao: equipe.capitao,
+                contato_capitao: equipe.contato_capitao
+            });
         } catch (erro) {
-            // console.error("❌ Erro ao obter equipe:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao obter equipe',
                 mensagem: (erro as Error).message 
@@ -144,26 +177,62 @@ export class EquipeController {
 
     async atualizar(req: Request, res: Response) {
         try {
-            // //console.log("📥 Dados recebidos para atualização:", req.body);
             const { id } = req.params;
-            const { nome } = req.body;
+            const { 
+                nome,
+                nomepdv,
+                cidade,
+                estado,
+                gerente,
+                contato_gerente,
+                capitao,
+                contato_capitao
+            } = req.body;
 
-            // Validação dos campos obrigatórios
-            if (!nome) {
+            // Validação dos campos
+            const camposAtualizacao = {
+                nome,
+                nomepdv,
+                cidade,
+                estado,
+                gerente,
+                contato_gerente,
+                capitao,
+                contato_capitao
+            };
+
+            // Filtra apenas os campos que foram fornecidos
+            const dadosAtualizacao = Object.entries(camposAtualizacao)
+                .filter(([_, valor]) => valor !== undefined)
+                .reduce((acc, [chave, valor]) => ({
+                    ...acc,
+                    [chave]: valor
+                }), {});
+
+            if (Object.keys(dadosAtualizacao).length === 0) {
                 return res.status(400).json({
-                    erro: 'Dados inválidos',
-                    detalhes: {
-                        nome: nome ? 'presente' : 'ausente'
-                    }
+                    erro: 'Nenhum campo válido para atualização foi fornecido'
                 });
             }
 
-            const equipeAtualizada = await this.atualizarEquipe.executar(id, { nome });
-            // //console.log("✅ Equipe atualizada com sucesso:", equipeAtualizada);
+            const equipeAtualizada = await this.atualizarEquipe.executar(id, dadosAtualizacao);
 
-            return res.status(200).json(equipeAtualizada);
+            if (!equipeAtualizada) {
+                return res.status(404).json({ erro: 'Equipe não encontrada' });
+            }
+
+            return res.status(200).json({
+                id: equipeAtualizada.id,
+                nome: equipeAtualizada.nome,
+                nomepdv: equipeAtualizada.nomepdv,
+                cidade: equipeAtualizada.cidade,
+                estado: equipeAtualizada.estado,
+                gerente: equipeAtualizada.gerente,
+                contato_gerente: equipeAtualizada.contato_gerente,
+                capitao: equipeAtualizada.capitao,
+                contato_capitao: equipeAtualizada.contato_capitao
+            });
         } catch (erro) {
-            // console.error("❌ Erro ao atualizar equipe:", erro);
             return res.status(500).json({ 
                 erro: 'Erro interno ao atualizar equipe',
                 mensagem: (erro as Error).message 

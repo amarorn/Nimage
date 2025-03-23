@@ -1,0 +1,37 @@
+{
+  "code-health": {
+    "enabled": true,
+    "threshold": 80
+  },
+  "mcp": {
+    "enabled": true,
+    "autoConnect": true,
+    "defaultServer": "code-context",
+    "commands": {
+      "enabled": true,
+      "showInPalette": true,
+      "shortcuts": {
+        "openMCP": "cmd+shift+m",
+        "quickActions": "cmd+shift+a"
+      }
+    },
+    "notifications": {
+      "enabled": true,
+      "showInStatusBar": true
+    }
+  },
+  "mcpServers": [
+    {
+      "name": "code-context",
+      "url": "https://cursor.sh/api/mcp/code-context",
+      "type": "development",
+      "description": "Análise de código, revisão e geração de documentação para TypeScript/Node.js"
+    },
+    {
+      "name": "github",
+      "url": "https://api.github.com",
+      "type": "github",
+      "description": "Gerenciamento de repositórios, issues e busca de código via GitHub API"
+    }
+  ]
+}

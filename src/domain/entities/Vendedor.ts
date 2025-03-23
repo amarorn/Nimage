@@ -1,8 +1,11 @@
 export class Vendedor {
     constructor(
-        public readonly id: string,
+        public id: string,
         public nome: string,
-        public equipe_id: string,
-        public equipeDetalhes?: { id: string; nome: string } | null
+        public equipeId: string,
+        public email: string,
+        public telefone: string,
+        public meta: number,
+        public cargo: string
     ) {}
 }

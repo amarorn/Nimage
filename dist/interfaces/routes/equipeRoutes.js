@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const EquipeRepositoryImpl_1 = require("../../infrastructure/repositories/EquipeRepositoryImpl");
@@ -31,30 +22,31 @@ const atualizar = new AtualizarEquipe_1.AtualizarEquipe(equipeRepo);
 const obterEquipeDadosFull = new ObterEquipeDadosFull_1.ObterEquipeDadosFull(equipeRepo, vendedorRepo, atividadeRepo, metaRepo);
 const equipeMetaService = new EquipeMetaService_1.EquipeMetaService(obterEquipeDadosFull);
 const equipeController = new EquipeController_1.EquipeController(criarEquipe, obterEquipe, obterEquipeDadosFull, equipeMetaService, atualizar);
-router.post("/equipes", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/equipes", async (req, res) => {
     //console.log("📨 Nova requisição POST /equipes");
     return equipeController.criar(req, res);
-}));
-router.get("/equipes/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/equipes/all", async (req, res) => {
     //console.log("📨 Nova requisição GET /equipes");
-    const equipes = yield equipeController.obterTodos(req, res);
+    const equipes = await equipeController.obterTodos(req, res);
     return res.json(equipes);
-}));
-router.get("/equipes/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/equipes/:id", async (req, res) => {
     //console.log("📨 Nova requisição GET /equipes/:id");
     return equipeController.obterPorId(req, res);
-}));
-router.get("/equipes/:equipeId/dados-full", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/equipes/:equipeId/dados-full", async (req, res) => {
     //console.log("📨 Nova requisição GET /equipes/:equipeId/dados-full");
     return equipeController.obterDadosFull(req, res);
-}));
+});
 // Nova rota para calcular a meta
-router.get("/equipes/:equipeId/calcular-meta", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/equipes/:equipeId/calcular-meta", async (req, res) => {
     //console.log("📨 Nova requisição GET /equipes/:equipeId/calcular-meta");
     return equipeController.calcularMeta(req, res);
-}));
-router.put("/equipes/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.put("/equipes/:id", async (req, res) => {
     //console.log("📨 Nova requisição PUT /equipes/:id");
     return equipeController.atualizar(req, res);
-}));
+});
 exports.default = router;
+//# sourceMappingURL=equipeRoutes.js.map

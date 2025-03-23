@@ -1,15 +1,13 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose from 'mongoose';
 
-export interface IVendedor extends Document {
-    id: string;
-    nome: string;
-    equipe_id: string;
-}
-
-const VendedorSchema: Schema = new Schema({
+const vendedorSchema = new mongoose.Schema({
     id: { type: String, required: true, unique: true },
     nome: { type: String, required: true },
-    equipe_id: { type: String, required: true }
+    equipeId: { type: String, required: true },
+    email: { type: String, required: true },
+    telefone: { type: String, required: true },
+    meta: { type: Number, required: true },
+    cargo: { type: String, required: true }
 });
 
-export const VendedorModel = mongoose.model<IVendedor>("Vendedor", VendedorSchema);
+export const VendedorModel = mongoose.model('Vendedor', vendedorSchema);

@@ -8,23 +8,76 @@ export class EquipeRepositoryImpl implements EquipeRepository {
     }
 
     async obterPorId(id: string): Promise<Equipe | null> {
-        return await EquipeModel.findOne({ id }).lean();
-    }
-    
-    async obterTodos(skip: number, limit: number): Promise<Equipe[]> {
-        return await EquipeModel.find().skip(skip).limit(limit).lean();
+        const equipe = await EquipeModel.findOne({ id }).lean();
+        
+        if (equipe) {
+            return new Equipe(
+                equipe.id,
+                equipe.nome,
+                equipe.nomepdv,
+                equipe.cidade,
+                equipe.estado,
+                equipe.gerente,
+                equipe.contato_gerente,
+                equipe.capitao,
+                equipe.contato_capitao
+            );
+        }
+        return null;
     }
 
-    async atualizar(id: string, dados: { nome: string }): Promise<Equipe | null> {
+    async obterTodos(skip: number, limit: number): Promise<Equipe[]> {
+        const equipes = await EquipeModel.find().skip(skip).limit(limit).lean();
+        return equipes.map(equipe => new Equipe(
+            equipe.id,
+            equipe.nome,
+            equipe.nomepdv,
+            equipe.cidade,
+            equipe.estado,
+            equipe.gerente,
+            equipe.contato_gerente,
+            equipe.capitao,
+            equipe.contato_capitao
+        ));
+    }
+
+    async atualizar(id: string, dados: {
+        nome?: string;
+        nomepdv?: string;
+        cidade?: string;
+        estado?: string;
+        gerente?: string;
+        contato_gerente?: string;
+        capitao?: string;
+        contato_capitao?: string;
+    }): Promise<Equipe | null> {
         const equipeAtualizada = await EquipeModel.findOneAndUpdate(
             { id },
-            { nome: dados.nome },
+            { $set: dados },
             { new: true }
         ).lean();
 
         if (equipeAtualizada) {
-            return new Equipe(equipeAtualizada.id, equipeAtualizada.nome);
+            return new Equipe(
+                equipeAtualizada.id,
+                equipeAtualizada.nome,
+                equipeAtualizada.nomepdv,
+                equipeAtualizada.cidade,
+                equipeAtualizada.estado,
+                equipeAtualizada.gerente,
+                equipeAtualizada.contato_gerente,
+                equipeAtualizada.capitao,
+                equipeAtualizada.contato_capitao
+            );
         }
         return null;
+    }
+
+    async deletar(id: string): Promise<void> {
+        await EquipeModel.deleteOne({ id });
+    }
+
+    async deletarTodos(): Promise<void> {
+        await EquipeModel.deleteMany({});
     }
 }
