@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetVendedorInsights = void 0;
+const InsightsRepositoryImpl_1 = require("../../infrastructure/repositories/InsightsRepositoryImpl");
 class GetVendedorInsights {
     constructor(vendedorRepository, equipeRepository, atividadeRepository, metaRepository, ollamaService, atividadeService, frequenciaVendasService) {
         this.vendedorRepository = vendedorRepository;
@@ -10,10 +11,23 @@ class GetVendedorInsights {
         this.ollamaService = ollamaService;
         this.atividadeService = atividadeService;
         this.frequenciaVendasService = frequenciaVendasService;
+        this.insightsRepository = new InsightsRepositoryImpl_1.InsightsRepositoryImpl();
     }
     async execute(vendedorId, mes) {
         try {
             console.log('🔍 Iniciando busca de insights para vendedor:', vendedorId, 'mês:', mes);
+            // Verifica se já existem insights recentes no MongoDB
+            console.log('🔄 Verificando cache de insights...');
+            const insightsRecentes = await this.insightsRepository.obterInsightsMaisRecentes(vendedorId, mes || this.getMesAtual());
+            if (insightsRecentes) {
+                console.log('✅ Insights encontrados no cache e válidos');
+                console.log('📊 Dados do cache:', {
+                    dataConsulta: insightsRecentes.dataConsulta,
+                    mesReferencia: insightsRecentes.mesReferencia
+                });
+                return insightsRecentes.dados;
+            }
+            console.log('⚠️ Cache não encontrado ou expirado. Gerando novos insights...');
             // Busca dados do vendedor
             console.log('🔍 Buscando dados do vendedor...');
             const vendedor = await this.vendedorRepository.obterPorId(vendedorId);
@@ -59,6 +73,13 @@ class GetVendedorInsights {
             console.log('🔍 Gerando insights...');
             const insights = await this.ollamaService.getInsights(vendorInfo);
             console.log('🎉 Insights gerados:', insights);
+            if (!insights || !insights.resultado || !insights.resultado.vendedor) {
+                throw new Error('Formato de insights inválido');
+            }
+            // Salva os insights no MongoDB
+            console.log('💾 Salvando novos insights no MongoDB...');
+            await this.insightsRepository.salvarInsights(vendedorId, mes || this.getMesAtual(), insights);
+            console.log('✅ Novos insights salvos com sucesso!');
             return insights;
         }
         catch (error) {
@@ -216,6 +237,10 @@ class GetVendedorInsights {
         }));
         console.log('✅ Histórico de vendas preparado:', historicoFormatado);
         return historicoFormatado;
+    }
+    getMesAtual() {
+        const hoje = new Date();
+        return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;
     }
 }
 exports.GetVendedorInsights = GetVendedorInsights;

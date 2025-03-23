@@ -1,8 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FormatterService = void 0;
-const date_fns_1 = require("date-fns");
-const locale_1 = require("date-fns/locale");
 class FormatterService {
     formatVendorData(vendorData) {
         console.log("🚀 ~ FormatterService ~ formatVendorData ~ vendorData:", vendorData);
@@ -10,16 +8,27 @@ class FormatterService {
         const equipe = vendorData.resultado.equipe;
         const vendedor = vendorData.resultado.vendedor;
         const mesRequisicao = vendorData.mesRequisicao;
-        const [ano, mes] = mesRequisicao.split('-').map(Number);
-        console.log("📅 Ano:", ano, "Mês:", mes);
-        const nextMonthDate = new Date(ano, mes - 1 + 1, 1); // Mês seguinte
-        console.log("🚀 Próximo mês:", nextMonthDate);
-        const followingMonthDate = new Date(ano, mes - 1 + 2, 1); // Mês subsequente
-        console.log("🚀 Mês subsequente:", followingMonthDate);
         if (!mesRequisicao) {
             console.error("❌ Mês da requisição não fornecido!");
             throw new Error("Mês da requisição é obrigatório");
         }
+        // Calcula os próximos dois meses
+        const [ano, mes] = mesRequisicao.split('-').map(Number);
+        const dataBase = new Date(ano, mes - 1, 1);
+        const nextMonth = new Date(dataBase);
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        const followingMonth = new Date(dataBase);
+        followingMonth.setMonth(followingMonth.getMonth() + 2);
+        // Formata os nomes dos meses em português
+        const formatarMes = (data) => {
+            return data.toLocaleDateString('pt-BR', { month: 'long' });
+        };
+        const nextMonthName = formatarMes(nextMonth);
+        const followingMonthName = formatarMes(followingMonth);
+        console.log("📅 Nomes dos meses:", {
+            proximo: nextMonthName,
+            seguinte: followingMonthName
+        });
         const formattedData = {
             "meta_anterior": this.formatCurrency(equipe.meta),
             "novaMetaEquipe": this.formatCurrency(equipe.meta),
@@ -64,7 +73,16 @@ class FormatterService {
                     ],
                     "dadosGrafico": {
                         "historico": vendedor.dadosGrafico.historico || [],
-                        "previsao": this.generateDailyForecast(vendedor.somaDocinhos / 6 * 1.2, vendedor.dadosGrafico.historico, mesRequisicao)
+                        "previsao": [
+                            {
+                                mes: nextMonthName.charAt(0).toUpperCase() + nextMonthName.slice(1),
+                                valor: Math.round(vendedor.somaDocinhos * 1.1)
+                            },
+                            {
+                                mes: followingMonthName.charAt(0).toUpperCase() + followingMonthName.slice(1),
+                                valor: Math.round(vendedor.somaDocinhos * 1.2)
+                            }
+                        ]
                     }
                 }]
         };
@@ -124,6 +142,25 @@ class FormatterService {
         ];
     }
     formatModelResponse(modelResponse) {
+        // Calcula os próximos dois meses
+        const [ano, mes] = modelResponse.vendedores[0].dadosGrafico.historico[0].mes.split('-').map(Number);
+        const dataBase = new Date(ano, mes - 1, 1);
+        const nextMonth = new Date(dataBase);
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        const followingMonth = new Date(dataBase);
+        followingMonth.setMonth(followingMonth.getMonth() + 2);
+        // Formata os nomes dos meses em português
+        const formatarMes = (data) => {
+            return data.toLocaleDateString('pt-BR', { month: 'long' });
+        };
+        const nextMonthName = formatarMes(nextMonth);
+        const followingMonthName = formatarMes(followingMonth);
+        console.log("📅 Nomes dos meses:", {
+            proximo: nextMonthName,
+            seguinte: followingMonthName
+        });
+        const vendedor = modelResponse.vendedores[0];
+        const somaDocinhos = vendedor.metricas.totalVendas.replace(/[^0-9]/g, '');
         return {
             meta_anterior: modelResponse.meta_anterior,
             novaMetaEquipe: modelResponse.novaMetaEquipe,
@@ -145,7 +182,19 @@ class FormatterService {
                 pontosFortes: vendedor.pontosFortes,
                 pontosFracos: vendedor.pontosFracos,
                 estrategiasPersonalizadas: vendedor.estrategiasPersonalizadas,
-                dadosGrafico: vendedor.dadosGrafico
+                dadosGrafico: {
+                    historico: vendedor.dadosGrafico.historico,
+                    previsao: [
+                        {
+                            mes: nextMonthName.charAt(0).toUpperCase() + nextMonthName.slice(1),
+                            valor: Math.round(Number(somaDocinhos) * 1.1)
+                        },
+                        {
+                            mes: followingMonthName.charAt(0).toUpperCase() + followingMonthName.slice(1),
+                            valor: Math.round(Number(somaDocinhos) * 1.2)
+                        }
+                    ]
+                }
             }))
         };
     }
@@ -219,21 +268,70 @@ class FormatterService {
             return "Iniciante";
         }
     }
-    generateDailyForecast(monthlyValue, historico, mesRequisicao) {
+    async generateDailyForecast(monthlyValue, historico, mesRequisicao) {
         console.log("📅 Gerando previsão para o mês:", mesRequisicao);
-        const dataBase = (0, date_fns_1.parse)(mesRequisicao, 'yyyy-MM', new Date());
-        const nextMonth = (0, date_fns_1.addMonths)(dataBase, 1);
-        const followingMonth = (0, date_fns_1.addMonths)(dataBase, 2);
+        const [ano, mes] = mesRequisicao.split('-').map(Number);
+        const dataBase = new Date(ano, mes - 1, 1);
+        // Calcula os próximos dois meses
+        const nextMonth = new Date(dataBase);
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        const followingMonth = new Date(dataBase);
+        followingMonth.setMonth(followingMonth.getMonth() + 2);
+        console.log("📅 Datas calculadas:", {
+            dataBase: dataBase.toISOString(),
+            nextMonth: nextMonth.toISOString(),
+            followingMonth: followingMonth.toISOString()
+        });
+        // Formata os nomes dos meses em português
+        const formatarMes = (data) => {
+            return data.toLocaleDateString('pt-BR', { month: 'long' });
+        };
+        const nextMonthName = formatarMes(nextMonth);
+        const followingMonthName = formatarMes(followingMonth);
+        console.log("📅 Nomes dos meses:", {
+            proximo: nextMonthName,
+            seguinte: followingMonthName
+        });
+        const nextMonthValue = await this.getPredictionFromModel(`
+Data: ${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}-01
+Meta atual: ${monthlyValue}
+Fator de ajuste: 1.1`, monthlyValue);
+        const followingMonthValue = await this.getPredictionFromModel(`
+Data: ${followingMonth.getFullYear()}-${String(followingMonth.getMonth() + 1).padStart(2, '0')}-01
+Meta atual: ${monthlyValue}
+Fator de ajuste: 1.2`, monthlyValue);
         return [
             {
-                mes: (0, date_fns_1.format)(nextMonth, 'MMMM', { locale: locale_1.ptBR }),
-                valor: Math.round(monthlyValue * 1.1)
+                mes: nextMonthName.charAt(0).toUpperCase() + nextMonthName.slice(1),
+                valor: nextMonthValue
             },
             {
-                mes: (0, date_fns_1.format)(followingMonth, 'MMMM', { locale: locale_1.ptBR }),
-                valor: Math.round(monthlyValue * 1.2)
+                mes: followingMonthName.charAt(0).toUpperCase() + followingMonthName.slice(1),
+                valor: followingMonthValue
             }
         ];
+    }
+    async getPredictionFromModel(prompt, monthlyValue) {
+        try {
+            const response = await fetch('http://localhost:11434/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'nimage',
+                    messages: [{ role: 'user', content: prompt }],
+                    stream: false
+                })
+            });
+            if (!response.ok) {
+                throw new Error(`Erro na chamada do modelo: ${response.status}`);
+            }
+            const result = await response.json();
+            return parseInt(result.message.content.trim());
+        }
+        catch (error) {
+            console.error('Erro ao obter previsão do modelo:', error);
+            return Math.round(monthlyValue * 1.1); // Fallback para cálculo simples
+        }
     }
 }
 exports.FormatterService = FormatterService;

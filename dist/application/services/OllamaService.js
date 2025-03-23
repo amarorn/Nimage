@@ -30,7 +30,6 @@ class OllamaService {
         }
     }
     async getInsights(vendorInfo) {
-        var _a;
         try {
             if (!vendorInfo || !vendorInfo.resultado) {
                 throw new Error('Invalid vendorInfo structure');
@@ -45,14 +44,6 @@ class OllamaService {
                 metaEquipe: metaEquipe,
                 metaAnterior: vendorInfo.resultado.equipe.meta_anterior
             });
-            // Log detalhado do mês anterior
-            console.log('\n📊 Dados do Mês Anterior:');
-            console.log('------------------------');
-            console.log(`🎯 Meta da Equipe: ${vendorInfo.resultado.equipe.meta_anterior}`);
-            console.log(`🍪 Total de Docinhos do Vendedor: ${vendedor.vendasMesAnterior}`);
-            console.log(`📈 Total de Vendas da Equipe: ${vendedor.totalVendasEquipeMesAnterior}`);
-            console.log(`📅 Período: ${vendorInfo.resultado.equipe.periodoMetaAnterior || 'Não especificado'}`);
-            console.log('------------------------\n');
             // Calcula o percentual de contribuição para a meta da equipe usando dados do mês anterior
             const vendasMesAnterior = parseFloat(vendedor.vendasMesAnterior) || 0;
             const totalVendasEquipeMesAnterior = parseFloat(vendedor.totalVendasEquipeMesAnterior) || 1;
@@ -91,223 +82,93 @@ class OllamaService {
                         -percentualContribuicao * 100 * 0.9; // Se negativo, -90% do percentual de contribuição
                 }
             }
-            // Atualiza o objeto vendedor original com os valores calculados
-            vendedor.percentualContribuicao = percentualContribuicaoFormatado.replace('%', '').replace(',', '.') + '%';
-            vendedor.percentualCrescimento = percentualCrescimento.toFixed(2);
-            // Prepara dados para análise
-            const analysisPrompt = `Você é um assistente especializado em análise de dados de vendas.
-
-DADOS DO VENDEDOR:
-${JSON.stringify({
-                nome: vendedor.nome,
-                fea: vendedor.feaVendedor,
-                iap: vendedor.iapVendedor,
-                dias_ativos: vendedor.numeroDiasComAtividade,
-                total_vendas: vendedor.somaDocinhos,
-                media_diaria: vendedor.mediaAtividadePorDia,
-                meta_individual: metaIndividual.toFixed(2),
-                meta_equipe: metaEquipe,
-                contribuicao: percentualContribuicaoFormatado,
-                historico: vendedor.historicoVendas || [],
-                percentualCrescimento: vendedor.percentualCrescimento
-            }, null, 2)}
-
-RETORNE EXATAMENTE ESTE JSON PREENCHIDO (MANTENHA A ESTRUTURA EXATA):
-
-{
-  "perfilVendas": "Vendedor experiente com alto FEA",
-  "tendencias": ["Crescimento constante nas vendas", "Aumento na média diária"],
-  "pontosFracos": ["Baixa conversão", "Poucos clientes novos"],
-  "pontosFortes": ["Alta eficiência", "Bom relacionamento"],
-  "recomendacoes": ["Aumentar base de clientes", "Focar em produtos premium"],
-  "projecaoCrescimento": "Crescimento de 15% esperado",
-  "probabilidadeCrescimento": "75%",
-  "fatorAjusteMeta": 0.8,
-  "novaMeta": 65000,
-  "estrategiasPersonalizadas": ["Visitar clientes VIP", "Oferecer pacotes especiais"],
-  "historico": [
-    {"mes": "Janeiro", "valor": 37500},
-    {"mes": "Fevereiro", "valor": 37500},
-    {"mes": "Março", "valor": 37500},
-    {"mes": "Abril", "valor": 37500}
-  ],
-  "previsao": [
-    {"mes": "Maio", "valor": 43125},
-    {"mes": "Junho", "valor": 49594}
-  ],
-  "analise_historico": {
-    "crescimento_periodo": "Crescimento constante no período analisado",
-    "tendencias_identificadas": ["Aumento gradual nas vendas", "Melhoria na performance"],
-    "pontos_melhoria": ["Aumentar volume de vendas", "Melhorar conversão"],
-    "estrategias_historico": ["Foco em produtos principais", "Atendimento personalizado"]
-  }
-}
-
-- Use os dados de histórico de vendas para detectar padrões de crescimento
-- Identifique tendências de vendas (ex: aumento de ticket médio, vendas em dias específicos)
-- Aponte pontos de melhoria com base em atividades e metas
-- Sugira estratégias com base nos padrões do histórico
-- NÃO escreva nada além do JSON de saída
-
-IMPORTANTE:
-1. Use os dados de histórico de vendas para detectar padrões de crescimento
-2. Identifique tendências de vendas (ex: aumento de ticket médio, vendas em dias específicos)
-3. Aponte pontos de melhoria com base em atividades e metas
-4. Sugira estratégias com base nos padrões do histórico
-5. MANTENHA EXATAMENTE A MESMA ESTRUTURA DO JSON ACIMA
-6. APENAS ALTERE OS VALORES, NÃO MUDE OS CAMPOS
-7. NÃO ADICIONE CAMPOS NOVOS
-8. NÃO REMOVA CAMPOS EXISTENTES
-9. NÃO INCLUA NENHUM TEXTO ANTES OU DEPOIS DO JSON
-10. O CAMPO "tendencias" DEVE SER UM ARRAY COM PELO MENOS UM ITEM
-11. TODOS OS ARRAYS DEVEM TER PELO MENOS UM ITEM`;
-            const response = await (0, node_fetch_1.default)(`${this.baseUrl}/chat`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: 'nimage',
-                    messages: [
-                        {
-                            role: 'system',
-                            content: 'Você é um analisador de dados de vendas que SEMPRE retorna APENAS JSON válido, sem texto adicional.'
+            // Calcula os próximos dois meses
+            const [ano, mes] = vendorInfo.mesRequisicao.split('-').map(Number);
+            const dataBase = new Date(ano, mes - 1, 1);
+            const nextMonth = new Date(dataBase);
+            nextMonth.setMonth(nextMonth.getMonth() + 1);
+            const followingMonth = new Date(dataBase);
+            followingMonth.setMonth(followingMonth.getMonth() + 2);
+            // Formata os nomes dos meses em português
+            const formatarMes = (data) => {
+                return data.toLocaleDateString('pt-BR', { month: 'long' });
+            };
+            const nextMonthName = formatarMes(nextMonth);
+            const followingMonthName = formatarMes(followingMonth);
+            // Prepara o histórico de vendas
+            const historico = vendedor.historicoVendas || [];
+            console.log('📊 Histórico de vendas:', historico);
+            // Calcula a média diária para previsão
+            const mediaDiaria = vendedor.mediaAtividadePorDia || 0;
+            const diasNoMes = 30; // Assumindo 30 dias para previsão
+            // Calcula o crescimento baseado na meta da equipe
+            const crescimentoMeta = (metaEquipeNumerico - metaAnterior) / metaAnterior;
+            const crescimentoVendas = (vendedor.somaDocinhos - vendasMesAnterior) / vendasMesAnterior;
+            // Ajusta o fator de crescimento baseado no desempenho do vendedor em relação à equipe
+            const fatorCrescimentoNextMonth = 1 + (crescimentoMeta * 0.5) + (crescimentoVendas * 0.3);
+            const fatorCrescimentoFollowingMonth = 1 + (crescimentoMeta * 0.7) + (crescimentoVendas * 0.5);
+            // Gera previsão dia a dia para os próximos dois meses
+            const previsaoNextMonth = Array.from({ length: diasNoMes }, (_, i) => ({
+                dia: i + 1,
+                valor: Math.round(mediaDiaria * (1 + (i / diasNoMes) * (fatorCrescimentoNextMonth - 1)))
+            }));
+            const previsaoFollowingMonth = Array.from({ length: diasNoMes }, (_, i) => ({
+                dia: i + 1,
+                valor: Math.round(mediaDiaria * (1 + (i / diasNoMes) * (fatorCrescimentoFollowingMonth - 1)))
+            }));
+            // Retorna o resultado formatado conforme o modelo solicitado
+            return {
+                resultado: {
+                    vendedor: {
+                        nome: vendedor.nome,
+                        feaVendedor: vendedor.feaVendedor,
+                        iapVendedor: vendedor.iapVendedor,
+                        numeroDiasComAtividade: vendedor.numeroDiasComAtividade,
+                        somaDocinhos: vendedor.somaDocinhos,
+                        mediaAtividadePorDia: vendedor.mediaAtividadePorDia,
+                        percentualContribuicao: percentualContribuicaoFormatado.replace('%', '').replace(',', '.') + '%',
+                        percentualCrescimento: percentualCrescimento.toFixed(2),
+                        pesoNaEquipe: (1 / vendedor.totalVendedores * 100).toFixed(2),
+                        distribuicaoMeta: metaIndividual.toFixed(2),
+                        desempenhoDiarioIdeal: (metaIndividual / 22).toFixed(2),
+                        equipe: {
+                            meta: metaEquipeNumerico,
+                            meta_anterior: metaAnterior,
+                            totalVendedores: vendedor.totalVendedores,
+                            mediaEquipe: vendedor.mediaEquipeMesAnterior,
+                            totalVendasMesAnterior: vendedor.totalVendasEquipeMesAnterior,
+                            crescimentoMeta: (crescimentoMeta * 100).toFixed(2) + '%',
+                            crescimentoVendas: (crescimentoVendas * 100).toFixed(2) + '%',
+                            diferenca: (metaEquipeNumerico - metaAnterior).toFixed(2),
+                            periodoMetaAnterior: vendorInfo.resultado.equipe.periodoMetaAnterior
                         },
-                        {
-                            role: 'user',
-                            content: analysisPrompt
+                        dadosGrafico: {
+                            historico: historico,
+                            previsao: [
+                                {
+                                    mes: nextMonthName.charAt(0).toUpperCase() + nextMonthName.slice(1),
+                                    valor: previsaoNextMonth.reduce((acc, curr) => acc + curr.valor, 0),
+                                    detalhes: previsaoNextMonth
+                                },
+                                {
+                                    mes: followingMonthName.charAt(0).toUpperCase() + followingMonthName.slice(1),
+                                    valor: previsaoFollowingMonth.reduce((acc, curr) => acc + curr.valor, 0),
+                                    detalhes: previsaoFollowingMonth
+                                }
+                            ]
+                        },
+                        analiseHistorico: {
+                            crescimentoPeriodo: "Crescimento constante no período analisado",
+                            tendenciasIdentificadas: ["Aumento gradual nas vendas"],
+                            pontosMelhoria: ["Aumentar volume de vendas"],
+                            estrategiasHistorico: ["Foco em produtos principais"]
                         }
-                    ],
-                    stream: false,
-                    options: {
-                        num_ctx: 4096,
-                        temperature: 0.7,
-                        top_k: 40,
-                        top_p: 0.9
-                    }
-                }),
-            });
-            if (!response.ok) {
-                console.error(`❌ Erro na chamada do Ollama: ${response.status} - ${response.statusText}`);
-                throw new Error(`Erro na chamada do Ollama: ${response.status}`);
-            }
-            const result = await response.json();
-            // Processa a resposta do Ollama
-            let analysis;
-            try {
-                console.log('\n🤖 Resposta bruta do Ollama:', result);
-                if (!((_a = result.message) === null || _a === void 0 ? void 0 : _a.content)) {
-                    console.error('❌ Resposta do Ollama está vazia');
-                    throw new Error('Resposta do Ollama está vazia');
-                }
-                // Remove caracteres especiais e espaços extras
-                const cleanResponse = result.message.content
-                    .replace(/\\n/g, ' ')
-                    .replace(/\\"/g, '"')
-                    .replace(/\\\\/g, '\\')
-                    .replace(/\n/g, ' ')
-                    .replace(/\r/g, ' ')
-                    .replace(/\t/g, ' ')
-                    .replace(/\s+/g, ' ')
-                    .trim();
-                console.log('\n🧹 Resposta limpa:', cleanResponse);
-                // Tenta encontrar um JSON válido na resposta
-                const jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
-                if (!jsonMatch) {
-                    console.error('❌ Nenhum JSON válido encontrado na resposta');
-                    throw new Error('Resposta não contém JSON válido');
-                }
-                console.log('\n📝 JSON encontrado:', jsonMatch[0]);
-                // Normaliza as chaves do JSON
-                let jsonStr = jsonMatch[0];
-                try {
-                    // Tenta fazer o parse direto primeiro
-                    analysis = JSON.parse(jsonStr);
-                    console.log('\n✅ JSON parseado com sucesso!');
-                }
-                catch (parseError) {
-                    console.log('\n⚠️ Erro no parse direto, tentando normalizar o JSON...');
-                    // Se falhar, tenta normalizar o JSON
-                    jsonStr = jsonStr
-                        .replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":')
-                        .replace(/:\s*'([^']*)'/g, ':"$1"')
-                        .replace(/,(\s*[}\]])/g, '$1');
-                    console.log('\n🔄 JSON normalizado:', jsonStr);
-                    try {
-                        analysis = JSON.parse(jsonStr);
-                        console.log('\n✅ JSON parseado com sucesso após normalização!');
-                    }
-                    catch (normalizeError) {
-                        console.error('\n❌ Erro ao fazer parse do JSON normalizado:', normalizeError);
-                        throw new Error('JSON inválido após normalização');
                     }
                 }
-                // Calcular percentual de contribuição
-                const totalVendasEquipe = Number(vendedor.totalVendasEquipeMesAnterior);
-                const vendasVendedor = Number(vendedor.vendasMesAnterior);
-                const percentualContribuicao = (vendasVendedor / totalVendasEquipe) * 100;
-                // Calcular percentual de crescimento
-                const percentualCrescimento = Number(vendedor.percentualCrescimento);
-                // Calcular peso na equipe
-                const totalVendedores = Number(vendedor.totalVendedores);
-                const pesoNaEquipe = (1 / totalVendedores) * 100;
-                // Calcular distribuição da meta
-                const metaEquipe = Number(vendorInfo.resultado.equipe.meta);
-                const distribuicaoMeta = metaEquipe / totalVendedores;
-                // Calcular desempenho diário ideal
-                const diasUteis = 22; // Média de dias úteis por mês
-                const desempenhoDiarioIdeal = distribuicaoMeta / diasUteis;
-                const vendedorReorganizado = {
-                    nome: vendedor.nome,
-                    feaVendedor: vendedor.feaVendedor,
-                    iapVendedor: vendedor.iapVendedor,
-                    numeroDiasComAtividade: vendedor.numeroDiasComAtividade,
-                    somaDocinhos: vendedor.somaDocinhos,
-                    mediaAtividadePorDia: vendedor.mediaAtividadePorDia,
-                    percentualContribuicao: percentualContribuicao.toFixed(2),
-                    percentualCrescimento: percentualCrescimento.toFixed(2),
-                    pesoNaEquipe: pesoNaEquipe.toFixed(2),
-                    distribuicaoMeta: distribuicaoMeta.toFixed(2),
-                    desempenhoDiarioIdeal: desempenhoDiarioIdeal.toFixed(2),
-                    dadosGrafico: {
-                        historico: vendedor.historicoVendas,
-                        previsao: analysis.previsao
-                    },
-                    analiseHistorico: {
-                        crescimentoPeriodo: analysis.analise_historico.crescimento_periodo,
-                        tendenciasIdentificadas: analysis.analise_historico.tendencias_identificadas,
-                        pontosMelhoria: analysis.analise_historico.pontos_melhoria,
-                        estrategiasHistorico: analysis.analise_historico.estrategias_historico
-                    }
-                };
-                console.log('\n✅ Resultado da análise:');
-                console.log('=========================\n');
-                console.log('👤 Informações do Vendedor:');
-                console.log('---------------------------');
-                console.log(`Nome: ${vendedor.nome}`);
-                console.log(`FEA: ${vendedor.feaVendedor}`);
-                console.log(`IAP: ${vendedor.iapVendedor}`);
-                console.log(`Dias com Atividade: ${vendedor.numeroDiasComAtividade}`);
-                console.log(`Total de Docinhos: ${vendedor.somaDocinhos.toLocaleString()}`);
-                console.log(`Média por Dia: ${vendedor.mediaAtividadePorDia.toLocaleString()}\n`);
-                console.log('📈 Métricas de Performance:');
-                console.log('---------------------------');
-                console.log(`Percentual de Contribuição: ${vendedorReorganizado.percentualContribuicao}%`);
-                console.log(`Percentual de Crescimento: ${vendedorReorganizado.percentualCrescimento}%`);
-                console.log(`Peso na Equipe: ${vendedorReorganizado.pesoNaEquipe}%`);
-                console.log(`Distribuição da Meta: ${vendedorReorganizado.distribuicaoMeta}`);
-                console.log(`Desempenho Diário Ideal: ${vendedorReorganizado.desempenhoDiarioIdeal}\n`);
-                return {
-                    resultado: {
-                        vendedor: vendedorReorganizado
-                    }
-                };
-            }
-            catch (error) {
-                console.error('\n❌ Erro ao processar resposta do Ollama:', error);
-                throw error;
-            }
+            };
         }
         catch (error) {
-            console.error('\n❌ Erro ao gerar insights:', error);
+            console.error('Error in getInsights:', error);
             throw error;
         }
     }

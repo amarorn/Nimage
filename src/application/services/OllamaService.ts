@@ -116,33 +116,52 @@ export class OllamaService {
             const mediaDiaria = vendedor.mediaAtividadePorDia || 0;
             const diasNoMes = 30; // Assumindo 30 dias para previsão
 
+            // Calcula o crescimento baseado na meta da equipe
+            const crescimentoMeta = (metaEquipeNumerico - metaAnterior) / metaAnterior;
+            const crescimentoVendas = (vendedor.somaDocinhos - vendasMesAnterior) / vendasMesAnterior;
+
+            // Ajusta o fator de crescimento baseado no desempenho do vendedor em relação à equipe
+            const fatorCrescimentoNextMonth = 1 + (crescimentoMeta * 0.5) + (crescimentoVendas * 0.3);
+            const fatorCrescimentoFollowingMonth = 1 + (crescimentoMeta * 0.7) + (crescimentoVendas * 0.5);
+
             // Gera previsão dia a dia para os próximos dois meses
             const previsaoNextMonth = Array.from({ length: diasNoMes }, (_, i) => ({
                 dia: i + 1,
-                valor: Math.round(mediaDiaria * (1 + (i / diasNoMes) * 0.1)) // Crescimento gradual de 10%
+                valor: Math.round(mediaDiaria * (1 + (i / diasNoMes) * (fatorCrescimentoNextMonth - 1)))
             }));
 
             const previsaoFollowingMonth = Array.from({ length: diasNoMes }, (_, i) => ({
                 dia: i + 1,
-                valor: Math.round(mediaDiaria * (1 + (i / diasNoMes) * 0.2)) // Crescimento gradual de 20%
+                valor: Math.round(mediaDiaria * (1 + (i / diasNoMes) * (fatorCrescimentoFollowingMonth - 1)))
             }));
 
             // Retorna o resultado formatado conforme o modelo solicitado
             return {
                 resultado: {
                     vendedor: {
-                        nome: vendedor.nome,
-                        feaVendedor: vendedor.feaVendedor,
-                        iapVendedor: vendedor.iapVendedor,
-                        numeroDiasComAtividade: vendedor.numeroDiasComAtividade,
-                        somaDocinhos: vendedor.somaDocinhos,
-                        mediaAtividadePorDia: vendedor.mediaAtividadePorDia,
+                    nome: vendedor.nome,
+                    feaVendedor: vendedor.feaVendedor,
+                    iapVendedor: vendedor.iapVendedor,
+                    numeroDiasComAtividade: vendedor.numeroDiasComAtividade,
+                    somaDocinhos: vendedor.somaDocinhos,
+                    mediaAtividadePorDia: vendedor.mediaAtividadePorDia,
                         percentualContribuicao: percentualContribuicaoFormatado.replace('%', '').replace(',', '.') + '%',
-                        percentualCrescimento: percentualCrescimento.toFixed(2),
+                    percentualCrescimento: percentualCrescimento.toFixed(2),
                         pesoNaEquipe: (1 / vendedor.totalVendedores * 100).toFixed(2),
                         distribuicaoMeta: metaIndividual.toFixed(2),
                         desempenhoDiarioIdeal: (metaIndividual / 22).toFixed(2),
-                        dadosGrafico: {
+                        equipe: {
+                            meta: metaEquipeNumerico,
+                            meta_anterior: metaAnterior,
+                            totalVendedores: vendedor.totalVendedores,
+                            mediaEquipe: vendedor.mediaEquipeMesAnterior,
+                            totalVendasMesAnterior: vendedor.totalVendasEquipeMesAnterior,
+                            crescimentoMeta: (crescimentoMeta * 100).toFixed(2) + '%',
+                            crescimentoVendas: (crescimentoVendas * 100).toFixed(2) + '%',
+                            diferenca: (metaEquipeNumerico - metaAnterior).toFixed(2),
+                            periodoMetaAnterior: vendorInfo.resultado.equipe.periodoMetaAnterior
+                        },
+                    dadosGrafico: {
                             historico: historico,
                             previsao: [
                                 {
@@ -156,8 +175,8 @@ export class OllamaService {
                                     detalhes: previsaoFollowingMonth
                                 }
                             ]
-                        },
-                        analiseHistorico: {
+                    },
+                    analiseHistorico: {
                             crescimentoPeriodo: "Crescimento constante no período analisado",
                             tendenciasIdentificadas: ["Aumento gradual nas vendas"],
                             pontosMelhoria: ["Aumentar volume de vendas"],
