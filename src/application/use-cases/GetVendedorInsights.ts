@@ -66,7 +66,11 @@ export class GetVendedorInsights {
 
             // Busca meta da equipe
             console.log('🔍 Buscando metas da equipe...');
-            const meta = await this.metaRepository.obterPorEquipe(equipe.id);
+            const meta = await this.metaRepository.obterPorEquipeEData(
+                equipe.id,
+                datas.dataInicio,
+                datas.dataFim
+            );
             const metaAnterior = await this.metaRepository.obterPorEquipeEData(
                 equipe.id,
                 datas.mesAnteriorInicio,
@@ -115,16 +119,26 @@ export class GetVendedorInsights {
             const insights = await this.ollamaService.getInsights(vendorInfo);
             console.log('🎉 Insights gerados:', insights);
 
-            if (!insights || !insights.resultado || !insights.resultado.vendedor) {
-                throw new Error('Formato de insights inválido');
-            }
+            // Combina os dados formatados com os insights
+            const resultadoFinal = {
+                ...vendorInfo,
+                resultado: {
+                    ...vendorInfo.resultado,
+                    analiseDeCrescimento: {
+                        ...vendorInfo.resultado.analiseDeCrescimento,
+                        tendencia: insights.tendencia,
+                        observacoes: insights.observacoes,
+                        recomendacoes: insights.recomendacoes
+                    }
+                }
+            };
 
             // Salva os insights no MongoDB
             console.log('💾 Salvando novos insights no MongoDB...');
-            await this.insightsRepository.salvarInsights(vendedorId, mes || this.getMesAtual(), insights);
+            await this.insightsRepository.salvarInsights(vendedorId, mes || this.getMesAtual(), resultadoFinal);
             console.log('✅ Novos insights salvos com sucesso!');
 
-            return insights;
+            return resultadoFinal;
         } catch (error) {
             console.error('❌ Erro ao gerar insights:', error);
             throw error;
@@ -187,11 +201,17 @@ export class GetVendedorInsights {
             0
         );
 
+        // Calcula a média de vendas do vendedor no mês anterior
+        const mediaVendedorMesAnterior = atividadesMesAnterior.length > 0 
+            ? totalDocinhosMesAnterior / atividadesMesAnterior.length 
+            : 0;
+
         console.log('📊 Métricas básicas calculadas:', {
             diasComAtividade,
             totalDocinhos,
             mediaPorDia,
-            totalDocinhosMesAnterior
+            totalDocinhosMesAnterior,
+            mediaVendedorMesAnterior
         });
 
         const vendedoresEquipe = await this.vendedorRepository.obterPorEquipeId(equipe.id);
@@ -249,6 +269,7 @@ export class GetVendedorInsights {
             totalDocinhos,
             mediaPorDia,
             totalDocinhosMesAnterior,
+            mediaVendedorMesAnterior,
             totalVendedores,
             totalVendasEquipeMesAnterior,
             mediaEquipeVendas,
@@ -267,8 +288,6 @@ export class GetVendedorInsights {
         const historicoVendas = this.prepararHistoricoVendas(metricas.atividades);
         console.log('📊 Histórico de vendas preparado:', historicoVendas);
 
-        
-
         const dadosAnalise = {
             mesRequisicao: mesRequisicao,
             resultado: {
@@ -279,19 +298,19 @@ export class GetVendedorInsights {
                     numeroDiasComAtividade: metricas.diasComAtividade,
                     somaDocinhos: metricas.totalDocinhos,
                     mediaAtividadePorDia: metricas.mediaPorDia,
-                    historicoVendas,
-                    vendasMesAnterior: metricas.totalDocinhosMesAnterior,
+                    vendasMesAnterior: metricas.totalVendasEquipeMesAnterior,
+                    mediaVendedorMesAnterior: metricas.mediaVendedorMesAnterior,
                     mediaEquipeMesAnterior: metricas.mediaEquipeVendas,
-                    totalVendedores: metricas.totalVendedores,
-                    totalVendasEquipeMesAnterior: metricas.totalVendasEquipeMesAnterior,
+                    totalVendasMesAnterior: metricas.totalDocinhosMesAnterior,
                     periodoAnalise: {
                         inicio: metricas.datas.dataInicio.toISOString(),
                         fim: metricas.datas.dataFim.toISOString()
                     }
                 },
                 equipe: {
-                    meta: metricas.meta?.objetivo || 0,
+                    meta_atual: metricas.meta?.objetivo || 0,
                     meta_anterior: metricas.metaAnterior?.objetivo || 0,
+                    meta_sugerida: Math.round(metricas.meta?.objetivo * (1 + (metricas.fea / 100))),
                     totalVendedores: metricas.totalVendedores,
                     mediaEquipe: metricas.mediaEquipeVendas,
                     totalVendasMesAnterior: metricas.totalVendasEquipeMesAnterior,
@@ -299,7 +318,19 @@ export class GetVendedorInsights {
                         inicio: metricas.datas.mesAnteriorInicio.toISOString(),
                         fim: metricas.datas.mesAnteriorFim.toISOString()
                     }
+                },
+                analiseDeCrescimento: {
+                    mediaMovel7Dias: [],
+                    variacaoPercentualMensal: ((metricas.totalVendasEquipeMesAnterior - metricas.totalDocinhos) / metricas.totalDocinhos * 100).toFixed(2) + "%",
+                    tendencia: "",
+                    observacoes: [],
+                    recomendacoes: []
                 }
+            },
+            dadosGrafico: {
+                historico: historicoVendas,
+                previsao: this.gerarPrevisao(historicoVendas, metricas.mediaPorDia),
+                totaldevedas: metricas.totalDocinhos
             }
         };
 
@@ -337,6 +368,46 @@ export class GetVendedorInsights {
 
         console.log('✅ Histórico de vendas preparado:', historicoFormatado);
         return historicoFormatado;
+    }
+
+    private gerarPrevisao(historicoVendas: any[], mediaPorDia: number): any[] {
+        console.log('🔄 Gerando previsão de vendas...');
+        
+        // Pega o último mês do histórico
+        const ultimoMes = historicoVendas[historicoVendas.length - 1]?.mes || 'Janeiro';
+        const ultimoValor = historicoVendas[historicoVendas.length - 1]?.valor || 0;
+        
+        // Lista de meses em português
+        const meses = [
+            'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+            'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+        ];
+        
+        // Encontra o índice do último mês
+        const ultimoMesIndex = meses.indexOf(ultimoMes);
+        
+        // Gera previsão para os próximos 3 meses
+        const previsao = [];
+        for (let i = 1; i <= 3; i++) {
+            const proximoMesIndex = (ultimoMesIndex + i) % 12;
+            const proximoMes = meses[proximoMesIndex];
+            
+            // Calcula o valor previsto com base na média diária e dias úteis (22)
+            const valorPrevisto = Math.round(mediaPorDia * 22 * (1 + (i * 0.1))); // Aumenta 10% a cada mês
+            
+            previsao.push({
+                mes: proximoMes,
+                valor: valorPrevisto,
+                detalhes: {
+                    mediaDiaria: mediaPorDia,
+                    diasUteis: 22,
+                    fatorCrescimento: 1 + (i * 0.1)
+                }
+            });
+        }
+        
+        console.log('✅ Previsão gerada:', previsao);
+        return previsao;
     }
 
     private getMesAtual(): string {
