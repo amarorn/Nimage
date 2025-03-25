@@ -4,17 +4,21 @@ import { Equipe } from '../../domain/entities/Equipe';
 import { Vendedor } from '../../domain/entities/Vendedor';
 import { Meta } from '../../domain/entities/Meta';
 import { Atividade } from '../../domain/entities/Atividade';
+import { Tema } from '../../domain/entities/Tema';
 import { EquipeModel } from '../../infrastructure/database/models/EquipeModel';
 import { VendedorModel } from '../../infrastructure/database/models/VendedorModel';
 import { MetaModel } from '../../infrastructure/database/models/MetaModel';
 import { AtividadeModel } from '../../infrastructure/database/models/AtividadeModel';
+import { TemaModel } from '../../infrastructure/database/models/TemaModel';
 import { EquipeRepositoryImpl } from '../../infrastructure/repositories/EquipeRepositoryImpl';
 import { VendedorRepositoryImpl } from '../../infrastructure/repositories/VendedorRepositoryImpl';
 import { MetaRepositoryImpl } from '../../infrastructure/repositories/MetaRepositoryImpl';
 import { AtividadeRepositoryImpl } from '../../infrastructure/repositories/AtividadeRepositoryImpl';
+import { TemaRepositoryImpl } from '../../infrastructure/repositories/TemaRepositoryImpl';
 
 // Constantes
 const META_BASE = 100000; // Meta base mensal por equipe
+const TEMAS = ['Gladiadores', 'Artilheiros', 'Predadores'];
 
 type PerfilDesempenho = 'ALTO_DESEMPENHO' | 'MEDIO_DESEMPENHO' | 'BAIXO_DESEMPENHO';
 
@@ -105,23 +109,46 @@ async function generateData() {
             EquipeModel.deleteMany({}),
             VendedorModel.deleteMany({}),
             MetaModel.deleteMany({}),
-            AtividadeModel.deleteMany({})
+            AtividadeModel.deleteMany({}),
+            TemaModel.deleteMany({})
         ]);
+
+        // Cria temas
+        console.log('🎨 Criando temas...');
+        console.time('Criação de temas');
+        const temas: { id: string; nome: string; descricao: string; cor: string }[] = [];
+        const bulkTemas = TemaModel.collection.initializeUnorderedBulkOp();
+
+        const temasConfig = [
+            { nome: 'Gladiadores', descricao: 'Equipes focadas em conquistar novos territórios', cor: '#FF4D4D' },
+            { nome: 'Artilheiros', descricao: 'Equipes especializadas em precisão e resultados', cor: '#4D79FF' },
+            { nome: 'Predadores', descricao: 'Equipes ágeis e estratégicas', cor: '#4DFF4D' }
+        ];
+
+        for (const config of temasConfig) {
+            const id = uuidv4();
+            const tema = new Tema(id, config.nome, config.descricao, config.cor);
+            temas.push({ id, ...config });
+            bulkTemas.insert(tema);
+        }
+        await bulkTemas.execute();
+        console.timeEnd('Criação de temas');
+        console.log('✅ 3 temas criados');
 
         // Cria equipes
         console.log('👥 Criando equipes...');
         console.time('Criação de equipes');
-        const nomesEquipes: Array<{ nome: string; perfil: PerfilDesempenho }> = [
-            { nome: 'Equipe Norte', perfil: 'ALTO_DESEMPENHO' },
-            { nome: 'Equipe Sul', perfil: 'MEDIO_DESEMPENHO' },
-            { nome: 'Equipe Leste', perfil: 'MEDIO_DESEMPENHO' },
-            { nome: 'Equipe Oeste', perfil: 'BAIXO_DESEMPENHO' }
+        const nomesEquipes: Array<{ nome: string; perfil: PerfilDesempenho; temaId: string }> = [
+            { nome: 'Equipe Norte', perfil: 'ALTO_DESEMPENHO', temaId: temas.find(t => t.nome === 'Gladiadores')?.id || '' },
+            { nome: 'Equipe Sul', perfil: 'MEDIO_DESEMPENHO', temaId: temas.find(t => t.nome === 'Artilheiros')?.id || '' },
+            { nome: 'Equipe Leste', perfil: 'MEDIO_DESEMPENHO', temaId: temas.find(t => t.nome === 'Predadores')?.id || '' },
+            { nome: 'Equipe Oeste', perfil: 'BAIXO_DESEMPENHO', temaId: temas.find(t => t.nome === 'Gladiadores')?.id || '' }
         ];
 
         const equipes: EquipeComPerfil[] = [];
         const bulkEquipes = EquipeModel.collection.initializeUnorderedBulkOp();
 
-        for (const { nome, perfil } of nomesEquipes) {
+        for (const { nome, perfil, temaId } of nomesEquipes) {
             const id = uuidv4();
             const equipe = new Equipe(
                 id,
@@ -132,7 +159,8 @@ async function generateData() {
                 `Gerente ${nome}`,
                 `(11) 9${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`,
                 `Capitão ${nome}`,
-                `(11) 9${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`
+                `(11) 9${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`,
+                temaId
             );
             equipes.push({ ...equipe, perfil });
             bulkEquipes.insert(equipe);
@@ -248,109 +276,90 @@ async function generateData() {
         console.log('✅ Metas criadas para todas as equipes');
 
         // Cria atividades
-        console.log('📊 Criando atividades...');
+        console.log('📝 Criando atividades...');
         console.time('Criação de atividades');
+        let bulkAtividades = AtividadeModel.collection.initializeUnorderedBulkOp();
+        const batchSize = 1000;
         let totalAtividades = 0;
-        const BATCH_SIZE = 10000; // Tamanho do lote para inserção
-        let atividadesBatch: Atividade[] = [];
-
-        // Gera datas para todo o período
-        const datas: Date[] = [];
-        let dataAtual = new Date(dataInicio);
-        while (dataAtual <= dataFim) {
-            if (dataAtual.getDay() !== 0) { // Exclui domingos
-                datas.push(new Date(dataAtual));
-            }
-            dataAtual.setDate(dataAtual.getDate() + 1);
-        }
+        let batchCount = 0;
 
         async function insertAtividadesBatch() {
-            if (atividadesBatch.length === 0) return;
-            
-            const bulkAtividades = AtividadeModel.collection.initializeUnorderedBulkOp();
-            atividadesBatch.forEach(atividade => bulkAtividades.insert(atividade));
-            await bulkAtividades.execute();
-            atividadesBatch = [];
+            if (bulkAtividades.length > 0) {
+                await bulkAtividades.execute();
+                console.log(`✅ Batch ${++batchCount} de atividades inserido (${bulkAtividades.length} atividades)`);
+                bulkAtividades = AtividadeModel.collection.initializeUnorderedBulkOp();
+            }
         }
 
         for (const vendedor of vendedores) {
-            console.log(`\n👤 Processando vendedor: ${vendedor.nome} (${vendedor.perfil})`);
             const perfilVendedor = PERFIS_VENDEDOR[vendedor.perfil];
-            
-            const frequencia = perfilVendedor.frequenciaMin + 
-                             (Math.random() * (perfilVendedor.frequenciaMax - perfilVendedor.frequenciaMin));
-            const diasComAtividade = Math.floor(datas.length * frequencia);
-            
-            const datasVendedor = [...datas]
-                .sort(() => Math.random() - 0.5)
-                .slice(0, diasComAtividade);
+            let dataAtual = new Date(dataInicio);
 
-            for (const data of datasVendedor) {
-                const equipeVendedor = equipes.find(e => e.id === vendedor.equipeId);
-                if (!equipeVendedor) continue;
+            while (dataAtual <= dataFim) {
+                // Determina se o vendedor trabalhou neste dia
+                const frequencia = perfilVendedor.frequenciaMin + Math.random() * (perfilVendedor.frequenciaMax - perfilVendedor.frequenciaMin);
+                const trabalhouHoje = Math.random() < frequencia;
 
-                const perfilEquipe = PERFIS_EQUIPE[equipeVendedor.perfil];
-                const metaDiaria = (META_BASE * perfilEquipe.fatorMetaBase) / 22;
-                
-                const fatorDesempenho = perfilVendedor.fatorDesempenhoMin + 
-                                      (Math.random() * (perfilVendedor.fatorDesempenhoMax - perfilVendedor.fatorDesempenhoMin));
-                
-                let fatorDiaSemana = 1.0;
-                const diaSemana = data.getDay();
-                if (diaSemana === 6) {
-                    fatorDiaSemana = 1.3;
-                } else if (diaSemana === 5) {
-                    fatorDiaSemana = 1.2;
+                if (trabalhouHoje && dataAtual.getDay() !== 0 && dataAtual.getDay() !== 6) { // Exclui fins de semana
+                    const fatorDesempenho = perfilVendedor.fatorDesempenhoMin + Math.random() * (perfilVendedor.fatorDesempenhoMax - perfilVendedor.fatorDesempenhoMin);
+                    const mes = dataAtual.toLocaleString('pt-BR', { month: 'long' });
+                    const fatorSazonal = VARIACAO_MENSAL[mes as keyof typeof VARIACAO_MENSAL] || 1.0;
+                    
+                    // Gera quantidade de docinhos vendidos
+                    const docinhosCoco = Math.round((20 + Math.random() * 30) * fatorDesempenho * fatorSazonal);
+                    
+                    // Gera quantidade de follow-ups baseado no perfil e desempenho
+                    const follow_up = Math.round((5 + Math.random() * 10) * fatorDesempenho);
+
+                    const atividade = new Atividade(
+                        uuidv4(),
+                        vendedor.id,
+                        new Date(dataAtual),
+                        docinhosCoco,
+                        follow_up
+                    );
+
+                    bulkAtividades.insert(atividade);
+                    totalAtividades++;
+
+                    if (totalAtividades % batchSize === 0) {
+                        await insertAtividadesBatch();
+                    }
                 }
 
-                const mes = data.toLocaleString('pt-BR', { month: 'long' });
-                const fatorMes = VARIACAO_MENSAL[mes as keyof typeof VARIACAO_MENSAL] || 1.0;
-                const fatorAleatorio = 0.85 + Math.random() * 0.3;
-
-                const docinhosCoco = Math.floor(
-                    metaDiaria * 
-                    fatorDesempenho * 
-                    fatorDiaSemana * 
-                    fatorMes * 
-                    fatorAleatorio
-                );
-
-                const atividade = new Atividade(
-                    uuidv4(),
-                    vendedor.id,
-                    data,
-                    docinhosCoco,
-                    docinhosCoco
-                );
-                
-                atividadesBatch.push(atividade);
-                totalAtividades++;
-
-                if (atividadesBatch.length >= BATCH_SIZE) {
-                    await insertAtividadesBatch();
-                    console.log(`  ✓ Inserido lote de ${BATCH_SIZE} atividades`);
-                }
+                // Avança para o próximo dia
+                dataAtual.setDate(dataAtual.getDate() + 1);
             }
         }
 
         // Insere as atividades restantes
-        if (atividadesBatch.length > 0) {
+        if (bulkAtividades.length > 0) {
             await insertAtividadesBatch();
-            console.log(`  ✓ Inserido lote final de ${atividadesBatch.length} atividades`);
         }
 
         console.timeEnd('Criação de atividades');
-        console.log(`\n🎉 Total de atividades criadas: ${totalAtividades}`);
+        console.log(`✅ ${totalAtividades} atividades criadas`);
 
         // Resumo final
         console.log('\n📊 RESUMO DA GERAÇÃO DE DADOS');
         console.log('==============================');
+        console.log('\n🎨 Temas:');
+        console.log(`  • Total: ${temas.length}`);
+        for (const tema of temas) {
+            console.log(`    - ${tema.nome}`);
+        }
+
         console.log('\n👥 Equipes:');
         console.log(`  • Total: ${equipes.length}`);
         console.log(`  • Distribuição por perfil:`);
         for (const perfil in PERFIS_EQUIPE) {
             const count = equipes.filter(e => e.perfil === perfil).length;
             console.log(`    - ${perfil}: ${count} equipe(s)`);
+        }
+        console.log(`  • Distribuição por tema:`);
+        for (const tema of temas) {
+            const count = equipes.filter(e => e.temaId === tema.id).length;
+            console.log(`    - ${tema.nome}: ${count} equipe(s)`);
         }
 
         console.log('\n👤 Vendedores:');

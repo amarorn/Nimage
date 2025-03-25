@@ -2,12 +2,13 @@ export class Equipe {
     constructor(
         public readonly id: string,
         public nome: string,
-        public nomepdv: string,
+        public pdv: string,
         public cidade: string,
         public estado: string,
-        public gerente: string,
-        public contato_gerente: string,
-        public capitao: string,
-        public contato_capitao: string
+        public gerenteNome: string,
+        public gerenteTelefone: string,
+        public capitaoNome: string,
+        public capitaoTelefone: string,
+        public temaId?: string
     ) {}
 }

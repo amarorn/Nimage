@@ -10,18 +10,18 @@ class EquipeRepositoryImpl {
     async obterPorId(id) {
         const equipe = await EquipeModel_1.EquipeModel.findOne({ id }).lean();
         if (equipe) {
-            return new Equipe_1.Equipe(equipe.id, equipe.nome, equipe.nomepdv, equipe.cidade, equipe.estado, equipe.gerente, equipe.contato_gerente, equipe.capitao, equipe.contato_capitao);
+            return new Equipe_1.Equipe(equipe.id, equipe.nome, equipe.pdv, equipe.cidade, equipe.estado, equipe.gerenteNome, equipe.gerenteTelefone, equipe.capitaoNome, equipe.capitaoTelefone, equipe.temaId);
         }
         return null;
     }
     async obterTodos(skip, limit) {
         const equipes = await EquipeModel_1.EquipeModel.find().skip(skip).limit(limit).lean();
-        return equipes.map(equipe => new Equipe_1.Equipe(equipe.id, equipe.nome, equipe.nomepdv, equipe.cidade, equipe.estado, equipe.gerente, equipe.contato_gerente, equipe.capitao, equipe.contato_capitao));
+        return equipes.map(equipe => new Equipe_1.Equipe(equipe.id, equipe.nome, equipe.pdv, equipe.cidade, equipe.estado, equipe.gerenteNome, equipe.gerenteTelefone, equipe.capitaoNome, equipe.capitaoTelefone, equipe.temaId));
     }
     async atualizar(id, dados) {
-        const equipeAtualizada = await EquipeModel_1.EquipeModel.findOneAndUpdate({ id }, { $set: dados }, { new: true }).lean();
+        const equipeAtualizada = await EquipeModel_1.EquipeModel.findOneAndUpdate({ id }, Object.assign({}, dados), { new: true }).lean();
         if (equipeAtualizada) {
-            return new Equipe_1.Equipe(equipeAtualizada.id, equipeAtualizada.nome, equipeAtualizada.nomepdv, equipeAtualizada.cidade, equipeAtualizada.estado, equipeAtualizada.gerente, equipeAtualizada.contato_gerente, equipeAtualizada.capitao, equipeAtualizada.contato_capitao);
+            return new Equipe_1.Equipe(equipeAtualizada.id, equipeAtualizada.nome, equipeAtualizada.pdv, equipeAtualizada.cidade, equipeAtualizada.estado, equipeAtualizada.gerenteNome, equipeAtualizada.gerenteTelefone, equipeAtualizada.capitaoNome, equipeAtualizada.capitaoTelefone, equipeAtualizada.temaId);
         }
         return null;
     }
@@ -30,6 +30,9 @@ class EquipeRepositoryImpl {
     }
     async deletarTodos() {
         await EquipeModel_1.EquipeModel.deleteMany({});
+    }
+    async obterTotal() {
+        return await EquipeModel_1.EquipeModel.countDocuments();
     }
 }
 exports.EquipeRepositoryImpl = EquipeRepositoryImpl;

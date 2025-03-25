@@ -4,13 +4,14 @@ export interface EquipeRepository {
     criar(equipe: Equipe): Promise<void>;
     atualizar(id: string, dados: {
         nome?: string;
-        nomepdv?: string;
+        pdv?: string;
         cidade?: string;
         estado?: string;
-        gerente?: string;
-        contato_gerente?: string;
-        capitao?: string;
-        contato_capitao?: string;
+        gerenteNome?: string;
+        gerenteTelefone?: string;
+        capitaoNome?: string;
+        capitaoTelefone?: string;
+        temaId?: string;
     }): Promise<Equipe | null>;
     obterPorId(id: string): Promise<Equipe | null>;
     obterTodos(skip: number, limit: number): Promise<Equipe[]>;

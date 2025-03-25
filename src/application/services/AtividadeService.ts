@@ -55,14 +55,18 @@ export class AtividadeService {
             const valorTotal = cachedResult.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
             
             // Busca informações do vendedor, equipe e meta em paralelo
-            const [vendedor, equipe, meta] = await Promise.all([
-                this.vendedorRepo.obterPorId(vendedorId),
-                this.equipeRepo.obterPorId(vendedorId),
+            const vendedor = await this.vendedorRepo.obterPorId(vendedorId);
+            if (!vendedor) {
+                throw new Error('Vendedor não encontrado');
+            }
+            
+            const [equipe, meta] = await Promise.all([
+                this.equipeRepo.obterPorId(vendedor.equipeId),
                 this.metaRepo.obterPorEquipe(vendedorId)
             ]);
 
-            if (!vendedor || !equipe) {
-                throw new Error('Vendedor ou equipe não encontrado');
+            if (!equipe) {
+                throw new Error('Equipe não encontrada');
             }
 
             return {
@@ -87,15 +91,19 @@ export class AtividadeService {
         }
 
         // Se não estiver no cache, busca do banco
-        const [atividades, vendedor, equipe, meta] = await Promise.all([
+        const vendedor = await this.vendedorRepo.obterPorId(vendedorId);
+        if (!vendedor) {
+            throw new Error('Vendedor não encontrado');
+        }
+
+        const [atividades, equipe, meta] = await Promise.all([
             this.atividadeRepo.obterPorVendedorEData(vendedorId, dataInicio, dataFim),
-            this.vendedorRepo.obterPorId(vendedorId),
-            this.equipeRepo.obterPorId(vendedorId),
+            this.equipeRepo.obterPorId(vendedor.equipeId),
             this.metaRepo.obterPorEquipe(vendedorId)
         ]);
 
-        if (!vendedor || !equipe) {
-            throw new Error('Vendedor ou equipe não encontrado');
+        if (!equipe) {
+            throw new Error('Equipe não encontrada');
         }
 
         const quantidade = atividades.length;

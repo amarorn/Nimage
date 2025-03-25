@@ -6,6 +6,7 @@ export interface IAtividade extends Document {
     vendedorId: string;
     data: Date;
     docinhosCoco: number;
+    follow_up: number;
     total_docinhos: number;
 }
 
@@ -14,6 +15,7 @@ const AtividadeSchema: Schema = new Schema({
     vendedorId: { type: String, required: true },
     data: { type: Date, required: true },
     docinhosCoco: { type: Number, required: true },
+    follow_up: { type: Number, required: true, default: 0 },
     total_docinhos: { type: Number }
 });
 

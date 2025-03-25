@@ -34,17 +34,18 @@ export class AtividadeController {
                 return res.status(400).json({ erro: 'Body da requisição está vazio' });
             }
 
-            const { id, vendedorId, data, docinhosCoco } = req.body;
+            const { id, vendedorId, data, docinhosCoco, follow_up } = req.body;
 
             // Validação dos campos obrigatórios
-            if (!id || !vendedorId || !data || docinhosCoco === undefined) {
+            if (!id || !vendedorId || !data || docinhosCoco === undefined || follow_up === undefined) {
                 return res.status(400).json({
                     erro: 'Dados inválidos',
                     detalhes: {
                         id: id ? 'presente' : 'ausente',
                         vendedorId: vendedorId ? 'presente' : 'ausente',
                         data: data ? 'presente' : 'ausente',
-                        docinhosCoco: docinhosCoco !== undefined ? 'presente' : 'ausente'
+                        docinhosCoco: docinhosCoco !== undefined ? 'presente' : 'ausente',
+                        follow_up: follow_up !== undefined ? 'presente' : 'ausente'
                     }
                 });
             }
@@ -55,7 +56,8 @@ export class AtividadeController {
                 id, 
                 vendedorId, 
                 data: new Date(data), 
-                docinhosCoco 
+                docinhosCoco,
+                follow_up
             });
             
             // //console.log("✅ Atividade criada com sucesso:", atividade);
@@ -207,21 +209,27 @@ export class AtividadeController {
         try {
             // //console.log("📥 Dados recebidos para atualização:", req.body);
             const { id } = req.params;
-            const { vendedorId, data, docinhosCoco } = req.body;
+            const { vendedorId, data, docinhosCoco, follow_up } = req.body;
 
             // Validação dos campos obrigatórios
-            if (!vendedorId || !data || docinhosCoco === undefined) {
+            if (!vendedorId || !data || docinhosCoco === undefined || follow_up === undefined) {
                 return res.status(400).json({
                     erro: 'Dados inválidos',
                     detalhes: {
                         vendedorId: vendedorId ? 'presente' : 'ausente',
                         data: data ? 'presente' : 'ausente',
-                        docinhosCoco: docinhosCoco !== undefined ? 'presente' : 'ausente'
+                        docinhosCoco: docinhosCoco !== undefined ? 'presente' : 'ausente',
+                        follow_up: follow_up !== undefined ? 'presente' : 'ausente'
                     }
                 });
             }
 
-            const atividadeAtualizada = await this.atualizarAtividade.executar(id, { vendedorId, data: new Date(data), docinhosCoco });
+            const atividadeAtualizada = await this.atualizarAtividade.executar(id, { 
+                vendedorId, 
+                data: new Date(data), 
+                docinhosCoco,
+                follow_up
+            });
             // //console.log("✅ Atividade atualizada com sucesso:", atividadeAtualizada);
 
             return res.status(200).json(atividadeAtualizada);

@@ -3,52 +3,45 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const app_1 = __importDefault(require("./app"));
+const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
+const dotenv_1 = require("dotenv");
 const MongoDB_1 = require("./infrastructure/database/MongoDB");
-const CacheInitializer_1 = require("./infrastructure/cache/CacheInitializer");
-const EquipeRepositoryImpl_1 = require("./infrastructure/repositories/EquipeRepositoryImpl");
-const VendedorRepositoryImpl_1 = require("./infrastructure/repositories/VendedorRepositoryImpl");
-const MetaRepositoryImpl_1 = require("./infrastructure/repositories/MetaRepositoryImpl");
-const AtividadeRepositoryImpl_1 = require("./infrastructure/repositories/AtividadeRepositoryImpl");
-const PORT = Number(process.env.PORT) || 3001;
-async function startServer() {
+const InitialCacheService_1 = require("./application/services/InitialCacheService");
+// Importação das rotas
+const vendedorRoutes_1 = __importDefault(require("./interfaces/routes/vendedorRoutes"));
+const equipeRoutes_1 = __importDefault(require("./interfaces/routes/equipeRoutes"));
+const atividadeRoutes_1 = __importDefault(require("./interfaces/routes/atividadeRoutes"));
+const metaRoutes_1 = __importDefault(require("./interfaces/routes/metaRoutes"));
+// Configuração do dotenv
+(0, dotenv_1.config)();
+const app = (0, express_1.default)();
+const port = process.env.PORT || 3001;
+// Middlewares
+app.use((0, cors_1.default)());
+app.use(express_1.default.json());
+// Rotas
+app.use("/api", vendedorRoutes_1.default);
+app.use("/api", equipeRoutes_1.default);
+app.use("/api", atividadeRoutes_1.default);
+app.use("/api", metaRoutes_1.default);
+// Inicialização do servidor
+const startServer = async () => {
     try {
-        console.log('🚀 Iniciando servidor...');
-        // Conecta ao MongoDB
-        console.log('📦 Conectando ao MongoDB...');
+        // Conecta ao banco de dados
         await MongoDB_1.MongoDB.conectar();
-        console.log('🔌 MongoDB conectado com sucesso!');
-        // Inicializa os repositórios
-        const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
-        const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
-        const metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
-        const atividadeRepo = new AtividadeRepositoryImpl_1.AtividadeRepositoryImpl();
-        // Inicializa o cache
-        console.log('🔄 Inicializando cache...');
-        const cacheInitializer = CacheInitializer_1.CacheInitializer.getInstance(equipeRepo, vendedorRepo, metaRepo, atividadeRepo);
-        await cacheInitializer.initialize();
-        console.log('✅ Cache inicializado com sucesso!');
-        // Inicia o servidor HTTP
-        console.log('🎯 Iniciando servidor na porta', PORT);
-        app_1.default.listen(PORT, '0.0.0.0', () => {
-            console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
-            console.log(`🔍 Health check disponível em http://localhost:${PORT}/api/health`);
+        // Inicializa o cache da aplicação
+        const initialCacheService = new InitialCacheService_1.InitialCacheService();
+        await initialCacheService.initializeCache();
+        // Inicia o servidor
+        app.listen(port, () => {
+            console.log(`🚀 Servidor rodando na porta ${port}`);
         });
     }
     catch (error) {
-        console.error('❌ Erro ao iniciar servidor:', error);
+        console.error("❌ Erro ao iniciar o servidor:", error);
         process.exit(1);
     }
-}
-// Tratamento de erros não capturados
-process.on('uncaughtException', (error) => {
-    console.error('❌ Erro não capturado:', error);
-    process.exit(1);
-});
-process.on('unhandledRejection', (error) => {
-    console.error('❌ Promessa rejeitada não tratada:', error);
-    process.exit(1);
-});
-// Inicia o servidor
+};
 startServer();
 //# sourceMappingURL=server.js.map

@@ -34,7 +34,7 @@ router.get("/metas/all", async (req, res) => {
             });
         }
         const resultado = await metaController.obterTodos(req, res);
-        return res.json(resultado);
+        return res.status(200).json(resultado);
     }
     catch (erro) {
         console.error('Erro ao obter metas:', erro);
