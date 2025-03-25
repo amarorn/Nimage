@@ -3,12 +3,12 @@ import { AtividadeRepositoryImpl } from "../../infrastructure/repositories/Ativi
 import { VendedorRepositoryImpl } from "../../infrastructure/repositories/VendedorRepositoryImpl";
 import { EquipeRepositoryImpl } from "../../infrastructure/repositories/EquipeRepositoryImpl";
 import { MetaRepositoryImpl } from "../../infrastructure/repositories/MetaRepositoryImpl";
-import { AtividadeService } from "../../application/services/AtividadeService";
+import { CriarAtividade } from "../../application/use-cases/CriarAtividade";
+import { AtividadeController } from "../controllers/AtividadeController";
 import { ObterAtividades } from "../../application/use-cases/ObterAtividades";
 import { AtualizarAtividade } from "../../application/use-cases/AtualizarAtividade";
 import { ObterAtividadesPorVendedorEData } from "../../application/use-cases/ObterAtividadesPorVendedorEData";
-import { AtividadeController } from "../controllers/AtividadeController";
-import { CriarAtividade } from "../../application/use-cases/CriarAtividade";
+import { AtividadeService } from "../../application/services/AtividadeService";
 import { FrequenciaVendasService } from "../../application/services/FrequenciaVendasService";
 import { ObterEquipeDadosFull } from "../../application/use-cases/ObterEquipeDadosFull";
 
@@ -20,27 +20,21 @@ const vendedorRepo = new VendedorRepositoryImpl();
 const equipeRepo = new EquipeRepositoryImpl();
 const metaRepo = new MetaRepositoryImpl();
 
+// Services
+const atividadeService = new AtividadeService(atividadeRepo, vendedorRepo, equipeRepo, metaRepo);
+
 // Use Cases
 const criarAtividade = new CriarAtividade(atividadeRepo);
-const obterAtividade = new ObterAtividades(atividadeRepo);
+const obterAtividades = new ObterAtividades(atividadeRepo);
 const atualizarAtividade = new AtualizarAtividade(atividadeRepo);
-const obterEquipeDadosFull = new ObterEquipeDadosFull(equipeRepo, vendedorRepo, atividadeRepo, metaRepo);
-
-// Services
-const atividadeService = new AtividadeService(
-    atividadeRepo,
-    vendedorRepo,
-    equipeRepo,
-    metaRepo
-);
-const frequenciaVendasService = new FrequenciaVendasService(obterEquipeDadosFull);
-
 const obterAtividadesPorVendedorEData = new ObterAtividadesPorVendedorEData(atividadeService);
+const obterEquipeDadosFull = new ObterEquipeDadosFull(equipeRepo, vendedorRepo, atividadeRepo, metaRepo);
+const frequenciaVendasService = new FrequenciaVendasService(obterEquipeDadosFull);
 
 // Controller
 const atividadeController = new AtividadeController(
     criarAtividade,
-    obterAtividade,
+    obterAtividades,
     atualizarAtividade,
     atividadeService,
     obterAtividadesPorVendedorEData,
@@ -52,6 +46,12 @@ router.post("/atividades", async (req, res) => {
     return atividadeController.criar(req, res);
 });
 
+// Rota para obter todas as atividades (mantida para compatibilidade)
+router.get("/atividades", async (req, res) => {
+    return atividadeController.obterTodos(req, res);
+});
+
+// Nova rota /all que faz a mesma coisa que /atividades
 router.get("/atividades/all", async (req, res) => {
     return atividadeController.obterTodos(req, res);
 });
@@ -60,15 +60,19 @@ router.get("/atividades/:id", async (req, res) => {
     return atividadeController.obterPorId(req, res);
 });
 
-router.get("/atividades/:id/detalhes", async (req, res) => {
-    return atividadeController.obterDetalhes(req, res);
-});
-
 router.put("/atividades/:id", async (req, res) => {
     return atividadeController.atualizar(req, res);
 });
 
 router.get("/atividades/vendedor/:vendedorId", async (req, res) => {
+    return atividadeController.getAtividadesByVendedorAndDate(req, res);
+});
+
+router.get("/atividades/equipe/:equipeId", async (req, res) => {
+    return atividadeController.getAtividadesByVendedorAndDate(req, res);
+});
+
+router.get("/atividades/vendedor/:vendedorId/data", async (req, res) => {
     return atividadeController.getAtividadesByVendedorAndDate(req, res);
 });
 

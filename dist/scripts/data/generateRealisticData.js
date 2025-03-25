@@ -1,19 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const MongoDB_1 = require("@/infrastructure/database/MongoDB");
-const EquipeRepositoryImpl_1 = require("@/infrastructure/repositories/EquipeRepositoryImpl");
-const VendedorRepositoryImpl_1 = require("@/infrastructure/repositories/VendedorRepositoryImpl");
-const MetaRepositoryImpl_1 = require("@/infrastructure/repositories/MetaRepositoryImpl");
-const AtividadeRepositoryImpl_1 = require("@/infrastructure/repositories/AtividadeRepositoryImpl");
-const Equipe_1 = require("@/domain/entities/Equipe");
-const Vendedor_1 = require("@/domain/entities/Vendedor");
-const Meta_1 = require("@/domain/entities/Meta");
-const Atividade_1 = require("@/domain/entities/Atividade");
+const MongoDB_1 = require("../../infrastructure/database/MongoDB");
+const EquipeRepositoryImpl_1 = require("../../infrastructure/repositories/EquipeRepositoryImpl");
+const VendedorRepositoryImpl_1 = require("../../infrastructure/repositories/VendedorRepositoryImpl");
+const MetaRepositoryImpl_1 = require("../../infrastructure/repositories/MetaRepositoryImpl");
+const AtividadeRepositoryImpl_1 = require("../../infrastructure/repositories/AtividadeRepositoryImpl");
+const Equipe_1 = require("../../domain/entities/Equipe");
+const Vendedor_1 = require("../../domain/entities/Vendedor");
+const Meta_1 = require("../../domain/entities/Meta");
+const Atividade_1 = require("../../domain/entities/Atividade");
 const uuid_1 = require("uuid");
-const EquipeModel_1 = require("@/infrastructure/database/models/EquipeModel");
-const VendedorModel_1 = require("@/infrastructure/database/models/VendedorModel");
-const MetaModel_1 = require("@/infrastructure/database/models/MetaModel");
-const AtividadeModel_1 = require("@/infrastructure/database/models/AtividadeModel");
+const EquipeModel_1 = require("../../infrastructure/database/models/EquipeModel");
+const VendedorModel_1 = require("../../infrastructure/database/models/VendedorModel");
+const MetaModel_1 = require("../../infrastructure/database/models/MetaModel");
+const AtividadeModel_1 = require("../../infrastructure/database/models/AtividadeModel");
 const perfisVendedores = [
     // Top Performers (4 vendedores)
     { nome: "João Silva", frequenciaVendas: 0.9, fatorDesempenho: 1.5, consistencia: 1.3 },

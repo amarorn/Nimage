@@ -8,93 +8,114 @@
 ![GitHub last commit](https://shields.io/badge/TypeScript-3178C6?style=flat&logo=TypeScript&logoColor=FFF&style=flat-square)
 ![Scrutinizer coverage (GitHub/Bitbucket) with branch](https://img.shields.io/scrutinizer/coverage/g/amarorn/Nimage/master)
 
-
-
-```markdown
-
 # Nimage
 
-Nimage é uma API em Node.js construída com TypeScript, seguindo os princípios da Arquitetura Limpa. Ela oferece um framework robusto para gerenciar equipes, vendedores, atividades e métricas de desempenho.
+API em Node.js com TypeScript seguindo Clean Architecture
 
-## Índice
+## Configuração do Ambiente
 
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [API Endpoints](#api-endpoints)
-- [Contributing](#contributing)
-- [License](#license)
+### Pré-requisitos
 
-## Features
+- Node.js v16 ou superior
+- MongoDB
+- Redis
+- Docker (opcional)
+- Docker Compose (opcional)
 
-- **Clean Architecture**: Separação de responsabilidades com foco em manutenibilidade e escalabilidade.
-- **TypeScript**: Recursos de linguagem fortemente tipada para melhor qualidade de código
-- **Express.js**: Framework web rápido e minimalista para Node.js.
-- **MongoDB**: Integração com banco de dados NoSQL para persistência de dados.
-- **Performance Metrics**: Calcular e rastrear métricas de desempenho diárias e totais para membros da equipe.
-- **CRUD Operations**: Criar, ler, atualizar e deletar operações para equipes, vendedores e atividades.
+### Instalação
 
+#### Usando Docker (Recomendado)
 
-## Instalação
+1. Clone o repositório
+2. Execute o ambiente de desenvolvimento:
+```bash
+docker-compose -f docker-compose.dev.yml up
+```
 
-Para começar a usar o Nimage, siga estes passos:
+O servidor estará disponível em `http://localhost:3001`
 
-1. **Clone o repositório**:
-   ```bash
-   git clone https://github.com/seuusuario/nimage.git
-   cd nimage
-   ```
+#### Instalação Manual
 
-2. **Instale as dependências**:
-   ```bash
-   npm install
-   ```
+1. Clone o repositório
+2. Instale as dependências:
+```bash
+npm install
+```
 
-3. **Configure as variáveis de ambiente**:
-   Crie um arquivo `.env` no diretório raiz e configure sua string de conexão com o MongoDB e outras variáveis de ambiente necessárias.
+3. Configure as variáveis de ambiente:
+- Copie o arquivo `.env.example` para `.env`
+- Ajuste as variáveis conforme seu ambiente
 
-4. **Compile o projeto**:
-   ```bash
-   npm run build
-   ```
+4. Inicie o MongoDB e Redis:
+```bash
+docker-compose up mongodb redis
+```
 
-5. **Inicie o servidor**:
-   ```bash
-   npm start
-   ```
+5. Inicie o servidor:
+```bash
+npm run dev
+```
 
-## Uso
+### Variáveis de Ambiente
 
-Com o servidor em execução, você pode acessar a API em `http://localhost:3000`. Use ferramentas como Postman ou cURL para interagir com os endpoints.
+- `MONGO_URI`: URL de conexão com o MongoDB
+- `PORT`: Porta do servidor (padrão: 3001)
+- `REDIS_URL`: URL de conexão com o Redis (padrão: redis://localhost:6379)
 
-## Endpoints da API
+### Cache Redis
 
-Aqui estão alguns dos principais endpoints da API disponíveis:
+O projeto utiliza Redis para cache das seguintes entidades:
+- Equipes
+- Vendedores
+- Metas
+- Atividades
 
-- **Verificação de Saúde**: `GET /health` - Verifica se o serviço está em execução.
-- **Equipes**:
-  - `POST /api/equipes` - Cria uma nova equipe.
-  - `GET /api/equipes/all` - Recupera todas as equipes.
-  - `GET /api/equipes/:id` - Obtém detalhes de uma equipe específica.
-  - `PUT /api/equipes/:id` - Atualiza uma equipe específica.
-  - `GET /api/equipes/:equipeId/calcular-meta` - Calcula métricas de desempenho para uma equipe.
+Cada entidade possui seu próprio serviço de cache com TTL configurável.
 
-- **Vendedores**:
-  - `POST /api/vendedores` - Cria um novo vendedor.
-  - `GET /api/vendedores/all` - Recupera todos os vendedores.
-  - `GET /api/vendedores/:id` - Obtém detalhes de um vendedor específico.
-  - `PUT /api/vendedores/:id` - Atualiza um vendedor específico.
+### Scripts Disponíveis
 
-- **Atividades**:
-  - `POST /api/atividades` - Registra uma nova atividade.
-  - `GET /api/atividades/all` - Recupera todas as atividades.
-  - `GET /api/atividades/:id` - Obtém detalhes de uma atividade específica.
-  - `PUT /api/atividades/:id` - Atualiza uma atividade específica.
+- `npm run build`: Compila o projeto
+- `npm run start`: Inicia o servidor em produção
+- `npm run dev`: Inicia o servidor em desenvolvimento com hot-reload
+- `npm run lint`: Executa o linter
+- `npm run format`: Formata o código
+- `npm run test`: Executa os testes
 
-- **Metas**:
-  - `POST /api/metas` - Cria uma nova meta.
-  - `GET /api/metas/all` - Recupera todas as metas.
-  - `GET /api/metas/:id` - Obtém detalhes de uma meta específica.
-  - `PUT /api/metas/:id` - Atualiza uma meta específica.
+### Docker
+
+O projeto inclui configurações Docker para desenvolvimento e produção:
+
+- `docker-compose.yml`: Configuração padrão com MongoDB e Redis
+- `docker-compose.dev.yml`: Configuração de desenvolvimento completa
+- `Dockerfile.dev`: Configuração do container da aplicação para desenvolvimento
+
+Para iniciar apenas os serviços de banco de dados:
+```bash
+docker-compose up mongodb redis
+```
+
+Para iniciar o ambiente de desenvolvimento completo:
+```bash
+docker-compose -f docker-compose.dev.yml up
+```
+
+## Estrutura do Projeto
 
 ```
+src/
+  ├── application/      # Casos de uso da aplicação
+  ├── domain/          # Entidades e regras de negócio
+  ├── infrastructure/  # Implementações de interfaces
+  │   └── cache/      # Serviços de cache Redis
+  └── presentation/    # Controllers e rotas
+```
+
+## Contribuição
+
+1. Faça o fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
+

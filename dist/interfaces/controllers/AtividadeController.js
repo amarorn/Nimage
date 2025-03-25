@@ -4,6 +4,7 @@ exports.AtividadeController = void 0;
 const VendedorRepositoryImpl_1 = require("../../infrastructure/repositories/VendedorRepositoryImpl");
 const EquipeRepositoryImpl_1 = require("../../infrastructure/repositories/EquipeRepositoryImpl");
 const MetaRepositoryImpl_1 = require("../../infrastructure/repositories/MetaRepositoryImpl");
+const AtividadeCacheService_1 = require("../../infrastructure/cache/AtividadeCacheService");
 class AtividadeController {
     constructor(criarAtividade, obterAtividades, atualizarAtividade, atividadeService, obterAtividadesPorVendedorEData, frequenciaVendasService) {
         this.criarAtividade = criarAtividade;
@@ -12,6 +13,7 @@ class AtividadeController {
         this.atividadeService = atividadeService;
         this.obterAtividadesPorVendedorEData = obterAtividadesPorVendedorEData;
         this.frequenciaVendasService = frequenciaVendasService;
+        this.atividadeCache = AtividadeCacheService_1.AtividadeCacheService.getInstance();
     }
     async criar(req, res) {
         try {
@@ -55,21 +57,40 @@ class AtividadeController {
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 10;
             const skip = (page - 1) * limit;
-            const atividades = await this.obterAtividades.executar(skip, limit);
-            // //console.log("✅ Atividades obtidas com sucesso:", atividades);
-            // Criar uma resposta personalizada com paginação
-            const respostaPersonalizada = {
+            // Tenta obter do cache primeiro
+            const cacheKey = `list:${page}:${limit}`;
+            const cachedAtividades = await this.atividadeCache.getAtividades();
+            if (cachedAtividades) {
+                console.log('📦 Cache hit: Atividades encontradas no cache');
+                return res.status(200).json({
+                    pagina: page,
+                    limite: limit,
+                    total: cachedAtividades.length,
+                    atividades: cachedAtividades.map((atividade) => ({
+                        id: atividade.id,
+                        vendedorId: atividade.vendedorId,
+                        data: atividade.data,
+                        docinhosCoco: atividade.docinhosCoco
+                    }))
+                });
+            }
+            console.log('🔄 Cache miss: Buscando atividades do banco');
+            const { atividades, total } = await this.obterAtividades.executar(skip, limit);
+            // Salva no cache
+            await this.atividadeCache.setAtividades(atividades);
+            console.log('💾 Cache: Atividades salvas no cache');
+            return res.status(200).json({
                 pagina: page,
                 limite: limit,
-                total: atividades.length,
-                atividades: atividades.map(atividade => ({
+                total,
+                totalPaginas: Math.ceil(total / limit),
+                atividades: atividades.map((atividade) => ({
                     id: atividade.id,
                     vendedorId: atividade.vendedorId,
                     data: atividade.data,
                     docinhosCoco: atividade.docinhosCoco
                 }))
-            };
-            return respostaPersonalizada;
+            });
         }
         catch (erro) {
             // console.error("❌ Erro ao obter atividades:", erro);

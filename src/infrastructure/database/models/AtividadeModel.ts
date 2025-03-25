@@ -1,17 +1,25 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { Atividade } from '../../../domain/entities/Atividade';
 
 export interface IAtividade extends Document {
     id: string;
     vendedorId: string;
     data: Date;
     docinhosCoco: number;
+    total_docinhos: number;
 }
 
 const AtividadeSchema: Schema = new Schema({
     id: { type: String, required: true, unique: true },
     vendedorId: { type: String, required: true },
     data: { type: Date, required: true },
-    docinhosCoco: { type: Number, required: true }
+    docinhosCoco: { type: Number, required: true },
+    total_docinhos: { type: Number }
 });
 
-export const AtividadeModel = mongoose.model<IAtividade>("Atividade", AtividadeSchema);
+// Índices para otimizar as queries mais comuns
+AtividadeSchema.index({ vendedorId: 1, data: 1 }); // Para queries por vendedor e data
+AtividadeSchema.index({ data: 1 }); // Para queries por data
+AtividadeSchema.index({ vendedorId: 1 }); // Para queries por vendedor
+
+export const AtividadeModel = mongoose.model<Atividade>("Atividade", AtividadeSchema);

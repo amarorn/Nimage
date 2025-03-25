@@ -3,14 +3,19 @@ import { CriarVendedor } from "../../application/use-cases/CriarVendedor";
 import { ObterVendedor } from "../../application/use-cases/ObterVendedor";
 import { AtualizarVendedor } from "../../application/use-cases/AtualizarVendedor";
 import { GetVendedorInsights } from "../../application/use-cases/GetVendedorInsights";
+import { VendedorCacheService } from "../../infrastructure/cache/VendedorCacheService";
 
 export class VendedorController {
+    private vendedorCache: VendedorCacheService;
+
     constructor(
         private criarVendedor: CriarVendedor,
         private obterVendedor: ObterVendedor,
         private atualizarVendedor: AtualizarVendedor,
         private getVendedorInsights: GetVendedorInsights
-    ) {}
+    ) {
+        this.vendedorCache = VendedorCacheService.getInstance();
+    }
 
     async criar(req: Request, res: Response) {
         try {
@@ -52,9 +57,36 @@ export class VendedorController {
             const limit = parseInt(req.query.limit as string) || 10;
             const skip = (page - 1) * limit;
 
-            const vendedores = await this.obterVendedor.executar(skip, limit);
+            // Tenta obter do cache primeiro
+            const cacheKey = `list:${page}:${limit}`;
+            const cachedVendedores = await this.vendedorCache.getVendedores();
+            
+            if (cachedVendedores) {
+                console.log('📦 Cache hit: Vendedores encontrados no cache');
+                return res.status(200).json({
+                    pagina: page,
+                    limite: limit,
+                    total: cachedVendedores.length,
+                    vendedores: cachedVendedores.map(vendedor => ({
+                        id: vendedor.id,
+                        nome: vendedor.nome,
+                        equipeId: vendedor.equipeId,
+                        email: vendedor.email,
+                        telefone: vendedor.telefone,
+                        meta: vendedor.meta,
+                        cargo: vendedor.cargo
+                    }))
+                });
+            }
 
-            const respostaPersonalizada = {
+            console.log('🔄 Cache miss: Buscando vendedores do banco');
+            const vendedores = await this.obterVendedor.executar(skip, limit);
+            
+            // Salva no cache
+            await this.vendedorCache.setVendedores(vendedores);
+            console.log('💾 Cache: Vendedores salvos no cache');
+
+            return res.status(200).json({
                 pagina: page,
                 limite: limit,
                 total: vendedores.length,
@@ -67,13 +99,11 @@ export class VendedorController {
                     meta: vendedor.meta,
                     cargo: vendedor.cargo
                 }))
-            };
-
-            return respostaPersonalizada;
+            });
         } catch (erro) {
-            return res.status(500).json({ 
+            return res.status(500).json({
                 erro: 'Erro interno ao obter vendedores',
-                mensagem: (erro as Error).message 
+                mensagem: (erro as Error).message
             });
         }
     }

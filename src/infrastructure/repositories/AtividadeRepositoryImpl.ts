@@ -16,6 +16,10 @@ export class AtividadeRepositoryImpl implements AtividadeRepository {
         return await AtividadeModel.find().skip(skip).limit(limit).lean();
     }
 
+    async obterTotal(): Promise<number> {
+        return await AtividadeModel.countDocuments();
+    }
+
     async obterPorVendedorId(vendedorId: string): Promise<Atividade[]> {
         return await AtividadeModel.find({ vendedorId }).lean();
     }

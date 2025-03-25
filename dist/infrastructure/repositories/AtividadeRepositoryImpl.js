@@ -13,6 +13,9 @@ class AtividadeRepositoryImpl {
     async obterTodos(skip, limit) {
         return await AtividadeModel_1.AtividadeModel.find().skip(skip).limit(limit).lean();
     }
+    async obterTotal() {
+        return await AtividadeModel_1.AtividadeModel.countDocuments();
+    }
     async obterPorVendedorId(vendedorId) {
         return await AtividadeModel_1.AtividadeModel.find({ vendedorId }).lean();
     }

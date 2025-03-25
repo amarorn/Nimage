@@ -4,15 +4,21 @@ import { ObterEquipe } from "../../application/use-cases/ObterEquipe";
 import { ObterEquipeDadosFull } from "../../application/use-cases/ObterEquipeDadosFull";
 import { EquipeMetaService } from "../../application/services/EquipeMetaService";
 import { AtualizarEquipe } from "../../application/use-cases/AtualizarEquipe";
+import { EquipeCacheService } from "../../infrastructure/cache/EquipeCacheService";
+import { Equipe } from "../../domain/entities/Equipe";
 
 export class EquipeController {
+    private equipeCache: EquipeCacheService;
+
     constructor(
         private criarEquipe: CriarEquipe, 
         private obterEquipe: ObterEquipe,
         private obterEquipeDadosFull: ObterEquipeDadosFull,
         private equipeMetaService: EquipeMetaService,
         private atualizarEquipe: AtualizarEquipe
-    ) {}
+    ) {
+        this.equipeCache = EquipeCacheService.getInstance();
+    }
 
     async criar(req: Request, res: Response) {
         try {
@@ -77,13 +83,42 @@ export class EquipeController {
             const limit = parseInt(req.query.limit as string) || 10;
             const skip = (page - 1) * limit;
 
-            const equipes = await this.obterEquipe.executar(skip, limit);
+            // Tenta obter do cache primeiro
+            const cacheKey = `list:${page}:${limit}`;
+            const cachedEquipes = await this.equipeCache.getEquipes();
+            
+            if (cachedEquipes) {
+                console.log('📦 Cache hit: Equipes encontradas no cache');
+                return res.status(200).json({
+                    pagina: page,
+                    limite: limit,
+                    total: cachedEquipes.length,
+                    equipes: cachedEquipes.map((equipe: Equipe) => ({
+                        id: equipe.id,
+                        nome: equipe.nome,
+                        nomepdv: equipe.nomepdv,
+                        cidade: equipe.cidade,
+                        estado: equipe.estado,
+                        gerente: equipe.gerente,
+                        contato_gerente: equipe.contato_gerente,
+                        capitao: equipe.capitao,
+                        contato_capitao: equipe.contato_capitao
+                    }))
+                });
+            }
 
-            const respostaPersonalizada = {
+            console.log('🔄 Cache miss: Buscando equipes do banco');
+            const equipes = await this.obterEquipe.executar(skip, limit);
+            
+            // Salva no cache
+            await this.equipeCache.setEquipes(equipes);
+            console.log('💾 Cache: Equipes salvas no cache');
+
+            return res.status(200).json({
                 pagina: page,
                 limite: limit,
                 total: equipes.length,
-                equipes: equipes.map(equipe => ({
+                equipes: equipes.map((equipe: Equipe) => ({
                     id: equipe.id,
                     nome: equipe.nome,
                     nomepdv: equipe.nomepdv,
@@ -94,13 +129,11 @@ export class EquipeController {
                     capitao: equipe.capitao,
                     contato_capitao: equipe.contato_capitao
                 }))
-            };
-
-            return respostaPersonalizada;
+            });
         } catch (erro) {
-            return res.status(500).json({ 
+            return res.status(500).json({
                 erro: 'Erro interno ao obter equipes',
-                mensagem: (erro as Error).message 
+                mensagem: (erro as Error).message
             });
         }
     }
@@ -220,6 +253,9 @@ export class EquipeController {
             if (!equipeAtualizada) {
                 return res.status(404).json({ erro: 'Equipe não encontrada' });
             }
+
+            // Invalida o cache da meta da equipe
+            await this.equipeMetaService.invalidarCache(id);
 
             return res.status(200).json({
                 id: equipeAtualizada.id,

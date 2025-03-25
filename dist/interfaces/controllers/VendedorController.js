@@ -1,12 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VendedorController = void 0;
+const VendedorCacheService_1 = require("../../infrastructure/cache/VendedorCacheService");
 class VendedorController {
     constructor(criarVendedor, obterVendedor, atualizarVendedor, getVendedorInsights) {
         this.criarVendedor = criarVendedor;
         this.obterVendedor = obterVendedor;
         this.atualizarVendedor = atualizarVendedor;
         this.getVendedorInsights = getVendedorInsights;
+        this.vendedorCache = VendedorCacheService_1.VendedorCacheService.getInstance();
     }
     async criar(req, res) {
         try {
@@ -44,8 +46,32 @@ class VendedorController {
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 10;
             const skip = (page - 1) * limit;
+            // Tenta obter do cache primeiro
+            const cacheKey = `list:${page}:${limit}`;
+            const cachedVendedores = await this.vendedorCache.getVendedores();
+            if (cachedVendedores) {
+                console.log('📦 Cache hit: Vendedores encontrados no cache');
+                return res.status(200).json({
+                    pagina: page,
+                    limite: limit,
+                    total: cachedVendedores.length,
+                    vendedores: cachedVendedores.map(vendedor => ({
+                        id: vendedor.id,
+                        nome: vendedor.nome,
+                        equipeId: vendedor.equipeId,
+                        email: vendedor.email,
+                        telefone: vendedor.telefone,
+                        meta: vendedor.meta,
+                        cargo: vendedor.cargo
+                    }))
+                });
+            }
+            console.log('🔄 Cache miss: Buscando vendedores do banco');
             const vendedores = await this.obterVendedor.executar(skip, limit);
-            const respostaPersonalizada = {
+            // Salva no cache
+            await this.vendedorCache.setVendedores(vendedores);
+            console.log('💾 Cache: Vendedores salvos no cache');
+            return res.status(200).json({
                 pagina: page,
                 limite: limit,
                 total: vendedores.length,
@@ -58,8 +84,7 @@ class VendedorController {
                     meta: vendedor.meta,
                     cargo: vendedor.cargo
                 }))
-            };
-            return respostaPersonalizada;
+            });
         }
         catch (erro) {
             return res.status(500).json({

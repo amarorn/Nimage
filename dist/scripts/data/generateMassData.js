@@ -10,10 +10,6 @@ const EquipeModel_1 = require("../../infrastructure/database/models/EquipeModel"
 const VendedorModel_1 = require("../../infrastructure/database/models/VendedorModel");
 const MetaModel_1 = require("../../infrastructure/database/models/MetaModel");
 const AtividadeModel_1 = require("../../infrastructure/database/models/AtividadeModel");
-const EquipeRepositoryImpl_1 = require("../../infrastructure/repositories/EquipeRepositoryImpl");
-const VendedorRepositoryImpl_1 = require("../../infrastructure/repositories/VendedorRepositoryImpl");
-const MetaRepositoryImpl_1 = require("../../infrastructure/repositories/MetaRepositoryImpl");
-const AtividadeRepositoryImpl_1 = require("../../infrastructure/repositories/AtividadeRepositoryImpl");
 // Constantes
 const META_BASE = 100000; // Meta base mensal por equipe
 const PERFIS_VENDEDOR = {
@@ -68,21 +64,21 @@ const PERFIS_EQUIPE = {
 async function generateData() {
     try {
         console.log('🚀 Iniciando geração de dados de massa...');
+        console.time('Tempo total de execução');
         // Conecta ao MongoDB
         await MongoDB_1.MongoDB.conectar();
         console.log('✅ Conectado ao MongoDB');
-        const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
-        const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
-        const metaRepo = new MetaRepositoryImpl_1.MetaRepositoryImpl();
-        const atividadeRepo = new AtividadeRepositoryImpl_1.AtividadeRepositoryImpl();
         // Limpa dados existentes
         console.log('🧹 Limpando dados existentes...');
-        await EquipeModel_1.EquipeModel.deleteMany({});
-        await VendedorModel_1.VendedorModel.deleteMany({});
-        await MetaModel_1.MetaModel.deleteMany({});
-        await AtividadeModel_1.AtividadeModel.deleteMany({});
+        await Promise.all([
+            EquipeModel_1.EquipeModel.deleteMany({}),
+            VendedorModel_1.VendedorModel.deleteMany({}),
+            MetaModel_1.MetaModel.deleteMany({}),
+            AtividadeModel_1.AtividadeModel.deleteMany({})
+        ]);
         // Cria equipes
         console.log('👥 Criando equipes...');
+        console.time('Criação de equipes');
         const nomesEquipes = [
             { nome: 'Equipe Norte', perfil: 'ALTO_DESEMPENHO' },
             { nome: 'Equipe Sul', perfil: 'MEDIO_DESEMPENHO' },
@@ -90,17 +86,19 @@ async function generateData() {
             { nome: 'Equipe Oeste', perfil: 'BAIXO_DESEMPENHO' }
         ];
         const equipes = [];
-        const equipesParaBulk = [];
+        const bulkEquipes = EquipeModel_1.EquipeModel.collection.initializeUnorderedBulkOp();
         for (const { nome, perfil } of nomesEquipes) {
             const id = (0, uuid_1.v4)();
             const equipe = new Equipe_1.Equipe(id, nome, `PDV ${nome}`, 'São Paulo', 'SP', `Gerente ${nome}`, `(11) 9${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`, `Capitão ${nome}`, `(11) 9${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`);
-            equipesParaBulk.push(equipe);
             equipes.push(Object.assign(Object.assign({}, equipe), { perfil }));
+            bulkEquipes.insert(equipe);
         }
-        await EquipeModel_1.EquipeModel.insertMany(equipesParaBulk);
+        await bulkEquipes.execute();
+        console.timeEnd('Criação de equipes');
         console.log('✅ 4 equipes criadas');
         // Cria vendedores
         console.log('👤 Criando vendedores...');
+        console.time('Criação de vendedores');
         const nomesVendedores = [
             'João Silva', 'Maria Santos', 'Pedro Oliveira', 'Ana Costa',
             'Carlos Souza', 'Julia Lima', 'Roberto Alves', 'Beatriz Ferreira',
@@ -108,7 +106,7 @@ async function generateData() {
             'Gustavo Oliveira', 'Carolina Lima', 'Daniel Alves', 'Amanda Ferreira'
         ];
         const vendedores = [];
-        const vendedoresParaBulk = [];
+        const bulkVendedores = VendedorModel_1.VendedorModel.collection.initializeUnorderedBulkOp();
         let nomeIndex = 0;
         for (const equipe of equipes) {
             const perfilEquipe = PERFIS_EQUIPE[equipe.perfil];
@@ -119,18 +117,26 @@ async function generateData() {
                 const meta = META_BASE * perfilEquipe.fatorMetaBase;
                 const cargo = 'Vendedor Pleno';
                 const vendedor = new Vendedor_1.Vendedor((0, uuid_1.v4)(), nome, equipe.id, email, telefone, meta, cargo);
-                vendedoresParaBulk.push(vendedor);
                 vendedores.push(Object.assign(Object.assign({}, vendedor), { perfil: equipe.perfil }));
+                bulkVendedores.insert(vendedor);
             }
         }
-        await VendedorModel_1.VendedorModel.insertMany(vendedoresParaBulk);
+        await bulkVendedores.execute();
+        console.timeEnd('Criação de vendedores');
         console.log('✅ 16 vendedores criados (4 por equipe)');
         // Cria metas
         console.log('🎯 Criando metas...');
+        console.time('Criação de metas');
         const dataInicio = new Date('2023-01-01');
         const dataFim = new Date('2027-12-01');
-        const meses = 14;
-        const metasParaBulk = [];
+        console.log('\n📅 Período dos dados gerados:');
+        console.log(`Data Início: ${dataInicio.toLocaleDateString('pt-BR')}`);
+        console.log(`Data Fim: ${dataFim.toLocaleDateString('pt-BR')}`);
+        // Calcula o número total de meses
+        const totalMeses = (dataFim.getFullYear() - dataInicio.getFullYear()) * 12 +
+            (dataFim.getMonth() - dataInicio.getMonth()) + 1;
+        console.log(`Total de meses: ${totalMeses}`);
+        const bulkMetas = MetaModel_1.MetaModel.collection.initializeUnorderedBulkOp();
         const estatisticasMetas = {
             totalMetas: 0,
             mediaMetasPorEquipe: 0,
@@ -145,9 +151,8 @@ async function generateData() {
         for (const equipe of equipes) {
             console.log(`\n📊 Gerando metas para ${equipe.nome} (${equipe.perfil})`);
             const perfilEquipe = PERFIS_EQUIPE[equipe.perfil];
-            for (let i = 0; i < meses; i++) {
+            for (let i = 0; i < totalMeses; i++) {
                 const inicioMes = new Date(dataInicio.getFullYear(), dataInicio.getMonth() + i, 1);
-                const fimMes = new Date(inicioMes.getFullYear(), inicioMes.getMonth() + 1, 0);
                 const mes = inicioMes.toLocaleString('pt-BR', { month: 'long' });
                 const fatorSazonal = VARIACAO_MENSAL[mes] || 1.0;
                 const fatorEquipe = perfilEquipe.fatorMetaBase;
@@ -163,23 +168,19 @@ async function generateData() {
                 if (objetivo < estatisticasMetas.menorMeta.valor) {
                     estatisticasMetas.menorMeta = { valor: objetivo, equipe: equipe.nome, mes };
                 }
-                console.log(`  📅 ${mes}: ${objetivo.toLocaleString('pt-BR')} (${(fatorSazonal * 100).toFixed(0)}% sazonal)`);
                 const meta = new Meta_1.Meta((0, uuid_1.v4)(), equipe.id, objetivo, inicioMes);
-                metasParaBulk.push(meta);
+                bulkMetas.insert(meta);
             }
         }
-        // Calcula médias finais
-        estatisticasMetas.mediaMetasPorEquipe = estatisticasMetas.totalMetas / equipes.length;
-        for (const perfil in estatisticasMetas.metasPorPerfil) {
-            const dados = estatisticasMetas.metasPorPerfil[perfil];
-            dados.media = dados.total > 0 ? dados.media / dados.total : 0;
-        }
-        await MetaModel_1.MetaModel.insertMany(metasParaBulk);
-        console.log('\n✅ Metas criadas para todas as equipes');
+        await bulkMetas.execute();
+        console.timeEnd('Criação de metas');
+        console.log('✅ Metas criadas para todas as equipes');
         // Cria atividades
         console.log('📊 Criando atividades...');
+        console.time('Criação de atividades');
         let totalAtividades = 0;
-        const atividadesParaBulk = [];
+        const BATCH_SIZE = 10000; // Tamanho do lote para inserção
+        let atividadesBatch = [];
         // Gera datas para todo o período
         const datas = [];
         let dataAtual = new Date(dataInicio);
@@ -188,6 +189,14 @@ async function generateData() {
                 datas.push(new Date(dataAtual));
             }
             dataAtual.setDate(dataAtual.getDate() + 1);
+        }
+        async function insertAtividadesBatch() {
+            if (atividadesBatch.length === 0)
+                return;
+            const bulkAtividades = AtividadeModel_1.AtividadeModel.collection.initializeUnorderedBulkOp();
+            atividadesBatch.forEach(atividade => bulkAtividades.insert(atividade));
+            await bulkAtividades.execute();
+            atividadesBatch = [];
         }
         for (const vendedor of vendedores) {
             console.log(`\n👤 Processando vendedor: ${vendedor.nome} (${vendedor.perfil})`);
@@ -223,14 +232,20 @@ async function generateData() {
                     fatorMes *
                     fatorAleatorio);
                 const atividade = new Atividade_1.Atividade((0, uuid_1.v4)(), vendedor.id, data, docinhosCoco, docinhosCoco);
-                atividadesParaBulk.push(atividade);
+                atividadesBatch.push(atividade);
                 totalAtividades++;
+                if (atividadesBatch.length >= BATCH_SIZE) {
+                    await insertAtividadesBatch();
+                    console.log(`  ✓ Inserido lote de ${BATCH_SIZE} atividades`);
+                }
             }
-            console.log(`✅ Preparadas ${diasComAtividade} atividades para ${vendedor.nome}`);
         }
-        // Insere todas as atividades de uma vez
-        console.log('💾 Salvando todas as atividades...');
-        await AtividadeModel_1.AtividadeModel.insertMany(atividadesParaBulk);
+        // Insere as atividades restantes
+        if (atividadesBatch.length > 0) {
+            await insertAtividadesBatch();
+            console.log(`  ✓ Inserido lote final de ${atividadesBatch.length} atividades`);
+        }
+        console.timeEnd('Criação de atividades');
         console.log(`\n🎉 Total de atividades criadas: ${totalAtividades}`);
         // Resumo final
         console.log('\n📊 RESUMO DA GERAÇÃO DE DADOS');
@@ -250,15 +265,11 @@ async function generateData() {
         console.log(`  • Média por equipe: ${estatisticasMetas.mediaMetasPorEquipe.toFixed(1)}`);
         console.log(`  • Maior meta: ${estatisticasMetas.maiorMeta.valor.toLocaleString('pt-BR')} (${estatisticasMetas.maiorMeta.equipe} - ${estatisticasMetas.maiorMeta.mes})`);
         console.log(`  • Menor meta: ${estatisticasMetas.menorMeta.valor.toLocaleString('pt-BR')} (${estatisticasMetas.menorMeta.equipe} - ${estatisticasMetas.menorMeta.mes})`);
-        console.log('\n  • Médias por perfil:');
-        for (const perfil in estatisticasMetas.metasPorPerfil) {
-            const dados = estatisticasMetas.metasPorPerfil[perfil];
-            console.log(`    - ${perfil}: ${dados.media.toLocaleString('pt-BR')}`);
-        }
         console.log('\n📈 Atividades:');
         console.log(`  • Total: ${totalAtividades}`);
         console.log(`  • Média por vendedor: ${(totalAtividades / vendedores.length).toFixed(1)}`);
         console.log(`  • Média por equipe: ${(totalAtividades / equipes.length).toFixed(1)}`);
+        console.timeEnd('Tempo total de execução');
         console.log('\n🎉 Geração de dados concluída com sucesso!');
     }
     catch (error) {
