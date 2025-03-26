@@ -21,9 +21,11 @@
   "dependencies": {
     "@tensorflow-models/coco-ssd": "^2.2.3",
     "@tensorflow/tfjs": "^4.17.0",
+    "@types/axios": "^0.14.4",
     "@types/dotenv": "^8.2.3",
     "@types/ioredis": "^5.0.0",
     "@types/uuid": "^10.0.0",
+    "axios": "^1.8.4",
     "badge-maker": "^4.1.0",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",

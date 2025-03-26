@@ -11,6 +11,7 @@ const equipeRoutes_1 = __importDefault(require("./interfaces/routes/equipeRoutes
 const metaRoutes_1 = __importDefault(require("./interfaces/routes/metaRoutes"));
 const desempenhoIdealRoutes_1 = __importDefault(require("./interfaces/routes/desempenhoIdealRoutes"));
 const temaRoutes_1 = __importDefault(require("./interfaces/routes/temaRoutes"));
+const cargoRoutes_1 = __importDefault(require("./interfaces/routes/cargoRoutes"));
 console.log('📦 Iniciando configuração do app...');
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
@@ -43,6 +44,7 @@ app.use("/api", equipeRoutes_1.default);
 app.use("/api", metaRoutes_1.default);
 app.use("/api", desempenhoIdealRoutes_1.default);
 app.use("/api", temaRoutes_1.default);
+app.use("/api", cargoRoutes_1.default);
 console.log('✅ App configurado com sucesso!');
 exports.default = app;
 //# sourceMappingURL=app.js.map

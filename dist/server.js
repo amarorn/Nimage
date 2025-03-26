@@ -14,6 +14,7 @@ const equipeRoutes_1 = __importDefault(require("./interfaces/routes/equipeRoutes
 const atividadeRoutes_1 = __importDefault(require("./interfaces/routes/atividadeRoutes"));
 const metaRoutes_1 = __importDefault(require("./interfaces/routes/metaRoutes"));
 const temaRoutes_1 = __importDefault(require("./interfaces/routes/temaRoutes"));
+const cargoRoutes_1 = __importDefault(require("./interfaces/routes/cargoRoutes"));
 // Configuração do dotenv
 (0, dotenv_1.config)();
 const app = (0, express_1.default)();
@@ -27,6 +28,7 @@ app.use("/api", equipeRoutes_1.default);
 app.use("/api", atividadeRoutes_1.default);
 app.use("/api", metaRoutes_1.default);
 app.use("/api", temaRoutes_1.default);
+app.use("/api", cargoRoutes_1.default);
 // Inicialização do servidor
 const startServer = async () => {
     try {
