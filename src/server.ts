@@ -9,6 +9,7 @@ import vendedorRoutes from "./interfaces/routes/vendedorRoutes";
 import equipeRoutes from "./interfaces/routes/equipeRoutes";
 import atividadeRoutes from "./interfaces/routes/atividadeRoutes";
 import metaRoutes from "./interfaces/routes/metaRoutes";
+import temaRoutes from "./interfaces/routes/temaRoutes";
 
 // Configuração do dotenv
 config();
@@ -25,6 +26,7 @@ app.use("/api", vendedorRoutes);
 app.use("/api", equipeRoutes);
 app.use("/api", atividadeRoutes);
 app.use("/api", metaRoutes);
+app.use("/api", temaRoutes);
 
 // Inicialização do servidor
 const startServer = async () => {

@@ -18,7 +18,7 @@ const temaController = new TemaController_1.TemaController(criarTema, obterTema,
 router.post("/temas", async (req, res) => {
     return temaController.criar(req, res);
 });
-router.get("/temas", async (req, res) => {
+router.get("/temas/all", async (req, res) => {
     return temaController.obterTodos(req, res);
 });
 router.get("/temas/:id", async (req, res) => {

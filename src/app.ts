@@ -43,7 +43,7 @@ app.use("/api", atividadeRoutes);
 app.use("/api", equipeRoutes);
 app.use("/api", metaRoutes);
 app.use("/api", desempenhoIdealRoutes);
-app.use('/api', temaRoutes);
+app.use("/api", temaRoutes);
 
 console.log('✅ App configurado com sucesso!');
 

@@ -21,7 +21,7 @@ router.post("/temas", async (req, res) => {
     return temaController.criar(req, res);
 });
 
-router.get("/temas", async (req, res) => {
+router.get("/temas/all", async (req, res) => {
     return temaController.obterTodos(req, res);
 });
 

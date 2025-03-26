@@ -42,7 +42,7 @@ app.use("/api", atividadeRoutes_1.default);
 app.use("/api", equipeRoutes_1.default);
 app.use("/api", metaRoutes_1.default);
 app.use("/api", desempenhoIdealRoutes_1.default);
-app.use('/api', temaRoutes_1.default);
+app.use("/api", temaRoutes_1.default);
 console.log('✅ App configurado com sucesso!');
 exports.default = app;
 //# sourceMappingURL=app.js.map
