@@ -2,16 +2,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Equipe = void 0;
 class Equipe {
-    constructor(id, nome, nomepdv, cidade, estado, gerente, contato_gerente, capitao, contato_capitao) {
+    constructor(id, nome, pdv, cidade, estado, gerenteNome, gerenteTelefone, capitaoNome, capitaoTelefone, temaId) {
         this.id = id;
         this.nome = nome;
-        this.nomepdv = nomepdv;
+        this.pdv = pdv;
         this.cidade = cidade;
         this.estado = estado;
-        this.gerente = gerente;
-        this.contato_gerente = contato_gerente;
-        this.capitao = capitao;
-        this.contato_capitao = contato_capitao;
+        this.gerenteNome = gerenteNome;
+        this.gerenteTelefone = gerenteTelefone;
+        this.capitaoNome = capitaoNome;
+        this.capitaoTelefone = capitaoTelefone;
+        this.temaId = temaId;
     }
 }
 exports.Equipe = Equipe;

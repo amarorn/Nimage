@@ -35,20 +35,19 @@ class OllamaService {
                 throw new Error('Invalid vendorInfo structure');
             }
             const vendedor = vendorInfo.resultado.vendedor;
-            const metaEquipe = vendorInfo.resultado.equipe.meta;
+            const equipe = vendorInfo.resultado.equipe;
             // Log dos dados iniciais para debug
-            console.log('Dados do vendedor:', {
+            console.log('🔍 Dados recebidos:', vendorInfo);
+            console.log('👤 Dados do vendedor:', {
                 nome: vendedor.nome,
                 vendasMesAnterior: vendedor.vendasMesAnterior,
                 totalVendasEquipeMesAnterior: vendedor.totalVendasEquipeMesAnterior,
-                metaEquipe: metaEquipe,
-                metaAnterior: vendorInfo.resultado.equipe.meta_anterior
+                metaEquipe: equipe.meta,
+                metaAnterior: equipe.meta_anterior
             });
             // Calcula o percentual de contribuição para a meta da equipe usando dados do mês anterior
             const vendasMesAnterior = parseFloat(vendedor.vendasMesAnterior) || 0;
             const totalVendasEquipeMesAnterior = parseFloat(vendedor.totalVendasEquipeMesAnterior) || 1;
-            const metaAnterior = parseFloat(vendorInfo.resultado.equipe.meta_anterior) || 0;
-            const metaEquipeNumerico = parseFloat(metaEquipe) || 0;
             // Verifica se totalVendasEquipeMesAnterior é zero para evitar divisão por zero
             let percentualContribuicao = 0;
             if (totalVendasEquipeMesAnterior > 0) {
@@ -57,118 +56,50 @@ class OllamaService {
             // Se o vendedor não tem histórico, usa uma distribuição igualitária
             const temHistorico = vendedor.numeroDiasComAtividade > 0;
             const percentualContribuicao_Final = temHistorico && percentualContribuicao > 0 ? percentualContribuicao : 1 / (vendedor.totalVendedores || 1);
-            // Calcula a meta individual do vendedor
-            const metaIndividual = percentualContribuicao_Final * metaEquipeNumerico;
             // Formata os valores monetários e percentuais
-            const metaIndividualFormatada = new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL'
-            }).format(metaIndividual);
             const percentualContribuicaoFormatado = new Intl.NumberFormat('pt-BR', {
                 style: 'percent',
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             }).format(percentualContribuicao_Final);
-            // Calcula o percentual de crescimento
-            const iapVendedor = parseFloat(vendedor.iapVendedor) || 0;
-            // Ajusta o percentual de crescimento para ficar abaixo do percentual de contribuição
-            let percentualCrescimento = 0;
-            if (vendasMesAnterior > 0) {
-                percentualCrescimento = ((iapVendedor - vendasMesAnterior) / vendasMesAnterior) * 100;
-                // Limita o percentual de crescimento ao percentual de contribuição
-                if (Math.abs(percentualCrescimento) > percentualContribuicao * 100) {
-                    percentualCrescimento = percentualCrescimento > 0 ?
-                        percentualContribuicao * 100 * 0.9 : // Se positivo, 90% do percentual de contribuição
-                        -percentualContribuicao * 100 * 0.9; // Se negativo, -90% do percentual de contribuição
-                }
-            }
-            // Calcula os próximos dois meses
-            const [ano, mes] = vendorInfo.mesRequisicao.split('-').map(Number);
-            const dataBase = new Date(ano, mes - 1, 1);
-            const nextMonth = new Date(dataBase);
-            nextMonth.setMonth(nextMonth.getMonth() + 1);
-            const followingMonth = new Date(dataBase);
-            followingMonth.setMonth(followingMonth.getMonth() + 2);
-            // Formata os nomes dos meses em português
-            const formatarMes = (data) => {
-                return data.toLocaleDateString('pt-BR', { month: 'long' });
-            };
-            const nextMonthName = formatarMes(nextMonth);
-            const followingMonthName = formatarMes(followingMonth);
+            // Obtém os valores dos últimos 3 meses
+            const vm1 = vendedor.vendasMesAnterior; // segundo mês anterior ao filtro
+            const vm2 = vendedor.totalVendasMesAnterior; // primeiro mês anterior ao filtro
+            const vm3 = vendedor.somaDocinhos; // mês atual (filtro)
+            // Calcula os crescimentos percentuais
+            const c1 = vm1 > 0 ? ((vm2 - vm1) / vm1) * 100 : 0;
+            const c2 = vm2 > 0 ? ((vm3 - vm2) / vm2) * 100 : 0;
+            // Calcula a média dos crescimentos
+            const crescimentoMedio = (c1 + c2) / 2;
+            // Calcula a nova meta sugerida
+            const metaSugerida = vm3 * (1 + (crescimentoMedio / 100));
+            console.log('📈 Análise de Crescimento:', {
+                vm1: vm1.toFixed(2),
+                vm2: vm2.toFixed(2),
+                vm3: vm3.toFixed(2),
+                c1: c1.toFixed(2) + '%',
+                c2: c2.toFixed(2) + '%',
+                crescimentoMedio: crescimentoMedio.toFixed(2) + '%',
+                metaSugerida: metaSugerida.toFixed(2)
+            });
             // Prepara o histórico de vendas
             const historico = vendedor.historicoVendas || [];
             console.log('📊 Histórico de vendas:', historico);
-            // Calcula a média diária para previsão
-            const mediaDiaria = vendedor.mediaAtividadePorDia || 0;
-            const diasNoMes = 30; // Assumindo 30 dias para previsão
-            // Calcula o crescimento baseado na meta da equipe
-            const crescimentoMeta = (metaEquipeNumerico - metaAnterior) / metaAnterior;
-            const crescimentoVendas = (vendedor.somaDocinhos - vendasMesAnterior) / vendasMesAnterior;
-            // Ajusta o fator de crescimento baseado no desempenho do vendedor em relação à equipe
-            const fatorCrescimentoNextMonth = 1 + (crescimentoMeta * 0.5) + (crescimentoVendas * 0.3);
-            const fatorCrescimentoFollowingMonth = 1 + (crescimentoMeta * 0.7) + (crescimentoVendas * 0.5);
-            // Gera previsão dia a dia para os próximos dois meses
-            const previsaoNextMonth = Array.from({ length: diasNoMes }, (_, i) => ({
-                dia: i + 1,
-                valor: Math.round(mediaDiaria * (1 + (i / diasNoMes) * (fatorCrescimentoNextMonth - 1)))
-            }));
-            const previsaoFollowingMonth = Array.from({ length: diasNoMes }, (_, i) => ({
-                dia: i + 1,
-                valor: Math.round(mediaDiaria * (1 + (i / diasNoMes) * (fatorCrescimentoFollowingMonth - 1)))
-            }));
-            // Retorna o resultado formatado conforme o modelo solicitado
+            // Retorna apenas os campos solicitados
             return {
-                resultado: {
-                    vendedor: {
-                        nome: vendedor.nome,
-                        feaVendedor: vendedor.feaVendedor,
-                        iapVendedor: vendedor.iapVendedor,
-                        numeroDiasComAtividade: vendedor.numeroDiasComAtividade,
-                        somaDocinhos: vendedor.somaDocinhos,
-                        mediaAtividadePorDia: vendedor.mediaAtividadePorDia,
-                        percentualContribuicao: percentualContribuicaoFormatado.replace('%', '').replace(',', '.') + '%',
-                        percentualCrescimento: percentualCrescimento.toFixed(2),
-                        pesoNaEquipe: (1 / vendedor.totalVendedores * 100).toFixed(2),
-                        distribuicaoMeta: metaIndividual.toFixed(2),
-                        desempenhoDiarioIdeal: (metaIndividual / 22).toFixed(2),
-                        equipe: {
-                            meta: metaEquipeNumerico,
-                            meta_anterior: metaAnterior,
-                            totalVendedores: vendedor.totalVendedores,
-                            mediaEquipe: vendedor.mediaEquipeMesAnterior,
-                            totalVendasMesAnterior: vendedor.totalVendasEquipeMesAnterior,
-                            crescimentoMeta: (crescimentoMeta * 100).toFixed(2) + '%',
-                            crescimentoVendas: (crescimentoVendas * 100).toFixed(2) + '%',
-                            diferenca: (metaEquipeNumerico - metaAnterior).toFixed(2),
-                            periodoMetaAnterior: vendorInfo.resultado.equipe.periodoMetaAnterior
-                        },
-                        dadosGrafico: {
-                            historico: historico,
-                            previsao: [
-                                {
-                                    mes: nextMonthName.charAt(0).toUpperCase() + nextMonthName.slice(1),
-                                    valor: previsaoNextMonth.reduce((acc, curr) => acc + curr.valor, 0),
-                                    detalhes: previsaoNextMonth
-                                },
-                                {
-                                    mes: followingMonthName.charAt(0).toUpperCase() + followingMonthName.slice(1),
-                                    valor: previsaoFollowingMonth.reduce((acc, curr) => acc + curr.valor, 0),
-                                    detalhes: previsaoFollowingMonth
-                                }
-                            ]
-                        },
-                        analiseHistorico: {
-                            crescimentoPeriodo: "Crescimento constante no período analisado",
-                            tendenciasIdentificadas: ["Aumento gradual nas vendas"],
-                            pontosMelhoria: ["Aumentar volume de vendas"],
-                            estrategiasHistorico: ["Foco em produtos principais"]
-                        }
-                    }
-                }
+                tendencia: "Estabilização com viés de recuperação nos últimos dias",
+                observacoes: [
+                    "Após queda acentuada no início do mês, houve retomada gradual na reta final.",
+                    "Volume de vendas mais consistente nas semanas finais, indicando possível reação."
+                ],
+                recomendacoes: [
+                    "Manter o ritmo dos últimos dias e reforçar atuação em dias úteis.",
+                    "Avaliar quais ações geraram aumento no final do mês e replicar."
+                ]
             };
         }
         catch (error) {
-            console.error('Error in getInsights:', error);
+            console.error('❌ Error in getInsights:', error);
             throw error;
         }
     }

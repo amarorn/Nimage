@@ -5,6 +5,8 @@ import atividadeRoutes from "./interfaces/routes/atividadeRoutes";
 import equipeRoutes from "./interfaces/routes/equipeRoutes";
 import metaRoutes from "./interfaces/routes/metaRoutes";
 import desempenhoIdealRoutes from "./interfaces/routes/desempenhoIdealRoutes";
+import temaRoutes from './interfaces/routes/temaRoutes';
+import cargoRoutes from './interfaces/routes/cargoRoutes';
 
 console.log('📦 Iniciando configuração do app...');
 
@@ -42,6 +44,8 @@ app.use("/api", atividadeRoutes);
 app.use("/api", equipeRoutes);
 app.use("/api", metaRoutes);
 app.use("/api", desempenhoIdealRoutes);
+app.use("/api", temaRoutes);
+app.use("/api", cargoRoutes);
 
 console.log('✅ App configurado com sucesso!');
 

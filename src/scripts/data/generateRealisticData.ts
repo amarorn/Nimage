@@ -1,17 +1,17 @@
-import { MongoDB } from '@/infrastructure/database/MongoDB';
-import { EquipeRepositoryImpl } from '@/infrastructure/repositories/EquipeRepositoryImpl';
-import { VendedorRepositoryImpl } from '@/infrastructure/repositories/VendedorRepositoryImpl';
-import { MetaRepositoryImpl } from '@/infrastructure/repositories/MetaRepositoryImpl';
-import { AtividadeRepositoryImpl } from '@/infrastructure/repositories/AtividadeRepositoryImpl';
-import { Equipe } from '@/domain/entities/Equipe';
-import { Vendedor } from '@/domain/entities/Vendedor';
-import { Meta } from '@/domain/entities/Meta';
-import { Atividade } from '@/domain/entities/Atividade';
+import { MongoDB } from '../../infrastructure/database/MongoDB';
+import { EquipeRepositoryImpl } from '../../infrastructure/repositories/EquipeRepositoryImpl';
+import { VendedorRepositoryImpl } from '../../infrastructure/repositories/VendedorRepositoryImpl';
+import { MetaRepositoryImpl } from '../../infrastructure/repositories/MetaRepositoryImpl';
+import { AtividadeRepositoryImpl } from '../../infrastructure/repositories/AtividadeRepositoryImpl';
+import { Equipe } from '../../domain/entities/Equipe';
+import { Vendedor } from '../../domain/entities/Vendedor';
+import { Meta } from '../../domain/entities/Meta';
+import { Atividade } from '../../domain/entities/Atividade';
 import { v4 as uuidv4 } from 'uuid';
-import { EquipeModel } from '@/infrastructure/database/models/EquipeModel';
-import { VendedorModel } from '@/infrastructure/database/models/VendedorModel';
-import { MetaModel } from '@/infrastructure/database/models/MetaModel';
-import { AtividadeModel } from '@/infrastructure/database/models/AtividadeModel';
+import { EquipeModel } from '../../infrastructure/database/models/EquipeModel';
+import { VendedorModel } from '../../infrastructure/database/models/VendedorModel';
+import { MetaModel } from '../../infrastructure/database/models/MetaModel';
+import { AtividadeModel } from '../../infrastructure/database/models/AtividadeModel';
 
 // Perfis de vendedores
 interface PerfilVendedor {

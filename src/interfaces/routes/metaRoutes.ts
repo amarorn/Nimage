@@ -17,29 +17,45 @@ const obterEquipePorId = new ObterEquipePorId(equipeRepo);
 const metaController = new MetaController(criarMeta, obterMeta, atualizarMeta, obterEquipePorId);
 
 router.post("/metas", async (req, res) => {
-    //console.log("📨 Nova requisição POST /metas");
     return metaController.criar(req, res);
 });
 
 router.get("/metas/all", async (req, res) => {
-    //console.log("📨 Nova requisição GET /metas");
-    const metas = await metaController.obterTodos(req, res);
-    return res.json(metas);
+    try {
+        // Validação dos parâmetros de paginação
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 20;
+
+        if (page < 1 || limit < 1) {
+            return res.status(400).json({
+                erro: 'Parâmetros de paginação inválidos',
+                detalhes: {
+                    page: page < 1 ? 'A página deve ser maior que 0' : 'válido',
+                    limit: limit < 1 ? 'O limite deve ser maior que 0' : 'válido'
+                }
+            });
+        }
+
+        const resultado = await metaController.obterTodos(req, res);
+        return res.status(200).json(resultado);
+    } catch (erro) {
+        console.error('Erro ao obter metas:', erro);
+        return res.status(500).json({
+            erro: 'Erro interno ao obter metas',
+            mensagem: (erro as Error).message
+        });
+    }
 });
 
 router.get("/metas/:id", async (req, res) => {
-    //console.log("📨 Nova requisição GET /metas/:id");
     return metaController.obterPorId(req, res);
 });
 
 router.get("/metas/equipe/:equipeId", async (req, res) => {
-    //console.log("📨 Nova requisição GET /metas/equipe/:equipeId");
-    const equipeId = req.params.equipeId;
     return metaController.obterPorEquipe(req, res);
 });
 
 router.put("/metas/:id", async (req, res) => {
-    //console.log("📨 Nova requisição PUT /metas/:id");
     return metaController.atualizar(req, res);
 });
 

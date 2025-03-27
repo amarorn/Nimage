@@ -4,14 +4,17 @@ import { Equipe } from "../../domain/entities/Equipe";
 export class AtualizarEquipe {
     constructor(private equipeRepo: EquipeRepository) {}
 
-    async executar(id: string, dados: { nome?: string; 
-        nomepdv?: string;
+    async executar(id: string, dados: { 
+        nome?: string; 
+        pdv?: string;
         cidade?: string; 
         estado?: string; 
-        gerente?: string; 
-        contato_gerente?: string; 
-        capitao?: string; 
-        contato_capitao?: string }): Promise<Equipe | null> {
+        gerenteNome?: string; 
+        gerenteTelefone?: string; 
+        capitaoNome?: string; 
+        capitaoTelefone?: string;
+        temaId?: string;
+    }): Promise<Equipe | null> {
         if (!id) {
             throw new Error('ID da equipe não fornecido');
         }

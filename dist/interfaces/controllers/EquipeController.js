@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EquipeController = void 0;
+const EquipeCacheService_1 = require("../../infrastructure/cache/EquipeCacheService");
 class EquipeController {
     constructor(criarEquipe, obterEquipe, obterEquipeDadosFull, equipeMetaService, atualizarEquipe) {
         this.criarEquipe = criarEquipe;
@@ -8,41 +9,42 @@ class EquipeController {
         this.obterEquipeDadosFull = obterEquipeDadosFull;
         this.equipeMetaService = equipeMetaService;
         this.atualizarEquipe = atualizarEquipe;
+        this.equipeCache = EquipeCacheService_1.EquipeCacheService.getInstance();
     }
     async criar(req, res) {
         try {
             if (!req.body) {
                 return res.status(400).json({ erro: 'Body da requisição está vazio' });
             }
-            const { id, nome, nomepdv, cidade, estado, gerente, contato_gerente, capitao, contato_capitao } = req.body;
+            const { id, nome, pdv, cidade, estado, gerenteNome, gerenteTelefone, capitaoNome, capitaoTelefone, temaId } = req.body;
             // Validação dos campos obrigatórios
-            if (!id || !nome || !nomepdv || !cidade || !estado ||
-                !gerente || !contato_gerente || !capitao || !contato_capitao) {
+            if (!id || !nome || !pdv || !cidade || !estado || !gerenteNome || !gerenteTelefone || !capitaoNome || !capitaoTelefone) {
                 return res.status(400).json({
                     erro: 'Dados inválidos',
                     detalhes: {
                         id: id ? 'presente' : 'ausente',
                         nome: nome ? 'presente' : 'ausente',
-                        nomepdv: nomepdv ? 'presente' : 'ausente',
+                        pdv: pdv ? 'presente' : 'ausente',
                         cidade: cidade ? 'presente' : 'ausente',
                         estado: estado ? 'presente' : 'ausente',
-                        gerente: gerente ? 'presente' : 'ausente',
-                        contato_gerente: contato_gerente ? 'presente' : 'ausente',
-                        capitao: capitao ? 'presente' : 'ausente',
-                        contato_capitao: contato_capitao ? 'presente' : 'ausente'
+                        gerenteNome: gerenteNome ? 'presente' : 'ausente',
+                        gerenteTelefone: gerenteTelefone ? 'presente' : 'ausente',
+                        capitaoNome: capitaoNome ? 'presente' : 'ausente',
+                        capitaoTelefone: capitaoTelefone ? 'presente' : 'ausente'
                     }
                 });
             }
             const equipe = await this.criarEquipe.executar({
                 id,
                 nome,
-                nomepdv,
+                pdv,
                 cidade,
                 estado,
-                gerente,
-                contato_gerente,
-                capitao,
-                contato_capitao
+                gerenteNome,
+                gerenteTelefone,
+                capitaoNome,
+                capitaoTelefone,
+                temaId
             });
             return res.status(201).json(equipe);
         }
@@ -58,24 +60,51 @@ class EquipeController {
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 10;
             const skip = (page - 1) * limit;
+            // Tenta obter do cache primeiro
+            const cacheKey = `list:${page}:${limit}`;
+            const cachedEquipes = await this.equipeCache.getEquipes();
+            if (cachedEquipes) {
+                console.log('📦 Cache hit: Equipes encontradas no cache');
+                return res.status(200).json({
+                    pagina: page,
+                    limite: limit,
+                    total: cachedEquipes.length,
+                    equipes: cachedEquipes.map((equipe) => ({
+                        id: equipe.id,
+                        nome: equipe.nome,
+                        pdv: equipe.pdv,
+                        cidade: equipe.cidade,
+                        estado: equipe.estado,
+                        gerenteNome: equipe.gerenteNome,
+                        gerenteTelefone: equipe.gerenteTelefone,
+                        capitaoNome: equipe.capitaoNome,
+                        capitaoTelefone: equipe.capitaoTelefone,
+                        temaId: equipe.temaId
+                    }))
+                });
+            }
+            console.log('🔄 Cache miss: Buscando equipes do banco');
             const equipes = await this.obterEquipe.executar(skip, limit);
-            const respostaPersonalizada = {
+            // Salva no cache
+            await this.equipeCache.setEquipes(equipes);
+            console.log('💾 Cache: Equipes salvas no cache');
+            return res.status(200).json({
                 pagina: page,
                 limite: limit,
                 total: equipes.length,
-                equipes: equipes.map(equipe => ({
+                equipes: equipes.map((equipe) => ({
                     id: equipe.id,
                     nome: equipe.nome,
-                    nomepdv: equipe.nomepdv,
+                    pdv: equipe.pdv,
                     cidade: equipe.cidade,
                     estado: equipe.estado,
-                    gerente: equipe.gerente,
-                    contato_gerente: equipe.contato_gerente,
-                    capitao: equipe.capitao,
-                    contato_capitao: equipe.contato_capitao
+                    gerenteNome: equipe.gerenteNome,
+                    gerenteTelefone: equipe.gerenteTelefone,
+                    capitaoNome: equipe.capitaoNome,
+                    capitaoTelefone: equipe.capitaoTelefone,
+                    temaId: equipe.temaId
                 }))
-            };
-            return respostaPersonalizada;
+            });
         }
         catch (erro) {
             return res.status(500).json({
@@ -94,13 +123,14 @@ class EquipeController {
             return res.status(200).json({
                 id: equipe.id,
                 nome: equipe.nome,
-                nomepdv: equipe.nomepdv,
+                pdv: equipe.pdv,
                 cidade: equipe.cidade,
                 estado: equipe.estado,
-                gerente: equipe.gerente,
-                contato_gerente: equipe.contato_gerente,
-                capitao: equipe.capitao,
-                contato_capitao: equipe.contato_capitao
+                gerenteNome: equipe.gerenteNome,
+                gerenteTelefone: equipe.gerenteTelefone,
+                capitaoNome: equipe.capitaoNome,
+                capitaoTelefone: equipe.capitaoTelefone,
+                temaId: equipe.temaId
             });
         }
         catch (erro) {
@@ -151,17 +181,18 @@ class EquipeController {
     async atualizar(req, res) {
         try {
             const { id } = req.params;
-            const { nome, nomepdv, cidade, estado, gerente, contato_gerente, capitao, contato_capitao } = req.body;
+            const { nome, pdv, cidade, estado, gerenteNome, gerenteTelefone, capitaoNome, capitaoTelefone, temaId } = req.body;
             // Validação dos campos
             const camposAtualizacao = {
                 nome,
-                nomepdv,
+                pdv,
                 cidade,
                 estado,
-                gerente,
-                contato_gerente,
-                capitao,
-                contato_capitao
+                gerenteNome,
+                gerenteTelefone,
+                capitaoNome,
+                capitaoTelefone,
+                temaId
             };
             // Filtra apenas os campos que foram fornecidos
             const dadosAtualizacao = Object.entries(camposAtualizacao)
@@ -176,16 +207,19 @@ class EquipeController {
             if (!equipeAtualizada) {
                 return res.status(404).json({ erro: 'Equipe não encontrada' });
             }
+            // Invalida o cache da meta da equipe
+            await this.equipeMetaService.invalidarCache(id);
             return res.status(200).json({
                 id: equipeAtualizada.id,
                 nome: equipeAtualizada.nome,
-                nomepdv: equipeAtualizada.nomepdv,
+                pdv: equipeAtualizada.pdv,
                 cidade: equipeAtualizada.cidade,
                 estado: equipeAtualizada.estado,
-                gerente: equipeAtualizada.gerente,
-                contato_gerente: equipeAtualizada.contato_gerente,
-                capitao: equipeAtualizada.capitao,
-                contato_capitao: equipeAtualizada.contato_capitao
+                gerenteNome: equipeAtualizada.gerenteNome,
+                gerenteTelefone: equipeAtualizada.gerenteTelefone,
+                capitaoNome: equipeAtualizada.capitaoNome,
+                capitaoTelefone: equipeAtualizada.capitaoTelefone,
+                temaId: equipeAtualizada.temaId
             });
         }
         catch (erro) {

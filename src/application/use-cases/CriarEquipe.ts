@@ -4,13 +4,14 @@ import { EquipeRepository } from "../../domain/repositories/EquipeRepository";
 interface CriarEquipeDTO {
     id: string;
     nome: string;
-    nomepdv: string;
+    pdv: string;
     cidade: string;
     estado: string;
-    gerente: string;
-    contato_gerente: string;
-    capitao: string;
-    contato_capitao: string;
+    gerenteNome: string;
+    gerenteTelefone: string;
+    capitaoNome: string;
+    capitaoTelefone: string;
+    temaId?: string;
 }
 
 export class CriarEquipe {
@@ -19,8 +20,8 @@ export class CriarEquipe {
     async executar(dados: CriarEquipeDTO) {
         //console.log("📝 Iniciando criação de equipe com dados:", dados);
 
-        if (!dados.id || !dados.nome || !dados.nomepdv || !dados.cidade || !dados.estado || 
-            !dados.gerente || !dados.contato_gerente || !dados.capitao || !dados.contato_capitao) {
+        if (!dados.id || !dados.nome || !dados.pdv || !dados.cidade || !dados.estado || 
+            !dados.gerenteNome || !dados.gerenteTelefone || !dados.capitaoNome || !dados.capitaoTelefone) {
             throw new Error('Dados inválidos para criar equipe');
         }
 
@@ -31,13 +32,14 @@ export class CriarEquipe {
         const equipe = new Equipe(
             dados.id,
             dados.nome,
-            dados.nomepdv,
+            dados.pdv,
             dados.cidade,
             dados.estado,
-            dados.gerente,
-            dados.contato_gerente,
-            dados.capitao,
-            dados.contato_capitao
+            dados.gerenteNome,
+            dados.gerenteTelefone,
+            dados.capitaoNome,
+            dados.capitaoTelefone,
+            dados.temaId
         );
         //console.log("🏗️ Equipe instanciada:", equipe);
 

@@ -9,18 +9,18 @@ export class EquipeRepositoryImpl implements EquipeRepository {
 
     async obterPorId(id: string): Promise<Equipe | null> {
         const equipe = await EquipeModel.findOne({ id }).lean();
-        
         if (equipe) {
             return new Equipe(
                 equipe.id,
                 equipe.nome,
-                equipe.nomepdv,
+                equipe.pdv,
                 equipe.cidade,
                 equipe.estado,
-                equipe.gerente,
-                equipe.contato_gerente,
-                equipe.capitao,
-                equipe.contato_capitao
+                equipe.gerenteNome,
+                equipe.gerenteTelefone,
+                equipe.capitaoNome,
+                equipe.capitaoTelefone,
+                equipe.temaId
             );
         }
         return null;
@@ -31,29 +31,31 @@ export class EquipeRepositoryImpl implements EquipeRepository {
         return equipes.map(equipe => new Equipe(
             equipe.id,
             equipe.nome,
-            equipe.nomepdv,
+            equipe.pdv,
             equipe.cidade,
             equipe.estado,
-            equipe.gerente,
-            equipe.contato_gerente,
-            equipe.capitao,
-            equipe.contato_capitao
+            equipe.gerenteNome,
+            equipe.gerenteTelefone,
+            equipe.capitaoNome,
+            equipe.capitaoTelefone,
+            equipe.temaId
         ));
     }
 
     async atualizar(id: string, dados: {
         nome?: string;
-        nomepdv?: string;
+        pdv?: string;
         cidade?: string;
         estado?: string;
-        gerente?: string;
-        contato_gerente?: string;
-        capitao?: string;
-        contato_capitao?: string;
+        gerenteNome?: string;
+        gerenteTelefone?: string;
+        capitaoNome?: string;
+        capitaoTelefone?: string;
+        temaId?: string;
     }): Promise<Equipe | null> {
         const equipeAtualizada = await EquipeModel.findOneAndUpdate(
             { id },
-            { $set: dados },
+            { ...dados },
             { new: true }
         ).lean();
 
@@ -61,13 +63,14 @@ export class EquipeRepositoryImpl implements EquipeRepository {
             return new Equipe(
                 equipeAtualizada.id,
                 equipeAtualizada.nome,
-                equipeAtualizada.nomepdv,
+                equipeAtualizada.pdv,
                 equipeAtualizada.cidade,
                 equipeAtualizada.estado,
-                equipeAtualizada.gerente,
-                equipeAtualizada.contato_gerente,
-                equipeAtualizada.capitao,
-                equipeAtualizada.contato_capitao
+                equipeAtualizada.gerenteNome,
+                equipeAtualizada.gerenteTelefone,
+                equipeAtualizada.capitaoNome,
+                equipeAtualizada.capitaoTelefone,
+                equipeAtualizada.temaId
             );
         }
         return null;
@@ -79,5 +82,9 @@ export class EquipeRepositoryImpl implements EquipeRepository {
 
     async deletarTodos(): Promise<void> {
         await EquipeModel.deleteMany({});
+    }
+
+    async obterTotal(): Promise<number> {
+        return await EquipeModel.countDocuments();
     }
 }

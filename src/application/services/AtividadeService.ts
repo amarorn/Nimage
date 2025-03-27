@@ -3,6 +3,7 @@ import { Atividade } from "../../domain/entities/Atividade";
 import { VendedorRepository } from "../../domain/repositories/VendedorRepository";
 import { EquipeRepository } from "../../domain/repositories/EquipeRepository";
 import { MetaRepository } from "../../domain/repositories/MetaRepository";
+import { AtividadeCacheService } from "../../infrastructure/cache/AtividadeCacheService";
 
 export interface AtividadesPorVendedorResult {
     quantidade: number;
@@ -28,51 +29,91 @@ export class AtividadeService {
     private vendedorRepo: VendedorRepository;
     private equipeRepo: EquipeRepository;
     private metaRepo: MetaRepository;
+    private atividadeRepo: AtividadeRepository;
+    private cacheService: AtividadeCacheService;
 
     constructor(
-        private atividadeRepo: AtividadeRepository,
+        atividadeRepo: AtividadeRepository,
         vendedorRepo: VendedorRepository,
         equipeRepo: EquipeRepository,
         metaRepo: MetaRepository
     ) {
+        this.atividadeRepo = atividadeRepo;
         this.vendedorRepo = vendedorRepo;
         this.equipeRepo = equipeRepo;
         this.metaRepo = metaRepo;
+        this.cacheService = AtividadeCacheService.getInstance();
     }
 
-    async obterAtividadesPorVendedorEData(vendedorId: string, dataInicio: Date, dataFim: Date): Promise<{ 
-        quantidade: number;
-        valorTotal: number;
-        vendedor: any;
-        equipe: any;
-        meta: any;
-    }> {
-        // Busca atividades
-        const atividades = await this.atividadeRepo.obterPorVendedorEData(vendedorId, dataInicio, dataFim);
-        const quantidade = atividades.length;
-        const valorTotal = atividades.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
+    async obterAtividadesPorVendedorEData(vendedorId: string, dataInicio: Date, dataFim: Date): Promise<AtividadesPorVendedorResult> {
+        // Tenta obter do cache primeiro
+        const cacheKey = `${vendedorId}:${dataInicio.toISOString()}:${dataFim.toISOString()}`;
+        const cachedResult = await this.cacheService.getAtividadesPorVendedorEData(vendedorId, dataInicio, dataFim);
+        
+        if (cachedResult) {
+            const quantidade = cachedResult.length;
+            const valorTotal = cachedResult.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
+            
+            // Busca informações do vendedor, equipe e meta em paralelo
+            const vendedor = await this.vendedorRepo.obterPorId(vendedorId);
+            if (!vendedor) {
+                throw new Error('Vendedor não encontrado');
+            }
+            
+            const [equipe, meta] = await Promise.all([
+                this.equipeRepo.obterPorId(vendedor.equipeId),
+                this.metaRepo.obterPorEquipe(vendedorId)
+            ]);
 
-        console.log('Debug - Buscando vendedor com ID:', vendedorId);
+            if (!equipe) {
+                throw new Error('Equipe não encontrada');
+            }
 
-        // Busca informações do vendedor
+            return {
+                quantidade,
+                valorTotal,
+                vendedor: {
+                    id: vendedor.id,
+                    nome: vendedor.nome,
+                    equipeId: vendedor.equipeId
+                },
+                equipe: {
+                    id: equipe.id,
+                    nome: equipe.nome
+                },
+                meta: meta ? {
+                    id: meta.id,
+                    equipeId: meta.equipeId,
+                    objetivo: meta.objetivo,
+                    data: meta.data
+                } : null
+            };
+        }
+
+        // Se não estiver no cache, busca do banco
         const vendedor = await this.vendedorRepo.obterPorId(vendedorId);
-        console.log('Debug - Resultado da busca do vendedor:', vendedor);
-
         if (!vendedor) {
             throw new Error('Vendedor não encontrado');
         }
 
-        // Busca informações da equipe
-        const equipe = await this.equipeRepo.obterPorId(vendedor.equipeId);
+        const [atividades, equipe, meta] = await Promise.all([
+            this.atividadeRepo.obterPorVendedorEData(vendedorId, dataInicio, dataFim),
+            this.equipeRepo.obterPorId(vendedor.equipeId),
+            this.metaRepo.obterPorEquipe(vendedorId)
+        ]);
+
         if (!equipe) {
             throw new Error('Equipe não encontrada');
         }
 
-        // Busca meta da equipe
-        const meta = await this.metaRepo.obterPorEquipe(equipe.id);
+        const quantidade = atividades.length;
+        const valorTotal = atividades.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
 
-        return { 
-            quantidade, 
+        // Salva no cache para próximas consultas
+        await this.cacheService.setAtividadesPorVendedorEData(vendedorId, dataInicio, dataFim, atividades);
+
+        return {
+            quantidade,
             valorTotal,
             vendedor: {
                 id: vendedor.id,

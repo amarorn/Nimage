@@ -4,10 +4,10 @@ import { Atividade } from "../../domain/entities/Atividade";
 export class AtualizarAtividade {
     constructor(private atividadeRepo: AtividadeRepository) {}
 
-    async executar(id: string, dados: { vendedorId: string; data: Date; docinhosCoco: number }): Promise<Atividade | null> {
+    async executar(id: string, dados: { vendedorId: string; data: Date; docinhosCoco: number; follow_up: number }): Promise<Atividade | null> {
         //console.log("📝 Iniciando atualização de atividade com dados:", dados);
 
-        if (!dados.vendedorId || !dados.data || dados.docinhosCoco === undefined) {
+        if (!dados.vendedorId || !dados.data || dados.docinhosCoco === undefined || dados.follow_up === undefined) {
             throw new Error('Dados inválidos para atualizar atividade');
         }
 

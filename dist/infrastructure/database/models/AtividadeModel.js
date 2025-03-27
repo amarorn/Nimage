@@ -39,7 +39,13 @@ const AtividadeSchema = new mongoose_1.Schema({
     id: { type: String, required: true, unique: true },
     vendedorId: { type: String, required: true },
     data: { type: Date, required: true },
-    docinhosCoco: { type: Number, required: true }
+    docinhosCoco: { type: Number, required: true },
+    follow_up: { type: Number, required: true, default: 0 },
+    total_docinhos: { type: Number }
 });
+// Índices para otimizar as queries mais comuns
+AtividadeSchema.index({ vendedorId: 1, data: 1 }); // Para queries por vendedor e data
+AtividadeSchema.index({ data: 1 }); // Para queries por data
+AtividadeSchema.index({ vendedorId: 1 }); // Para queries por vendedor
 exports.AtividadeModel = mongoose_1.default.model("Atividade", AtividadeSchema);
 //# sourceMappingURL=AtividadeModel.js.map

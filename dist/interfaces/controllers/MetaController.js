@@ -71,20 +71,16 @@ class MetaController {
                     ano: meta.data.getFullYear()
                 };
             }));
-            const respostaPersonalizada = {
+            return {
                 pagina: page,
                 statuscode: 200,
                 limite: limit,
                 total: metas.length,
                 metas: metasComEquipe
             };
-            return respostaPersonalizada;
         }
         catch (erro) {
-            return res.status(500).json({
-                erro: 'Erro interno ao obter metas',
-                mensagem: erro.message
-            });
+            throw erro;
         }
     }
     async obterPorId(req, res) {

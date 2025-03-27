@@ -13,13 +13,16 @@ class AtividadeRepositoryImpl {
     async obterTodos(skip, limit) {
         return await AtividadeModel_1.AtividadeModel.find().skip(skip).limit(limit).lean();
     }
+    async obterTotal() {
+        return await AtividadeModel_1.AtividadeModel.countDocuments();
+    }
     async obterPorVendedorId(vendedorId) {
         return await AtividadeModel_1.AtividadeModel.find({ vendedorId }).lean();
     }
     async atualizar(id, dados) {
-        const atividadeAtualizada = await AtividadeModel_1.AtividadeModel.findOneAndUpdate({ id }, { vendedorId: dados.vendedorId, data: dados.data, docinhosCoco: dados.docinhosCoco }, { new: true }).lean();
+        const atividadeAtualizada = await AtividadeModel_1.AtividadeModel.findOneAndUpdate({ id }, { vendedorId: dados.vendedorId, data: dados.data, docinhosCoco: dados.docinhosCoco, follow_up: dados.follow_up }, { new: true }).lean();
         if (atividadeAtualizada) {
-            return new Atividade_1.Atividade(atividadeAtualizada.id, atividadeAtualizada.vendedorId, atividadeAtualizada.data, atividadeAtualizada.docinhosCoco);
+            return new Atividade_1.Atividade(atividadeAtualizada.id, atividadeAtualizada.vendedorId, atividadeAtualizada.data, atividadeAtualizada.docinhosCoco, atividadeAtualizada.follow_up, atividadeAtualizada.total_docinhos);
         }
         return null;
     }

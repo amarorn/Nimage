@@ -16,19 +16,30 @@ export class AtividadeRepositoryImpl implements AtividadeRepository {
         return await AtividadeModel.find().skip(skip).limit(limit).lean();
     }
 
+    async obterTotal(): Promise<number> {
+        return await AtividadeModel.countDocuments();
+    }
+
     async obterPorVendedorId(vendedorId: string): Promise<Atividade[]> {
         return await AtividadeModel.find({ vendedorId }).lean();
     }
 
-    async atualizar(id: string, dados: { vendedorId: string; data: Date; docinhosCoco: number }): Promise<Atividade | null> {
+    async atualizar(id: string, dados: { vendedorId: string; data: Date; docinhosCoco: number; follow_up: number }): Promise<Atividade | null> {
         const atividadeAtualizada = await AtividadeModel.findOneAndUpdate(
             { id },
-            { vendedorId: dados.vendedorId, data: dados.data, docinhosCoco: dados.docinhosCoco },
+            { vendedorId: dados.vendedorId, data: dados.data, docinhosCoco: dados.docinhosCoco, follow_up: dados.follow_up },
             { new: true }
         ).lean();
 
         if (atividadeAtualizada) {
-            return new Atividade(atividadeAtualizada.id, atividadeAtualizada.vendedorId, atividadeAtualizada.data, atividadeAtualizada.docinhosCoco);
+            return new Atividade(
+                atividadeAtualizada.id, 
+                atividadeAtualizada.vendedorId, 
+                atividadeAtualizada.data, 
+                atividadeAtualizada.docinhosCoco,
+                atividadeAtualizada.follow_up,
+                atividadeAtualizada.total_docinhos
+            );
         }
         return null;
     }

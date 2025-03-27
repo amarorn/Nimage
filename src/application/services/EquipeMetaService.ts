@@ -1,43 +1,98 @@
 import { ObterEquipeDadosFull } from "../use-cases/ObterEquipeDadosFull";
+import { EquipeMetaCacheService } from "../../infrastructure/cache/EquipeMetaCacheService";
 
 export class EquipeMetaService {
-    constructor(private obterEquipeDadosFull: ObterEquipeDadosFull) {}
+    private equipeMetaCache: EquipeMetaCacheService;
+
+    constructor(private obterEquipeDadosFull: ObterEquipeDadosFull) {
+        this.equipeMetaCache = EquipeMetaCacheService.getInstance();
+    }
 
     async calcularMeta(equipeId: string) {
-        const dadosCompletos = await this.obterEquipeDadosFull.executar(equipeId);
+        try {
+            // Tenta obter do cache primeiro
+            const cacheData = await this.equipeMetaCache.getCalculoMeta(equipeId);
+            if (cacheData) {
+                console.log('📦 Cache hit: Dados da meta encontrados no cache');
+                return cacheData;
+            }
 
-        const somaDocinhosPorVendedor = dadosCompletos.vendedores.map(vendedor => {
-            const soma = vendedor.atividades.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
+            console.log('🔄 Cache miss: Calculando meta...');
+            const dadosCompletos = await this.obterEquipeDadosFull.executar(equipeId);
 
-            // Calcular o desempenho diário
-            const desempenhoDiario = vendedor.atividades.reduce((acc, atividade) => {
-                const data = atividade.data.toISOString().split('T')[0]; // Formatar a data como YYYY-MM-DD
-                if (!acc[data]) {
-                    acc[data] = 0;
-                }
-                acc[data] += atividade.docinhosCoco;
-                return acc;
-            }, {} as Record<string, number>);
+            const somaDocinhosPorVendedor = dadosCompletos.vendedores.map(vendedor => {
+                // Agrupa atividades por ano e mês
+                const desempenhoPorAnoMes = vendedor.atividades.reduce((acc, atividade) => {
+                    const data = new Date(atividade.data);
+                    const ano = data.getFullYear();
+                    const mes = data.getMonth() + 1; // getMonth() retorna 0-11
+                    const nomeMes = data.toLocaleString('pt-BR', { month: 'long' });
+                    
+                    if (!acc[ano]) {
+                        acc[ano] = {};
+                    }
+                    if (!acc[ano][mes]) {
+                        acc[ano][mes] = {
+                            nome: nomeMes,
+                            dias: {},
+                            somaMes: 0
+                        };
+                    }
 
-            // Calcular o total do desempenho diário
-            const totalDesempenho = Object.values(desempenhoDiario).reduce((total, valor) => total + valor, 0);
+                    const dia = data.getDate();
+                    if (!acc[ano][mes].dias[dia]) {
+                        acc[ano][mes].dias[dia] = 0;
+                    }
+                    acc[ano][mes].dias[dia] += atividade.docinhosCoco;
 
-            return {
-                vendedorId: vendedor.id,
-                vendedorNome: vendedor.nome,
-                somaDocinhos: soma,
-                desempenhoDiario,
-                totalDesempenho
+                    return acc;
+                }, {} as Record<number, Record<number, { nome: string, dias: Record<number, number>, somaMes: number }>>);
+
+                // Calcula o total geral de docinhos
+                const soma = vendedor.atividades.reduce((total, atividade) => total + atividade.docinhosCoco, 0);
+
+                // Adiciona somaMes para cada mês
+                Object.keys(desempenhoPorAnoMes).forEach(ano => {
+                    Object.keys(desempenhoPorAnoMes[Number(ano)]).forEach(mes => {
+                        const somaMes = Object.values(desempenhoPorAnoMes[Number(ano)][Number(mes)].dias).reduce((total: number, valor: number) => total + valor, 0);
+                        desempenhoPorAnoMes[Number(ano)][Number(mes)].somaMes = somaMes;
+                    });
+                });
+
+                return {
+                    vendedorId: vendedor.id,
+                    vendedorNome: vendedor.nome,
+                    somaDocinhos: soma,
+                    desempenhoPorAnoMes
+                };
+            });
+
+            const somaTotalDocinhos = somaDocinhosPorVendedor.reduce((total, vendedor) => total + vendedor.somaDocinhos, 0);
+
+            const resultado = {
+                equipe: dadosCompletos.equipe,
+                meta: dadosCompletos.meta,
+                somaDocinhosPorVendedor,
+                somaTotalDocinhos
             };
-        });
 
-        const somaTotalDocinhos = somaDocinhosPorVendedor.reduce((total, vendedor) => total + vendedor.somaDocinhos, 0);
+            // Salva no cache
+            await this.equipeMetaCache.setCalculoMeta(equipeId, resultado);
+            console.log('💾 Cache: Dados da meta salvos no cache');
 
-        return {
-            equipe: dadosCompletos.equipe,
-            meta: dadosCompletos.meta,
-            somaDocinhosPorVendedor,
-            somaTotalDocinhos
-        };
+            return resultado;
+        } catch (error) {
+            console.error('❌ Erro ao calcular meta:', error);
+            throw error;
+        }
+    }
+
+    async invalidarCache(equipeId: string): Promise<void> {
+        try {
+            await this.equipeMetaCache.invalidateCalculoMeta(equipeId);
+            console.log('🗑️ Cache: Dados da meta invalidados');
+        } catch (error) {
+            console.error('❌ Erro ao invalidar cache da meta:', error);
+        }
     }
 }

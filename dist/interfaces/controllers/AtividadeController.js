@@ -4,6 +4,7 @@ exports.AtividadeController = void 0;
 const VendedorRepositoryImpl_1 = require("../../infrastructure/repositories/VendedorRepositoryImpl");
 const EquipeRepositoryImpl_1 = require("../../infrastructure/repositories/EquipeRepositoryImpl");
 const MetaRepositoryImpl_1 = require("../../infrastructure/repositories/MetaRepositoryImpl");
+const AtividadeCacheService_1 = require("../../infrastructure/cache/AtividadeCacheService");
 class AtividadeController {
     constructor(criarAtividade, obterAtividades, atualizarAtividade, atividadeService, obterAtividadesPorVendedorEData, frequenciaVendasService) {
         this.criarAtividade = criarAtividade;
@@ -12,6 +13,7 @@ class AtividadeController {
         this.atividadeService = atividadeService;
         this.obterAtividadesPorVendedorEData = obterAtividadesPorVendedorEData;
         this.frequenciaVendasService = frequenciaVendasService;
+        this.atividadeCache = AtividadeCacheService_1.AtividadeCacheService.getInstance();
     }
     async criar(req, res) {
         try {
@@ -19,16 +21,17 @@ class AtividadeController {
             if (!req.body) {
                 return res.status(400).json({ erro: 'Body da requisição está vazio' });
             }
-            const { id, vendedorId, data, docinhosCoco } = req.body;
+            const { id, vendedorId, data, docinhosCoco, follow_up } = req.body;
             // Validação dos campos obrigatórios
-            if (!id || !vendedorId || !data || docinhosCoco === undefined) {
+            if (!id || !vendedorId || !data || docinhosCoco === undefined || follow_up === undefined) {
                 return res.status(400).json({
                     erro: 'Dados inválidos',
                     detalhes: {
                         id: id ? 'presente' : 'ausente',
                         vendedorId: vendedorId ? 'presente' : 'ausente',
                         data: data ? 'presente' : 'ausente',
-                        docinhosCoco: docinhosCoco !== undefined ? 'presente' : 'ausente'
+                        docinhosCoco: docinhosCoco !== undefined ? 'presente' : 'ausente',
+                        follow_up: follow_up !== undefined ? 'presente' : 'ausente'
                     }
                 });
             }
@@ -37,7 +40,8 @@ class AtividadeController {
                 id,
                 vendedorId,
                 data: new Date(data),
-                docinhosCoco
+                docinhosCoco,
+                follow_up
             });
             // //console.log("✅ Atividade criada com sucesso:", atividade);
             return res.status(201).json(atividade);
@@ -55,21 +59,40 @@ class AtividadeController {
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 10;
             const skip = (page - 1) * limit;
-            const atividades = await this.obterAtividades.executar(skip, limit);
-            // //console.log("✅ Atividades obtidas com sucesso:", atividades);
-            // Criar uma resposta personalizada com paginação
-            const respostaPersonalizada = {
+            // Tenta obter do cache primeiro
+            const cacheKey = `list:${page}:${limit}`;
+            const cachedAtividades = await this.atividadeCache.getAtividades();
+            if (cachedAtividades) {
+                console.log('📦 Cache hit: Atividades encontradas no cache');
+                return res.status(200).json({
+                    pagina: page,
+                    limite: limit,
+                    total: cachedAtividades.length,
+                    atividades: cachedAtividades.map((atividade) => ({
+                        id: atividade.id,
+                        vendedorId: atividade.vendedorId,
+                        data: atividade.data,
+                        docinhosCoco: atividade.docinhosCoco
+                    }))
+                });
+            }
+            console.log('🔄 Cache miss: Buscando atividades do banco');
+            const { atividades, total } = await this.obterAtividades.executar(skip, limit);
+            // Salva no cache
+            await this.atividadeCache.setAtividades(atividades);
+            console.log('💾 Cache: Atividades salvas no cache');
+            return res.status(200).json({
                 pagina: page,
                 limite: limit,
-                total: atividades.length,
-                atividades: atividades.map(atividade => ({
+                total,
+                totalPaginas: Math.ceil(total / limit),
+                atividades: atividades.map((atividade) => ({
                     id: atividade.id,
                     vendedorId: atividade.vendedorId,
                     data: atividade.data,
                     docinhosCoco: atividade.docinhosCoco
                 }))
-            };
-            return respostaPersonalizada;
+            });
         }
         catch (erro) {
             // console.error("❌ Erro ao obter atividades:", erro);
@@ -156,19 +179,25 @@ class AtividadeController {
         try {
             // //console.log("📥 Dados recebidos para atualização:", req.body);
             const { id } = req.params;
-            const { vendedorId, data, docinhosCoco } = req.body;
+            const { vendedorId, data, docinhosCoco, follow_up } = req.body;
             // Validação dos campos obrigatórios
-            if (!vendedorId || !data || docinhosCoco === undefined) {
+            if (!vendedorId || !data || docinhosCoco === undefined || follow_up === undefined) {
                 return res.status(400).json({
                     erro: 'Dados inválidos',
                     detalhes: {
                         vendedorId: vendedorId ? 'presente' : 'ausente',
                         data: data ? 'presente' : 'ausente',
-                        docinhosCoco: docinhosCoco !== undefined ? 'presente' : 'ausente'
+                        docinhosCoco: docinhosCoco !== undefined ? 'presente' : 'ausente',
+                        follow_up: follow_up !== undefined ? 'presente' : 'ausente'
                     }
                 });
             }
-            const atividadeAtualizada = await this.atualizarAtividade.executar(id, { vendedorId, data: new Date(data), docinhosCoco });
+            const atividadeAtualizada = await this.atualizarAtividade.executar(id, {
+                vendedorId,
+                data: new Date(data),
+                docinhosCoco,
+                follow_up
+            });
             // //console.log("✅ Atividade atualizada com sucesso:", atividadeAtualizada);
             return res.status(200).json(atividadeAtualizada);
         }

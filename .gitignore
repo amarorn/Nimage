@@ -9,3 +9,17 @@ yarn-error.log*
 .pnp.js
 
 .vscode/*
+
+# Redis
+dump.rdb
+appendonly.aof
+*.rdb
+*.aof
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Docker
+docker-compose.override.yml

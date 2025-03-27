@@ -29,9 +29,15 @@ router.post("/equipes", async (req, res) => {
 });
 
 router.get("/equipes/all", async (req, res) => {
-    //console.log("📨 Nova requisição GET /equipes");
-    const equipes = await equipeController.obterTodos(req, res);
-    return res.json(equipes);
+    try {
+        const resultado = await equipeController.obterTodos(req, res);
+        return resultado;
+    } catch (erro) {
+        return res.status(500).json({
+            erro: 'Erro interno ao obter equipes',
+            mensagem: (erro as Error).message
+        });
+    }
 });
 
 router.get("/equipes/:id", async (req, res) => {
