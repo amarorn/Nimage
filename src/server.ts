@@ -3,6 +3,7 @@ import cors from "cors";
 import { config } from "dotenv";
 import { MongoDB } from "./infrastructure/database/MongoDB";
 import { InitialCacheService } from "./application/services/InitialCacheService";
+import app from "./app";
 
 // Importação das rotas
 import vendedorRoutes from "./interfaces/routes/vendedorRoutes";
@@ -14,7 +15,6 @@ import cargoRoutes from "./interfaces/routes/cargoRoutes";
 // Configuração do dotenv
 config();
 
-const app = express();
 const port = process.env.PORT || 3001;
 
 // Middlewares

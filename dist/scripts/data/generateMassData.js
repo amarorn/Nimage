@@ -12,13 +12,20 @@ async function generateTemas() {
         { id: "tema-3", nome: "Titã", descricao: "Equipe Titã - Poder e Resistência", cor: "#0000FF" },
         { id: "tema-4", nome: "Lutador", descricao: "Equipe Lutador - Coragem e Persistência", cor: "#FFA500" }
     ];
+    const temasExistentes = await axios_1.default.get('http://localhost:3001/api/temas/all');
+    const temasIds = new Set(temasExistentes.data.temas.map(t => t.id));
     for (const tema of temas) {
-        try {
-            await axios_1.default.post('http://localhost:3001/api/temas', tema);
-            console.log(`Tema ${tema.nome} criado com sucesso`);
+        if (!temasIds.has(tema.id)) {
+            try {
+                await axios_1.default.post('http://localhost:3001/api/temas', tema);
+                console.log(`Tema ${tema.nome} criado com sucesso`);
+            }
+            catch (error) {
+                console.error(`Erro ao criar tema ${tema.nome}:`, error);
+            }
         }
-        catch (error) {
-            console.error(`Erro ao criar tema ${tema.nome}:`, error);
+        else {
+            console.log(`Tema ${tema.nome} já existe`);
         }
     }
     return temas;
@@ -30,13 +37,20 @@ async function generateCargos() {
         { id: "cargo-2", nome: "Capitão", descricao: "Capitão de Equipe", tag: "capitao" },
         { id: "cargo-3", nome: "Vendedor", descricao: "Vendedor de Equipe", tag: "vendedor" }
     ];
+    const cargosExistentes = await axios_1.default.get('http://localhost:3001/api/cargos/all');
+    const cargosIds = new Set(cargosExistentes.data.cargos.map(c => c.id));
     for (const cargo of cargos) {
-        try {
-            await axios_1.default.post('http://localhost:3001/api/cargos', cargo);
-            console.log(`Cargo ${cargo.nome} criado com sucesso`);
+        if (!cargosIds.has(cargo.id)) {
+            try {
+                await axios_1.default.post('http://localhost:3001/api/cargos', cargo);
+                console.log(`Cargo ${cargo.nome} criado com sucesso`);
+            }
+            catch (error) {
+                console.error(`Erro ao criar cargo ${cargo.nome}:`, error);
+            }
         }
-        catch (error) {
-            console.error(`Erro ao criar cargo ${cargo.nome}:`, error);
+        else {
+            console.log(`Cargo ${cargo.nome} já existe`);
         }
     }
     return cargos;
@@ -48,59 +62,85 @@ function distribuirCargos(numeroVendedores) {
     return [...cargos, ...vendedores].sort(() => Math.random() - 0.5); // Mistura aleatoriamente
 }
 // Função para gerar equipes
-async function generateEquipes() {
-    const temasResponse = await axios_1.default.get('http://localhost:3001/api/temas/all');
-    const temas = temasResponse.data.temas;
-    const cargosResponse = await axios_1.default.get('http://localhost:3001/api/cargos/all');
-    const cargos = cargosResponse.data.cargos;
-    const equipes = [];
-    for (let i = 1; i <= 4; i++) {
-        const tema = temas[i - 1];
-        const numeroVendedores = Math.floor(Math.random() * 5) + 5; // Entre 5 e 10 vendedores
-        const cargosDistribuidos = distribuirCargos(numeroVendedores);
+async function generateEquipes(temas) {
+    const equipesExistentes = await axios_1.default.get('http://localhost:3001/api/equipes/all');
+    const equipesIds = new Set(equipesExistentes.data.equipes.map(e => e.id));
+    for (let i = 1; i <= temas.length; i++) {
         const equipe = {
             id: `equipe-${i}`,
-            nome: `Equipe ${tema.nome}`,
-            temaId: tema.id,
-            vendedores: cargosDistribuidos.map((cargoId, index) => ({
-                id: `vendedor-${i}-${index + 1}`,
-                nome: `Vendedor ${i}-${index + 1}`,
-                cargoId: cargoId,
-                equipeId: `equipe-${i}`
-            }))
+            nome: `Equipe ${temas[i - 1].nome}`,
+            temaId: `tema-${i}`,
+            pdv: `PDV ${i}`,
+            cidade: "São Paulo",
+            estado: "SP",
+            gerenteNome: `Gerente da Equipe ${i}`,
+            gerenteTelefone: `(11) 9999-${i}000`,
+            capitaoNome: `Capitão da Equipe ${i}`,
+            capitaoTelefone: `(11) 9999-${i}001`
         };
-        try {
-            await axios_1.default.post('http://localhost:3001/api/equipes', equipe);
-            console.log(`Equipe ${equipe.nome} criada com sucesso`);
-            equipes.push(equipe);
+        if (!equipesIds.has(equipe.id)) {
+            try {
+                await axios_1.default.post('http://localhost:3001/api/equipes', equipe);
+                console.log(`Equipe ${equipe.nome} criada com sucesso`);
+            }
+            catch (error) {
+                console.error(`Erro ao criar equipe ${equipe.nome}:`, error);
+            }
         }
-        catch (error) {
-            console.error(`Erro ao criar equipe ${equipe.nome}:`, error);
+        else {
+            console.log(`Equipe ${equipe.nome} já existe`);
         }
     }
-    return equipes;
 }
-// Função principal
-async function generateData() {
-    try {
-        console.log('Iniciando geração de dados...');
-        // Gera temas e cargos primeiro
-        await generateTemas();
-        await generateCargos();
-        // Gera equipes com os temas e cargos criados
-        const equipes = await generateEquipes();
-        console.log('Geração de dados concluída com sucesso!');
-        console.log('\nResumo da geração:');
-        console.log('==============================');
-        console.log('\n🎨 Temas:');
-        console.log(`  • Total: ${equipes.length}`);
-        for (const equipe of equipes) {
-            console.log(`    - ${equipe.nome}`);
+// Função para gerar vendedores
+async function generateVendedores() {
+    const equipesResponse = await axios_1.default.get('http://localhost:3001/api/equipes/all');
+    const equipes = equipesResponse.data.equipes;
+    const vendedoresExistentes = await axios_1.default.get('http://localhost:3001/api/vendedores/all');
+    const vendedoresIds = new Set(vendedoresExistentes.data.vendedores.map(v => v.id));
+    for (let i = 1; i <= equipes.length; i++) {
+        const numVendedores = i === 4 ? 9 : 5; // Equipe 4 tem 9 vendedores
+        for (let j = 1; j <= numVendedores; j++) {
+            const vendedor = {
+                id: `vendedor-${i}-${j}`,
+                nome: `Vendedor ${i}-${j}`,
+                email: `vendedor${i}-${j}@nimage.com.br`,
+                telefone: `(11) 9${i}${j}${j}${j}-${i}${j}${j}${j}`,
+                meta: 10000 + (i * 1000) + (j * 100),
+                cargo: "cargo-3", // Vendedor padrão
+                equipeId: `equipe-${i}`
+            };
+            // Ajusta o cargo para capitão e gerente
+            if (j === numVendedores - 1)
+                vendedor.cargo = "cargo-2"; // Penúltimo é capitão
+            if (j === numVendedores)
+                vendedor.cargo = "cargo-1"; // Último é gerente
+            if (!vendedoresIds.has(vendedor.id)) {
+                try {
+                    await axios_1.default.post('http://localhost:3001/api/vendedores', vendedor);
+                    console.log(`Vendedor ${vendedor.nome} criado com sucesso`);
+                }
+                catch (error) {
+                    console.error(`Erro ao criar vendedor ${vendedor.nome}:`, error);
+                }
+            }
+            else {
+                console.log(`Vendedor ${vendedor.nome} já existe`);
+            }
         }
     }
-    catch (error) {
-        console.error('Erro ao gerar dados:', error);
-    }
+}
+// Função principal para gerar dados
+async function generateData() {
+    const temas = await generateTemas();
+    const cargos = await generateCargos();
+    await generateEquipes(temas);
+    await generateVendedores();
+    console.log("\nGeração de dados concluída com sucesso!");
+    console.log("\nResumo da geração:");
+    console.log("==============================\n");
+    console.log("🎨 Temas:");
+    console.log(`  • Total: ${temas.length}`);
 }
 // Executa a geração de dados
 generateData();

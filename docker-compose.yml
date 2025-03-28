@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   app:
     build:
@@ -6,10 +8,10 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - NODE_ENV=production
-      - MONGO_URI=mongodb+srv://root:VTTgLMuwxpgCbjRw@cluster0.xft7o.mongodb.net/nimage?authSource=admin
-      - REDIS_URL=redis://localhost:6379
-      - PORT=${PORT}
+      - NODE_ENV=development
+      - PORT=3001
+      - MONGODB_URI=mongodb://mongodb:27017/nimage
+      - REDIS_URI=redis://redis:6379
       - OLLAMA_URL=http://ollama:11434/api
     depends_on:
       - mongodb
@@ -18,7 +20,7 @@ services:
     networks:
       - nimage-network
     healthcheck:
-      test: ["CMD", "wget", "--spider", "http://localhost:3001/health"]
+      test: ["CMD", "wget", "--spider", "http://localhost:3001/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -56,15 +58,12 @@ services:
     image: mongo:latest
     ports:
       - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     volumes:
       - mongodb_data:/data/db
     networks:
       - nimage-network
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongodb localhost:27017/test --quiet
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
       interval: 30s
       timeout: 10s
       retries: 3
