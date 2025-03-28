@@ -48,4 +48,4 @@ networks:
 
 volumes:
   redis_data:
-  mongodb_data: 
+  mongodb_data:
