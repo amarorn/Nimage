@@ -1,8 +1,44 @@
-version: '3.8'
-
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb+srv://root:VTTgLMuwxpgCbjRw@cluster0.xft7o.mongodb.net/nimage?authSource=admin
+      - REDIS_URL=redis://localhost:6379
+      - PORT=${PORT}
+      - OLLAMA_URL=http://ollama:11434/api
+    depends_on:
+      - mongodb
+      - redis
+      - ollama
+    networks:
+      - nimage-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - nimage-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   redis:
-    image: redis:latest
+    image: redis:alpine
     ports:
       - "6379:6379"
     volumes:
@@ -10,18 +46,28 @@ services:
     command: redis-server --appendonly yes
     networks:
       - nimage-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   mongodb:
     image: mongo:latest
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     volumes:
       - mongodb_data:/data/db
     networks:
       - nimage-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongodb localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 networks:
   nimage-network:
@@ -29,4 +75,5 @@ networks:
 
 volumes:
   redis_data:
-  mongodb_data: 
+  mongodb_data:
+  ollama_data:

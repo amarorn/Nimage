@@ -64,7 +64,22 @@ export class DesempenhoIdealService {
         // Busca meta do mês anterior
         const metaAnterior = await this.metaRepo.obterPorEquipeEData(equipeId, dataInicio, dataFim);
         if (!metaAnterior) {
-            throw new Error('Meta do mês anterior não encontrada');
+            // Se não houver meta anterior, retorna um objeto com valores zerados
+            return {
+                equipeId: equipe.id,
+                nome: equipe.nome,
+                metaAnterior: 0,
+                totalVendasAnterior: 0,
+                vendedores: await this.vendedorRepo.obterPorEquipeId(equipeId).then(vendedores => vendedores.map((vendedor: Vendedor) => ({
+                    vendedorId: vendedor.id,
+                    nome: vendedor.nome,
+                    metaIdeal: 0,
+                    contribuicaoAnterior: 0,
+                    porcentagemContribuicao: 0,
+                    diasUteis: this.calcularDiasUteis(mes, ano),
+                    mediaDiariaIdeal: 0
+                })))
+            };
         }
 
         // Busca todos os vendedores da equipe
