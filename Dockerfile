@@ -1,39 +1,43 @@
-# Use a imagem base do Node.js
-FROM node:18-alpine AS builder
+# Estágio de build
+FROM node:20-alpine AS builder
 
-# Instale curl para healthcheck
-RUN apk add --no-cache curl
-
-# Defina o diretório de trabalho dentro do container
 WORKDIR /app
 
-# Copie apenas os arquivos de dependências para aproveitar o cache do Docker
+# Copia os arquivos de configuração
 COPY package*.json ./
 
-# Instale todas as dependências (incluindo as de desenvolvimento)
+# Instala as dependências
 RUN npm ci
 
-# Copie o restante do código da aplicação
+# Copia o código fonte
 COPY . .
 
-# Compile o TypeScript para JavaScript
+# Compila o TypeScript
 RUN npm run build
 
-# Imagem de produção
-FROM node:18-alpine
-
-# Instale curl para healthcheck
-RUN apk add --no-cache curl
+# Estágio de produção
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Copie apenas os arquivos necessários do builder
-COPY --from=builder /app/dist ./dist
+# Instala o wait-for-it script para esperar serviços
+RUN apk add --no-cache bash
 COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
 
-# Exponha a porta que a aplicação irá rodar
+# Instala apenas as dependências de produção
+RUN npm ci --only=production
+
+# Define variáveis de ambiente
+ENV NODE_ENV=production
+ENV PORT=3001
+
+# Expõe a porta
 EXPOSE 3001
 
-# Comando para iniciar aplicação
-CMD ["npm", "start"]
+# Adiciona script de healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/api/health || exit 1
+
+# Comando para iniciar a aplicação com retry na conexão
+CMD ["node", "dist/server.js"]
