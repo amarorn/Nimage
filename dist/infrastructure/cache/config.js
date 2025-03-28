@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RedisConfig = void 0;
 exports.RedisConfig = {
-    url: process.env.REDIS_URI || process.env.REDIS_URL || 'redis://localhost:6379',
+    url: process.env.REDIS_URL || 'redis://red-cvigo1t6ubrc73datbm0:6379',
     ttl: {
         default: 3600, // 1 hora
         equipe: 3600,

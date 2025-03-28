@@ -7,6 +7,7 @@ import metaRoutes from "./interfaces/routes/metaRoutes";
 import desempenhoIdealRoutes from "./interfaces/routes/desempenhoIdealRoutes";
 import temaRoutes from './interfaces/routes/temaRoutes';
 import cargoRoutes from './interfaces/routes/cargoRoutes';
+import { Request, Response } from 'express';
 
 console.log('📦 Iniciando configuração do app...');
 
@@ -36,6 +37,11 @@ app.get("/api/health", (req, res) => {
         },
         version: process.env.npm_package_version || '1.0.0'
     });
+});
+
+// Health check endpoint
+app.get('/health', (req: Request, res: Response) => {
+    res.status(200).json({ status: 'ok' });
 });
 
 console.log('🔄 Registrando rotas...');
