@@ -58,6 +58,7 @@ services:
     image: mongo:latest
     ports:
       - "27017:27017"
+
     volumes:
       - mongodb_data:/data/db
     networks:
@@ -76,3 +77,4 @@ volumes:
   redis_data:
   mongodb_data:
   ollama_data:
+
