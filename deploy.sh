@@ -1,50 +1,55 @@
 #!/bin/bash
 
-# Cores para output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m'
-
-# Configurações
-REGISTRY="registry.digitalocean.com"
-REPOSITORY="nimage"
-IMAGE_NAME="app"
-TAG="latest"
-
-echo -e "${YELLOW}🚀 Iniciando processo de deploy em produção...${NC}"
-
-# Verifica se o doctl está instalado
-if ! command -v doctl &> /dev/null; then
-    echo -e "${RED}❌ doctl não está instalado. Por favor, instale o doctl primeiro.${NC}"
+# Verifica se o ambiente foi especificado
+if [ -z "$1" ]; then
+    echo "Por favor, especifique o ambiente (dev ou prd)"
+    echo "Uso: ./deploy.sh [dev|prd]"
     exit 1
 fi
 
-# Verifica se está autenticado no DigitalOcean
-if ! doctl account get &> /dev/null; then
-    echo -e "${RED}❌ Não está autenticado no DigitalOcean. Por favor, faça login primeiro.${NC}"
-    echo -e "${YELLOW}Use: doctl auth init${NC}"
+ENV=$1
+NAMESPACE="nimage-$ENV"
+
+# Verifica se o ambiente é válido
+if [ "$ENV" != "dev" ] && [ "$ENV" != "prd" ]; then
+    echo "Ambiente inválido. Use 'dev' ou 'prd'"
     exit 1
 fi
 
-# Para containers existentes
-echo -e "${YELLOW}🛑 Parando containers existentes...${NC}"
-docker-compose -f docker-compose.prod.yml down
+# Verifica se o Docker Desktop está rodando
+if ! docker info > /dev/null 2>&1; then
+    echo "Docker Desktop não está rodando. Por favor, inicie o Docker Desktop primeiro."
+    exit 1
+fi
 
-# Remove imagens antigas
-echo -e "${YELLOW}🧹 Removendo imagens antigas...${NC}"
-docker system prune -f
+# Verifica se o Kubernetes está habilitado no Docker Desktop
+if ! kubectl get nodes > /dev/null 2>&1; then
+    echo "Kubernetes não está habilitado no Docker Desktop. Por favor, habilite o Kubernetes nas configurações do Docker Desktop."
+    exit 1
+fi
 
-# Pull da imagem mais recente do registry
-echo -e "${YELLOW}📥 Baixando imagem mais recente do registry...${NC}"
-docker pull ${REGISTRY}/${REPOSITORY}/${IMAGE_NAME}:${TAG}
+# Constrói a imagem local
+echo "Construindo imagem Docker..."
+docker build -t nimage-app:$ENV .
 
-# Inicia os containers
-echo -e "${YELLOW}🚀 Iniciando containers...${NC}"
-docker-compose -f docker-compose.prod.yml up -d
+# Aplica os manifestos do Kubernetes
+echo "Aplicando manifestos do Kubernetes para ambiente $ENV..."
+kubectl apply -f k8s/$ENV/configmap.yaml
+kubectl apply -f k8s/mongodb.yaml -n $NAMESPACE
+kubectl apply -f k8s/redis.yaml -n $NAMESPACE
+kubectl apply -f k8s/ollama.yaml -n $NAMESPACE
+kubectl apply -f k8s/deployment.yaml -n $NAMESPACE
+kubectl apply -f k8s/service.yaml -n $NAMESPACE
 
-# Verifica o status dos containers
-echo -e "${YELLOW}📊 Verificando status dos containers...${NC}"
-docker-compose -f docker-compose.prod.yml ps
+# Aguarda os pods estarem prontos
+echo "Aguardando pods estarem prontos..."
+kubectl wait --for=condition=ready pod -l app=nimage -n $NAMESPACE --timeout=300s
 
-echo -e "${GREEN}✅ Deploy concluído com sucesso!${NC}" 
+# Obtém o IP do serviço
+echo "Obtendo IP do serviço..."
+SERVICE_IP=$(kubectl get service nimage-service -n $NAMESPACE -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+echo "Aplicação está disponível em: http://$SERVICE_IP:3001"
+
+# Mostra o status dos pods
+echo "Status dos pods:"
+kubectl get pods -n $NAMESPACE 

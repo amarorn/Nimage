@@ -2,19 +2,19 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: redis-pvc
-  namespace: nimage
+  namespace: nimage-prd
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: 5Gi
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: redis
-  namespace: nimage
+  namespace: nimage-prd
 spec:
   ports:
   - port: 6379
@@ -26,10 +26,10 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: redis
-  namespace: nimage
+  namespace: nimage-prd
 spec:
   serviceName: redis
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: redis
@@ -40,7 +40,8 @@ spec:
     spec:
       containers:
       - name: redis
-        image: redis:6-alpine
+        image: redis:alpine
+        command: ["redis-server", "--appendonly", "yes"]
         ports:
         - containerPort: 6379
         volumeMounts:
@@ -48,11 +49,25 @@ spec:
           mountPath: /data
         resources:
           requests:
-            cpu: 100m
-            memory: 128Mi
+            cpu: "200m"
+            memory: "256Mi"
           limits:
-            cpu: 200m
-            memory: 256Mi
+            cpu: "500m"
+            memory: "512Mi"
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 5
+          periodSeconds: 5
   volumeClaimTemplates:
   - metadata:
       name: redis-data
@@ -60,4 +75,4 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 1Gi 
+          storage: 5Gi 

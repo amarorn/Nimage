@@ -2,9 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nimage-app
-  namespace: nimage
+  namespace: nimage-prd
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: nimage
@@ -14,23 +14,20 @@ spec:
         app: nimage
     spec:
       containers:
-      - name: nimage
-        image: nimage-app:local
-        imagePullPolicy: Never
+      - name: nimage-app
+        image: nimage-app:latest
         ports:
         - containerPort: 3001
         envFrom:
         - configMapRef:
             name: nimage-config
-        - secretRef:
-            name: mongodb-secret
         resources:
           requests:
-            cpu: "200m"
-            memory: "256Mi"
-          limits:
             cpu: "500m"
             memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
         livenessProbe:
           httpGet:
             path: /api/health
