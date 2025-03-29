@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mongodb-pvc
-  namespace: nimage
+  namespace: nimage-dev
 spec:
   accessModes:
     - ReadWriteOnce
@@ -14,7 +14,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mongodb
-  namespace: nimage
+  namespace: nimage-dev
 spec:
   ports:
   - port: 27017
@@ -26,7 +26,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mongodb
-  namespace: nimage
+  namespace: nimage-dev
 spec:
   serviceName: mongodb
   replicas: 1
@@ -46,24 +46,29 @@ spec:
         volumeMounts:
         - name: mongodb-data
           mountPath: /data/db
-        env:
-        - name: MONGO_INITDB_ROOT_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: mongodb-secret
-              key: mongodb-root-username
-        - name: MONGO_INITDB_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mongodb-secret
-              key: mongodb-root-password
         resources:
           requests:
-            cpu: 200m
-            memory: 256Mi
+            cpu: "100m"
+            memory: "256Mi"
           limits:
-            cpu: 500m
-            memory: 512Mi
+            cpu: "500m"
+            memory: "512Mi"
+        livenessProbe:
+          exec:
+            command:
+            - mongo
+            - --eval
+            - "db.adminCommand('ping')"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - mongo
+            - --eval
+            - "db.adminCommand('ping')"
+          initialDelaySeconds: 5
+          periodSeconds: 5
   volumeClaimTemplates:
   - metadata:
       name: mongodb-data

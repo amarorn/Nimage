@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nimage-app
-  namespace: nimage
+  namespace: nimage-dev
 spec:
   replicas: 1
   selector:
@@ -14,19 +14,17 @@ spec:
         app: nimage
     spec:
       containers:
-      - name: nimage
-        image: nimage-app:local
+      - name: nimage-app
+        image: nimage-app:dev
         imagePullPolicy: Never
         ports:
         - containerPort: 3001
         envFrom:
         - configMapRef:
             name: nimage-config
-        - secretRef:
-            name: mongodb-secret
         resources:
           requests:
-            cpu: "200m"
+            cpu: "100m"
             memory: "256Mi"
           limits:
             cpu: "500m"

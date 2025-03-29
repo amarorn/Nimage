@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nimage-config
+  namespace: nimage-dev
+data:
+  NODE_ENV: "development"
+  PORT: "3001"
+  MONGODB_URI: "mongodb://mongodb:27017/nimage-dev"
+  REDIS_URI: "redis://redis:6379"
+  OLLAMA_URL: "http://ollama:11434/api"
+  LOG_LEVEL: "debug" 
