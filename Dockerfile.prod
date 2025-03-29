@@ -1,0 +1,38 @@
+# Estágio de build
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copia os arquivos de dependências
+COPY package*.json ./
+
+# Instala as dependências
+RUN npm ci
+
+# Copia o código fonte
+COPY . .
+
+# Compila o TypeScript
+RUN npm run build
+
+# Estágio de produção
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Instala apenas as dependências de produção
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Copia os arquivos compilados do estágio de build
+COPY --from=builder /app/dist ./dist
+
+# Configura variáveis de ambiente
+ENV NODE_ENV=production
+ENV PORT=3001
+
+# Expõe a porta da aplicação
+EXPOSE 3001
+
+# Comando para iniciar a aplicação
+CMD ["node", "dist/server.js"] 

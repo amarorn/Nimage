@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mongodb-restore
+  namespace: nimage
+spec:
+  template:
+    spec:
+      containers:
+      - name: mongodb-restore
+        image: mongo:latest
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          aws s3 cp s3://nimage-backups/backup-$(date +%Y%m%d).tar.gz /backup/
+          tar -xzf /backup/backup-$(date +%Y%m%d).tar.gz -C /backup
+          mongorestore --uri="mongodb://root:$(MONGODB_ROOT_PASSWORD)@mongodb:27017/nimage?authSource=admin" /backup/nimage
+        env:
+        - name: MONGODB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-root-password
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws-secret
+              key: aws-access-key-id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws-secret
+              key: aws-secret-access-key
+        - name: AWS_DEFAULT_REGION
+          value: "us-east-1"
+        volumeMounts:
+        - name: backup-volume
+          mountPath: /backup
+      volumes:
+      - name: backup-volume
+        emptyDir: {}
+      restartPolicy: Never 

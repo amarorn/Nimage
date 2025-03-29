@@ -1,0 +1,18 @@
+# Arquivos de configuração local
+.env
+*.local.yaml
+
+# Arquivos temporários
+*.tmp
+*.temp
+
+# Logs
+*.log
+
+# Arquivos de backup
+*.bak
+*.backup
+
+# Arquivos de estado do Kubernetes
+*.state
+*.status 
