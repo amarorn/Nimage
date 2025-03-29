@@ -77,3 +77,32 @@ envVarGroups:
         value: https://api.example.com
       - key: APP_SECRET
         generateValue: true
+
+# New service added
+- type: web
+  name: nimage-api
+  env: docker
+  dockerfilePath: ./Dockerfile
+  dockerContext: .
+  envVars:
+    - key: NODE_ENV
+      value: production
+    - key: PORT
+      value: 3001
+    - key: MONGODB_URI
+      sync: false
+    - key: REDIS_URI
+      value: ${REDIS_URL} # Render fornece esta variável automaticamente
+  healthCheckPath: /api/health
+  autoDeploy: true
+  plan: free
+  disk:
+    name: data
+    mountPath: /data
+    sizeGB: 1
+
+- type: redis
+  name: nimage-redis
+  ipAllowList: []
+  plan: free
+  maxmemoryPolicy: noeviction

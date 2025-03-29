@@ -12,27 +12,41 @@ class VendedorController {
     }
     async criar(req, res) {
         try {
-            if (!req.body) {
-                return res.status(400).json({ erro: 'Body da requisição está vazio' });
-            }
             const { id, nome, equipeId, email, telefone, meta, cargo } = req.body;
             // Validação dos campos obrigatórios
-            if (!id || !nome || !equipeId || !email || !telefone || !meta || !cargo) {
+            const camposObrigatorios = {
+                id: id,
+                nome: nome,
+                equipeId: equipeId,
+                email: email,
+                telefone: telefone,
+                meta: meta,
+                cargo: cargo
+            };
+            const camposAusentes = Object.entries(camposObrigatorios)
+                .filter(([_, valor]) => !valor)
+                .map(([campo]) => campo);
+            const camposPresentes = Object.entries(camposObrigatorios)
+                .filter(([_, valor]) => valor)
+                .map(([campo]) => campo);
+            if (camposAusentes.length > 0) {
                 return res.status(400).json({
                     erro: 'Dados inválidos',
-                    detalhes: {
-                        id: id ? 'presente' : 'ausente',
-                        nome: nome ? 'presente' : 'ausente',
-                        equipeId: equipeId ? 'presente' : 'ausente',
-                        email: email ? 'presente' : 'ausente',
-                        telefone: telefone ? 'presente' : 'ausente',
-                        meta: meta ? 'presente' : 'ausente',
-                        cargo: cargo ? 'presente' : 'ausente'
-                    }
+                    detalhes: Object.assign(Object.assign({}, camposAusentes.reduce((acc, campo) => (Object.assign(Object.assign({}, acc), { [campo]: 'ausente' })), {})), camposPresentes.reduce((acc, campo) => (Object.assign(Object.assign({}, acc), { [campo]: 'presente' })), {}))
                 });
             }
-            const vendedor = await this.criarVendedor.executar({ id, nome, equipeId, email, telefone, meta, cargo });
-            return res.status(201).json(vendedor);
+            await this.criarVendedor.executar({
+                id,
+                nome,
+                equipeId,
+                email,
+                telefone,
+                meta,
+                cargo
+            });
+            // Invalida o cache após criar um novo vendedor
+            await this.vendedorCache.invalidateAll();
+            return res.status(201).json({ mensagem: 'Vendedor criado com sucesso' });
         }
         catch (erro) {
             return res.status(500).json({
@@ -46,31 +60,9 @@ class VendedorController {
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 10;
             const skip = (page - 1) * limit;
-            // Tenta obter do cache primeiro
-            const cacheKey = `list:${page}:${limit}`;
-            const cachedVendedores = await this.vendedorCache.getVendedores();
-            if (cachedVendedores) {
-                console.log('📦 Cache hit: Vendedores encontrados no cache');
-                return res.status(200).json({
-                    pagina: page,
-                    limite: limit,
-                    total: cachedVendedores.length,
-                    vendedores: cachedVendedores.map(vendedor => ({
-                        id: vendedor.id,
-                        nome: vendedor.nome,
-                        equipeId: vendedor.equipeId,
-                        email: vendedor.email,
-                        telefone: vendedor.telefone,
-                        meta: vendedor.meta,
-                        cargo: vendedor.cargo
-                    }))
-                });
-            }
-            console.log('🔄 Cache miss: Buscando vendedores do banco');
+            // Busca direto do banco de dados
+            console.log('🔄 Buscando vendedores do banco');
             const vendedores = await this.obterVendedor.executar(skip, limit);
-            // Salva no cache
-            await this.vendedorCache.setVendedores(vendedores);
-            console.log('💾 Cache: Vendedores salvos no cache');
             return res.status(200).json({
                 pagina: page,
                 limite: limit,
@@ -121,19 +113,28 @@ class VendedorController {
         try {
             const { id } = req.params;
             const { nome, equipeId, email, telefone, meta, cargo } = req.body;
-            // Validação dos campos obrigatórios
-            const camposAtualizacao = { nome, equipeId, email, telefone, meta, cargo };
-            const camposVazios = Object.entries(camposAtualizacao)
-                .filter(([_, valor]) => valor !== undefined && !valor)
-                .map(([campo]) => campo);
-            if (camposVazios.length > 0) {
-                return res.status(400).json({
-                    erro: 'Dados inválidos',
-                    detalhes: `Os seguintes campos estão vazios: ${camposVazios.join(', ')}`
-                });
+            const vendedorAtualizado = await this.atualizarVendedor.executar(id, {
+                nome,
+                equipeId,
+                email,
+                telefone,
+                meta,
+                cargo
+            });
+            if (!vendedorAtualizado) {
+                return res.status(404).json({ erro: 'Vendedor não encontrado' });
             }
-            const vendedorAtualizado = await this.atualizarVendedor.executar(id, camposAtualizacao);
-            return res.status(200).json(vendedorAtualizado);
+            // Invalida o cache após atualizar um vendedor
+            await this.vendedorCache.invalidateAll();
+            return res.status(200).json({
+                id: vendedorAtualizado.id,
+                nome: vendedorAtualizado.nome,
+                equipeId: vendedorAtualizado.equipeId,
+                email: vendedorAtualizado.email,
+                telefone: vendedorAtualizado.telefone,
+                meta: vendedorAtualizado.meta,
+                cargo: vendedorAtualizado.cargo
+            });
         }
         catch (erro) {
             return res.status(500).json({
@@ -145,24 +146,13 @@ class VendedorController {
     async obterInsights(req, res) {
         try {
             const { id } = req.params;
-            const { mes } = req.query;
-            console.log("🚀 Iniciando obterInsights");
-            console.log("ID do vendedor:", id);
-            console.log("Mês requisitado:", mes);
-            if (!id) {
-                console.error("ID do vendedor não fornecido");
-                return res.status(400).json({ error: "ID do vendedor é obrigatório" });
-            }
-            const insights = await this.getVendedorInsights.execute(id, mes);
-            console.log("✅ Insights obtidos com sucesso:", insights);
-            return res.json(insights);
+            const insights = await this.getVendedorInsights.execute(id);
+            return res.status(200).json(insights);
         }
-        catch (error) {
-            console.error('❌ Erro ao obter insights do vendedor:', error);
+        catch (erro) {
             return res.status(500).json({
-                error: 'Erro ao obter insights do vendedor',
-                message: error.message,
-                stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+                erro: 'Erro interno ao obter insights do vendedor',
+                mensagem: erro.message
             });
         }
     }

@@ -2,21 +2,22 @@ version: '3.8'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: registry.digitalocean.com/nimage/app:latest
     ports:
       - "3001:3001"
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - PORT=3001
       - MONGODB_URI=mongodb://mongodb:27017/nimage
       - REDIS_URI=redis://redis:6379
       - OLLAMA_URL=http://ollama:11434/api
     depends_on:
-      - mongodb
-      - redis
-      - ollama
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
     networks:
       - nimage-network
     healthcheck:
@@ -24,6 +25,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
 
   ollama:
     image: ollama/ollama:latest
@@ -38,6 +40,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
 
   redis:
     image: redis:alpine
@@ -53,12 +56,12 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
 
   mongodb:
     image: mongo:latest
     ports:
       - "27017:27017"
-
     volumes:
       - mongodb_data:/data/db
     networks:
@@ -68,6 +71,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
 
 networks:
   nimage-network:
@@ -76,5 +80,4 @@ networks:
 volumes:
   redis_data:
   mongodb_data:
-  ollama_data:
-
+  ollama_data: 

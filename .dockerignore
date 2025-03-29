@@ -1,5 +1,29 @@
+# Dependências
 node_modules
-dist
-.idea
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Arquivos de desenvolvimento
+.git
+.gitignore
+.env
+.env.*
+*.md
 .vscode
+.idea
+coverage
+dist
+
+# Arquivos de teste
+__tests__
+*.test.ts
+*.spec.ts
+
+# Arquivos de build
+build
+*.tsbuildinfo
+
+# Outros
+.DS_Store
 *.log 
