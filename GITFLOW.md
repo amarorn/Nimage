@@ -1,6 +1,6 @@
 # Git Flow - Projeto Nimage
 
-Este documento descreve o processo de Git Flow utilizado no Projeto Nimage.
+Este documento descreve o processo de Git Flow e versionamento semântico utilizado no Projeto Nimage.
 
 ## Estrutura de Branches
 
@@ -53,6 +53,39 @@ git flow hotfix start nome-do-hotfix
 git flow hotfix finish nome-do-hotfix
 ```
 
+## Versionamento Semântico
+
+O projeto utiliza versionamento semântico automático baseado nas mensagens de commit:
+
+### Formato da Versão
+
+`MAJOR.MINOR.PATCH` (exemplo: 1.2.3)
+
+- **MAJOR**: Mudanças incompatíveis com versões anteriores
+- **MINOR**: Novas funcionalidades mantendo compatibilidade
+- **PATCH**: Correções de bugs mantendo compatibilidade
+
+### Incremento Automático
+
+O versionamento é incrementado automaticamente baseado no tipo de commit:
+
+- **MAJOR**: Commits com "BREAKING CHANGE" ou "!"
+  - Exemplo: "feat!: nova API incompatível"
+  - Resultado: 1.0.0 -> 2.0.0
+
+- **MINOR**: Commits começando com "feat:"
+  - Exemplo: "feat: nova funcionalidade"
+  - Resultado: 1.0.0 -> 1.1.0
+
+- **PATCH**: Commits começando com "fix:" ou outros
+  - Exemplo: "fix: correção de bug"
+  - Resultado: 1.0.0 -> 1.0.1
+
+### Scripts de Versionamento
+
+- `scripts/version-bump.sh`: Script principal de versionamento
+- Hook `post-commit`: Executa o versionamento após cada commit
+
 ## Convenções de Commits
 
 - `feat`: Nova funcionalidade
@@ -63,11 +96,12 @@ git flow hotfix finish nome-do-hotfix
 - `test`: Adição ou correção de testes
 - `chore`: Atualizações de build, configurações, etc.
 
-Exemplo:
+Exemplos:
 ```
 feat: adiciona sistema de autenticação
 fix: corrige bug no cálculo de metas
 docs: atualiza README com novas instruções
+feat!: nova API incompatível com versão anterior
 ```
 
 ## Processo de Code Review
@@ -79,9 +113,9 @@ docs: atualiza README com novas instruções
 
 ## Tags e Versões
 
-- Cada release deve ser tagado com a versão
+- Cada versão é automaticamente tagada
 - Formato: v1.0.0
-- Seguir Semantic Versioning (MAJOR.MINOR.PATCH)
+- Tags são criadas automaticamente pelo script de versionamento
 
 ## Comandos Úteis
 
@@ -100,6 +134,9 @@ git flow hotfix list
 
 # Visualizar status do Git Flow
 git flow status
+
+# Ver histórico de versões
+git tag -l
 ```
 
 ## Boas Práticas
