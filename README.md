@@ -1,185 +1,122 @@
-![Docker Image Version](https://img.shields.io/docker/v/angellorn/nimage)
-![Docker Pulls](https://img.shields.io/docker/pulls/angellorn/nimage)
-![Docker Image Size (tag)](https://img.shields.io/docker/image-size/angellorn/nimage/api-1.0.1)
-![Docker Image Size (tag)](https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white)
-![GitHub pull request check contexts](https://img.shields.io/github/status/contexts/pulls/amarorn/Nimage/18)
-![MyGet Downloads](https://img.shields.io/badge/-MongoDB-4DB33D?style=flat&logo=mongodb&logoColor=FFFFFF)
-![MyGet Downloads](https://img.shields.io/badge/Clean_Architecture-0A0A0A?style=flat&logo=microservices&logoColor=white)
-![GitHub last commit](https://shields.io/badge/TypeScript-3178C6?style=flat&logo=TypeScript&logoColor=FFF&style=flat-square)
-![Scrutinizer coverage (GitHub/Bitbucket) with branch](https://img.shields.io/scrutinizer/coverage/g/amarorn/Nimage/master)
-
 # Nimage
 
-API em Node.js com TypeScript seguindo Clean Architecture e suporte a Kubernetes
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
+[![Clean Architecture](https://img.shields.io/badge/Clean%20Architecture-6B7280?style=for-the-badge&logo=architecture&logoColor=white)](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+[![Git Flow](https://img.shields.io/badge/Git%20Flow-F05032?style=for-the-badge&logo=git&logoColor=white)](https://nvie.com/posts/a-successful-git-branching-model/)
+[![Semantic Versioning](https://img.shields.io/badge/Semantic%20Versioning-2.0.0-3B82F6?style=for-the-badge&logo=semver&logoColor=white)](https://semver.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Coverage Status](https://coveralls.io/repos/github/seu-usuario/nimage/badge.svg?branch=main)](https://coveralls.io/github/seu-usuario/nimage?branch=main)
+[![Build Status](https://github.com/seu-usuario/nimage/workflows/CI/badge.svg)](https://github.com/seu-usuario/nimage/actions)
+[![Code Quality](https://img.shields.io/badge/code%20quality-A-green)](https://codeclimate.com/github/seu-usuario/nimage)
+[![Last Commit](https://img.shields.io/github/last-commit/seu-usuario/nimage)](https://github.com/seu-usuario/nimage/commits/main)
+[![Contributors](https://img.shields.io/github/contributors/seu-usuario/nimage)](https://github.com/seu-usuario/nimage/graphs/contributors)
+[![Issues](https://img.shields.io/github/issues/seu-usuario/nimage)](https://github.com/seu-usuario/nimage/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/seu-usuario/nimage)](https://github.com/seu-usuario/nimage/pulls)
 
-## Funcionalidades Principais
+API para análise de imagens usando IA, construída com Node.js, TypeScript e Clean Architecture.
 
-- Gerenciamento de equipes e vendedores
-- Sistema de metas e atividades
-- Cache distribuído com Redis
-- Análise de desempenho com IA (Ollama)
-- Monitoramento e health checks
-- Suporte a múltiplos ambientes (dev/prod)
+## 📚 Documentação
 
-## Configuração do Ambiente
+- [Começando](docs/getting-started/README.md)
+- [Arquitetura](docs/architecture/README.md)
+- [Desenvolvimento](docs/development/README.md)
+- [Deployment](docs/deployment/README.md)
+- [API](docs/api/README.md)
 
-### Pré-requisitos
+## ✨ Funcionalidades
 
-- Node.js v16 ou superior
+- Upload e gerenciamento de imagens
+- Análise de imagens usando IA
+- Detecção de objetos
+- Classificação de imagens
+- Cache com Redis
+- Monitoramento com Prometheus e Grafana
+- CI/CD com GitHub Actions
+- Versionamento semântico automático
+
+## 🛠️ Tecnologias
+
+- Node.js
+- TypeScript
+- Express
 - MongoDB
 - Redis
-- Ollama
 - Docker
 - Kubernetes
-- kubectl
+- Jest
+- Clean Architecture
+- Git Flow
+- Semantic Versioning
 
-### Instalação
+## 📋 Pré-requisitos
 
-#### Usando Kubernetes (Recomendado)
+- Node.js 18+
+- Docker e Docker Compose
+- MongoDB
+- Redis
+- Ollama (para IA)
 
-1. Clone o repositório
-2. Escolha o ambiente de deploy:
+## 🚀 Instalação
+
+1. Clone o repositório:
 ```bash
-# Desenvolvimento
-./deploy.sh dev
-
-# Produção
-./deploy.sh prd
+git clone https://github.com/seu-usuario/nimage.git
+cd nimage
 ```
 
-O servidor estará disponível em:
-- Dev: http://localhost:3001
-- Prod: http://localhost:3001
-
-#### Usando Docker Compose (Desenvolvimento Local)
-
-```bash
-docker-compose -f docker-compose.dev.yml up
-```
-
-#### Instalação Manual
-
-1. Clone o repositório
 2. Instale as dependências:
 ```bash
 npm install
 ```
 
 3. Configure as variáveis de ambiente:
-- Copie `.env.example` para `.env`
-- Ajuste as variáveis conforme seu ambiente
+```bash
+cp .env.example .env
+```
 
 4. Inicie os serviços:
 ```bash
-docker-compose up mongodb redis ollama
+docker-compose up -d
 ```
 
-5. Inicie o servidor:
+5. Inicie a aplicação:
 ```bash
 npm run dev
 ```
 
-## Arquitetura
+## 📄 Licença
 
-### Clean Architecture
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-```
-src/
-  ├── application/      # Casos de uso e serviços
-  │   ├── services/    # Serviços da aplicação
-  │   └── use-cases/   # Casos de uso
-  ├── domain/          # Regras de negócio
-  │   ├── entities/    # Entidades do domínio
-  │   ├── models/      # Modelos de IA
-  │   └── repositories/# Interfaces dos repositórios
-  ├── infrastructure/  # Implementações
-  │   ├── cache/      # Cache Redis
-  │   ├── database/   # MongoDB
-  │   └── repositories/# Implementações dos repositórios
-  └── interfaces/     # Controllers e rotas
-```
+## 🤝 Contribuindo
 
-### Kubernetes
-
-```
-k8s/
-├── dev/              # Configurações de desenvolvimento
-│   ├── configmap.yaml
-│   ├── deployment.yaml
-│   ├── mongodb.yaml
-│   ├── redis.yaml
-│   └── service.yaml
-├── prd/              # Configurações de produção
-│   ├── configmap.yaml
-│   ├── deployment.yaml
-│   ├── mongodb.yaml
-│   ├── redis.yaml
-│   └── service.yaml
-└── monitoring.yaml   # Configuração de monitoramento
-```
-
-## Serviços
-
-### Cache Redis
-- Cache distribuído para todas as entidades
-- TTL configurável por tipo de entidade
-- Invalidação automática em atualizações
-
-### MongoDB
-- Persistência principal de dados
-- Backup automático configurado
-- Índices otimizados para consultas frequentes
-
-### Ollama
-- Análise de desempenho com IA
-- Treinamento de modelos personalizados
-- Integração com dados históricos
-
-## Monitoramento
-
-- Health checks para todos os serviços
-- Métricas de performance
-- Logs estruturados
-- Prometheus e Grafana integrados
-
-## Scripts Disponíveis
-
-- `npm run build`: Compila o projeto
-- `npm run start`: Inicia em produção
-- `npm run dev`: Inicia em desenvolvimento
-- `npm run lint`: Executa o linter
-- `npm run test`: Executa os testes
-- `npm run generate-data`: Gera dados de teste
-
-## Variáveis de Ambiente
-
-### Aplicação
-- `NODE_ENV`: Ambiente (development/production)
-- `PORT`: Porta do servidor
-- `LOG_LEVEL`: Nível de logs
-
-### Banco de Dados
-- `MONGO_URI`: URL do MongoDB
-- `MONGO_DB_NAME`: Nome do banco
-
-### Cache
-- `REDIS_URL`: URL do Redis
-- `REDIS_TTL`: Tempo de cache
-
-### IA
-- `OLLAMA_URL`: URL do serviço Ollama
-- `MODEL_NAME`: Nome do modelo
-
-## Contribuição
-
-1. Fork do projeto
-2. Crie uma branch (`git checkout -b feature/nova-feature`)
-3. Commit suas mudanças (`git commit -m 'feat: nova feature'`)
-4. Push para a branch (`git push origin feature/nova-feature`)
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
 
-## Licença
+## 💬 Suporte
 
-Este projeto está sob a licença MIT.
+- Abra uma issue no GitHub
+- Entre em contato via email
+- Consulte a documentação
+
+## 🙏 Agradecimentos
+
+- [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+- [Git Flow](https://nvie.com/posts/a-successful-git-branching-model/)
+- [Semantic Versioning](https://semver.org/)
+- [Node.js](https://nodejs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Express](https://expressjs.com/)
+- [MongoDB](https://www.mongodb.com/)
+- [Redis](https://redis.io/)
+- [Docker](https://www.docker.com/)
+- [Kubernetes](https://kubernetes.io/)
 
 
