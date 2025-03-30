@@ -1,6 +1,6 @@
 {
   "name": "Nimage",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "API em Node.js com TypeScript seguindo Clean Architecture",
   "main": "dist/index.js",
   "scripts": {
