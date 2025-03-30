@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">80% </span>
+                <span class="strong">25% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>8/10</span>
+                <span class='fraction'>3/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">66.66% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/6</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>1/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">80% </span>
+                <span class="strong">25% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>8/10</span>
+                <span class='fraction'>3/12</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -94,7 +94,12 @@
 <a name='L29'></a><a href='#L29'>29</a>
 <a name='L30'></a><a href='#L30'>30</a>
 <a name='L31'></a><a href='#L31'>31</a>
-<a name='L32'></a><a href='#L32'>32</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -103,15 +108,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -120,10 +129,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Atividade } from "../../domain/entities/Atividade";
 import { AtividadeRepository } from "../../domain/repositories/AtividadeRepository";
@@ -131,30 +141,35 @@ import { AtividadeRepository } from "../../domain/repositories/AtividadeReposito
 export class CriarAtividade {
     constructor(private atividadeRepo: AtividadeRepository) {}
 &nbsp;
-    async executar(dados: { id: string; vendedorId: string; data: Date; docinhosCoco: number }) {
+<span class="fstat-no" title="function not covered" >    async </span>executar(dados: { id: string; vendedorId: string; data: Date; docinhosCoco: number; follow_up: number }) {
         //console.log("📝 Iniciando criação de atividade com dados:", dados);
 &nbsp;
-        <span class="missing-if-branch" title="if path not taken" >I</span>if (!dados.id || !dados.vendedorId || !dados.data || dados.docinhosCoco === undefined) {
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!dados.id || !dados.vendedorId || !dados.data || dados.docinhosCoco === undefined || dados.follow_up === undefined) {</span>
 <span class="cstat-no" title="statement not covered" >            throw new Error('Dados inválidos para criar atividade');</span>
         }
 &nbsp;
-        <span class="missing-if-branch" title="if path not taken" >I</span>if (dados.docinhosCoco &lt; 0) {
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (dados.docinhosCoco &lt; 0) {</span>
 <span class="cstat-no" title="statement not covered" >            throw new Error('Quantidade de docinhos não pode ser negativa');</span>
         }
 &nbsp;
-        const atividade = new Atividade(
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (dados.follow_up &lt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >            throw new Error('Número de follow-ups não pode ser negativo');</span>
+        }
+&nbsp;
+        const atividade = <span class="cstat-no" title="statement not covered" >new Atividade(</span>
             dados.id, 
             dados.vendedorId, 
             dados.data, 
-            dados.docinhosCoco
+            dados.docinhosCoco,
+            dados.follow_up
         );
         
         //console.log("🏗️ Atividade instanciada:", atividade);
 &nbsp;
-        await this.atividadeRepo.criar(atividade);
+<span class="cstat-no" title="statement not covered" >        await this.atividadeRepo.criar(atividade);</span>
         //console.log("💾 Atividade persistida no banco");
 &nbsp;
-        return atividade;
+<span class="cstat-no" title="statement not covered" >        return atividade;</span>
     }
 }</pre></td></tr></table></pre>
 
@@ -163,7 +178,7 @@ export class CriarAtividade {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-02-23T21:31:30.299Z
+                at 2025-03-30T05:37:36.074Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
