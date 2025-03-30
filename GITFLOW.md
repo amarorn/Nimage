@@ -2,6 +2,21 @@
 
 Este documento descreve o processo de Git Flow e versionamento semântico utilizado no Projeto Nimage.
 
+## Configuração do Git Flow
+
+O projeto utiliza as seguintes configurações do Git Flow:
+
+```ini
+[gitflow "branch"]
+    master = master
+    develop = develop
+    feature = feature/
+    release = release/
+    hotfix = hotfix/
+    support = support/
+    versiontag = v
+```
+
 ## Estrutura de Branches
 
 - `master`: Branch principal que contém o código em produção
@@ -97,53 +112,77 @@ O versionamento é incrementado automaticamente baseado no tipo de commit:
 - `chore`: Atualizações de build, configurações, etc.
 
 Exemplos:
-```
-feat: adiciona sistema de autenticação
-fix: corrige bug no cálculo de metas
-docs: atualiza README com novas instruções
-feat!: nova API incompatível com versão anterior
-```
-
-## Processo de Code Review
-
-1. Criar Pull Request da branch de feature para develop
-2. Aguardar revisão e aprovação
-3. Resolver conflitos se necessário
-4. Merge após aprovação
-
-## Tags e Versões
-
-- Cada versão é automaticamente tagada
-- Formato: v1.0.0
-- Tags são criadas automaticamente pelo script de versionamento
-
-## Comandos Úteis
-
 ```bash
-# Inicializar Git Flow
+# Nova funcionalidade
+git commit -m "feat: adiciona autenticação JWT"
+
+# Correção de bug
+git commit -m "fix: corrige validação de email"
+
+# Alteração na documentação
+git commit -m "docs: atualiza README com novas instruções"
+
+# Mudança incompatível
+git commit -m "feat!: remove suporte a versão antiga da API"
+```
+
+## Configuração Inicial
+
+Para configurar o Git Flow em um novo ambiente:
+
+1. Instale o Git Flow:
+```bash
+# macOS
+brew install git-flow
+
+# Linux
+sudo apt-get install git-flow
+```
+
+2. Inicialize o Git Flow no projeto:
+```bash
 git flow init
+```
 
-# Listar todas as features
-git flow feature list
+3. Configure o versionamento automático:
+```bash
+# Torne o script executável
+chmod +x scripts/version-bump.sh
 
-# Listar todos os releases
-git flow release list
-
-# Listar todos os hotfixes
-git flow hotfix list
-
-# Visualizar status do Git Flow
-git flow status
-
-# Ver histórico de versões
-git tag -l
+# Configure o hook post-commit
+cp scripts/post-commit .git/hooks/
+chmod +x .git/hooks/post-commit
 ```
 
 ## Boas Práticas
 
-1. Manter branches atualizadas com develop
-2. Fazer commits frequentes e atômicos
-3. Seguir as convenções de commits
-4. Manter a documentação atualizada
-5. Resolver conflitos localmente antes de fazer push
-6. Não fazer merge direto em master ou develop 
+1. **Commits Atômicos**: Cada commit deve representar uma única mudança
+2. **Mensagens Descritivas**: Use mensagens claras e descritivas
+3. **Branch Naming**: Use nomes descritivos para as branches
+4. **Code Review**: Faça review do código antes de merge
+5. **Testes**: Mantenha os testes atualizados e passando
+
+## Troubleshooting
+
+### Problemas Comuns
+
+1. **Conflitos de Merge**
+   - Resolva os conflitos manualmente
+   - Use `git status` para ver arquivos conflitantes
+   - Use `git add` após resolver conflitos
+
+2. **Versionamento Incorreto**
+   - Verifique a mensagem do último commit
+   - Confirme se o hook post-commit está ativo
+   - Verifique os logs do script de versionamento
+
+3. **Branch Perdida**
+   - Use `git reflog` para encontrar commits perdidos
+   - Recupere a branch com `git checkout -b branch-name commit-hash`
+
+## Suporte
+
+Para suporte adicional:
+- Consulte a [documentação oficial do Git Flow](https://github.com/nvie/gitflow)
+- Abra uma issue no repositório
+- Entre em contato com a equipe de desenvolvimento 
