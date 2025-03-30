@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: nimage-app
     ports:
       - "3001:3001"
     environment:
@@ -52,6 +53,22 @@ services:
       timeout: 10s
       retries: 3
 
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    ports:
+      - "9121:9121"
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+    networks:
+      - nimage-network
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:9121/metrics"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   mongodb:
     image: mongo:latest
     ports:
@@ -71,7 +88,7 @@ services:
 
 networks:
   nimage-network:
-    driver: bridge
+    external: true
 
 volumes:
   redis_data:
