@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev": "./scripts/dev.sh",
     "dev:docker": "./scripts/dev.sh",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write .",

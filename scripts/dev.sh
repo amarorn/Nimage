@@ -30,4 +30,8 @@ docker-compose ps
 
 # Verificar logs
 echo -e "${YELLOW}📝 Logs dos containers:${NC}"
-docker-compose logs -f 
+docker-compose logs -f &
+
+# Iniciar a aplicação em modo desenvolvimento
+echo -e "${YELLOW}🚀 Iniciando aplicação em modo desenvolvimento...${NC}"
+npm run dev 
