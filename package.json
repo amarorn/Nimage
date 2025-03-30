@@ -1,6 +1,6 @@
 {
   "name": "Nimage",
-  "version": "1.0.1",
+  "version": "1.1.1",
   "description": "API em Node.js com TypeScript seguindo Clean Architecture",
   "main": "dist/index.js",
   "scripts": {
@@ -17,7 +17,10 @@
     "train-model": "ts-node src/domain/models/trainModel.ts",
     "train-ollama": "ts-node src/domain/models/ollamaTrainer.ts",
     "train-ollama-simple": "ts-node src/scripts/trainOllamaSimple.ts",
-    "setup-gitflow": "./scripts/setup-gitflow.sh"
+    "setup-gitflow": "./scripts/setup-gitflow.sh",
+    "test:coverage": "nyc npm test",
+    "test:coverage:report": "nyc --reporter=text --reporter=lcov npm test",
+    "coveralls": "nyc --reporter=lcov npm test && cat ./coverage/lcov.info | coveralls"
   },
   "dependencies": {
     "@tensorflow-models/coco-ssd": "^2.2.3",
@@ -43,6 +46,7 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@istanbuljs/nyc-config-babel": "^3.0.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.14",
@@ -61,5 +65,30 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.5.3"
   },
-  "private": true
+  "private": true,
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-babel",
+    "all": true,
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "src/**/*.test.ts",
+      "src/**/*.spec.ts",
+      "src/**/__tests__/**",
+      "src/**/__mocks__/**"
+    ],
+    "reporter": [
+      "text",
+      "lcov",
+      "html"
+    ],
+    "report-dir": "./coverage",
+    "check-coverage": {
+      "statements": 80,
+      "branches": 80,
+      "functions": 80,
+      "lines": 80
+    }
+  }
 }
