@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">9.52% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>2/6</span>
+                <span class='fraction'>2/21</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">13.33% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>2/6</span>
+                <span class='fraction'>2/15</span>
             </div>
         
             
@@ -81,41 +81,98 @@
 <a name='L16'></a><a href='#L16'>16</a>
 <a name='L17'></a><a href='#L17'>17</a>
 <a name='L18'></a><a href='#L18'>18</a>
-<a name='L19'></a><a href='#L19'>19</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { VendedorRepository } from "../../domain/repositories/VendedorRepository";
-import { Vendedor } from "../../domain/entities/Vendedor";
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Vendedor } from "../../domain/entities/Vendedor";
+import { VendedorRepository } from "../../domain/repositories/VendedorRepository";
+&nbsp;
+interface AtualizarVendedorDTO {
+    nome?: string;
+    equipeId?: string;
+    email?: string;
+    telefone?: string;
+    meta?: number;
+    cargo?: string;
+}
 &nbsp;
 export class AtualizarVendedor {
-    constructor(private vendedorRepo: VendedorRepository) {}
+    constructor(private vendedorRepository: VendedorRepository) {}
 &nbsp;
-    async <span class="fstat-no" title="function not covered" >executar(</span>id: string, dados: { nome: string; equipe_id: string }): Promise&lt;Vendedor | null&gt; {
-        //console.log("📝 Iniciando atualização de vendedor com dados:", dados);
-&nbsp;
-<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!dados.nome || !dados.equipe_id) {</span>
-<span class="cstat-no" title="statement not covered" >            throw new Error('Dados inválidos para atualizar vendedor');</span>
+<span class="fstat-no" title="function not covered" >    async </span>executar(id: string, dados: AtualizarVendedorDTO): Promise&lt;Vendedor | null&gt; {
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!id) {</span>
+<span class="cstat-no" title="statement not covered" >            throw new Error('ID do vendedor é obrigatório');</span>
         }
 &nbsp;
-        const vendedorAtualizado = <span class="cstat-no" title="statement not covered" >await this.vendedorRepo.atualizar(id, dados);</span>
-        //console.log("💾 Vendedor atualizado no banco:", vendedorAtualizado);
+        // Verifica se o vendedor existe
+        const vendedorExistente = <span class="cstat-no" title="statement not covered" >await this.vendedorRepository.obterPorId(id);</span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!vendedorExistente) {</span>
+<span class="cstat-no" title="statement not covered" >            throw new Error('Vendedor não encontrado');</span>
+        }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        return vendedorAtualizado;</span>
+        // Filtra apenas os campos que foram fornecidos
+        const dadosAtualizacao: AtualizarVendedorDTO = <span class="cstat-no" title="statement not covered" >{};</span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (dados.nome !== undefined) <span class="cstat-no" title="statement not covered" >dadosAtualizacao.nome = dados.nome;</span></span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (dados.equipeId !== undefined) <span class="cstat-no" title="statement not covered" >dadosAtualizacao.equipeId = dados.equipeId;</span></span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (dados.email !== undefined) <span class="cstat-no" title="statement not covered" >dadosAtualizacao.email = dados.email;</span></span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (dados.telefone !== undefined) <span class="cstat-no" title="statement not covered" >dadosAtualizacao.telefone = dados.telefone;</span></span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (dados.meta !== undefined) <span class="cstat-no" title="statement not covered" >dadosAtualizacao.meta = dados.meta;</span></span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (dados.cargo !== undefined) <span class="cstat-no" title="statement not covered" >dadosAtualizacao.cargo = dados.cargo;</span></span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        return await this.vendedorRepository.atualizar(id, dadosAtualizacao);</span>
     }
 } </pre></td></tr></table></pre>
 
@@ -124,7 +181,7 @@ export class AtualizarVendedor {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-02-23T21:31:30.299Z
+                at 2025-03-30T05:37:36.074Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

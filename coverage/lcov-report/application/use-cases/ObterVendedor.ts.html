@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">22.22% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>2/4</span>
+                <span class='fraction'>2/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">25% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/3</span>
+                <span class='fraction'>1/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">22.22% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>2/4</span>
+                <span class='fraction'>2/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -78,7 +78,17 @@
 <a name='L13'></a><a href='#L13'>13</a>
 <a name='L14'></a><a href='#L14'>14</a>
 <a name='L15'></a><a href='#L15'>15</a>
-<a name='L16'></a><a href='#L16'>16</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -90,6 +100,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -97,16 +117,26 @@
 import { Vendedor } from "../../domain/entities/Vendedor";
 &nbsp;
 export class ObterVendedor {
-    constructor(private vendedorRepo: VendedorRepository) {}
+    constructor(private vendedorRepository: VendedorRepository) {}
 &nbsp;
-    async <span class="fstat-no" title="function not covered" >executar(</span>skip: number, limit: number): Promise&lt;Vendedor[]&gt; {
+<span class="fstat-no" title="function not covered" >    async </span>executar(skip: number, limit: number): Promise&lt;Vendedor[]&gt; {
         //console.log("Executando ObterVendedor com paginação", { skip, limit });
-<span class="cstat-no" title="statement not covered" >        return await this.vendedorRepo.obterTodos(skip, limit);</span>
+<span class="cstat-no" title="statement not covered" >        return await this.vendedorRepository.obterTodos(skip, limit);</span>
     }
 &nbsp;
-    async <span class="fstat-no" title="function not covered" >executarPorId(</span>id: string): Promise&lt;Vendedor | null&gt; {
+<span class="fstat-no" title="function not covered" >    async </span>executarPorId(id: string): Promise&lt;Vendedor | null&gt; {
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!id) {</span>
+<span class="cstat-no" title="statement not covered" >            throw new Error('ID do vendedor é obrigatório');</span>
+        }
         //console.log("Executando ObterVendedor por ID", { id });
-<span class="cstat-no" title="statement not covered" >        return await this.vendedorRepo.obterPorId(id);</span>
+<span class="cstat-no" title="statement not covered" >        return await this.vendedorRepository.obterPorId(id);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    async </span>executarPorEquipeId(equipeId: string): Promise&lt;Vendedor[]&gt; {
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!equipeId) {</span>
+<span class="cstat-no" title="statement not covered" >            throw new Error('ID da equipe é obrigatório');</span>
+        }
+<span class="cstat-no" title="statement not covered" >        return await this.vendedorRepository.obterPorEquipeId(equipeId);</span>
     }
 } </pre></td></tr></table></pre>
 
@@ -115,7 +145,7 @@ export class ObterVendedor {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-02-23T21:31:30.299Z
+                at 2025-03-30T05:37:36.074Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

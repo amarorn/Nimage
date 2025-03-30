@@ -1,6 +1,6 @@
 {
   "name": "Nimage",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "API em Node.js com TypeScript seguindo Clean Architecture",
   "main": "dist/index.js",
   "scripts": {
@@ -16,7 +16,8 @@
     "prepare-training": "ts-node src/scripts/prepareTrainingData.ts",
     "train-model": "ts-node src/domain/models/trainModel.ts",
     "train-ollama": "ts-node src/domain/models/ollamaTrainer.ts",
-    "train-ollama-simple": "ts-node src/scripts/trainOllamaSimple.ts"
+    "train-ollama-simple": "ts-node src/scripts/trainOllamaSimple.ts",
+    "setup-gitflow": "./scripts/setup-gitflow.sh"
   },
   "dependencies": {
     "@tensorflow-models/coco-ssd": "^2.2.3",
