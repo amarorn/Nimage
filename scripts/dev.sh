@@ -34,4 +34,4 @@ docker-compose logs -f &
 
 # Iniciar a aplicação em modo desenvolvimento
 echo -e "${YELLOW}🚀 Iniciando aplicação em modo desenvolvimento...${NC}"
-npm run dev
+ts-node-dev --respawn --transpile-only src/server.ts
