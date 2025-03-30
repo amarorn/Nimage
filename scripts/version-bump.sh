@@ -35,11 +35,11 @@ current_version=$(node -p "require('./package.json').version")
 # Determina o tipo de versão baseado no último commit
 commit_message=$(git log -1 --pretty=%B)
 
-if [[ $commit_message == feat:* ]] || [[ $commit_message == feat(*)* ]]; then
+if [[ $commit_message =~ ^feat[[:space:]]*(\([^)]+\))?:[[:space:]].*$ ]]; then
     version_type="minor"
-elif [[ $commit_message == fix:* ]] || [[ $commit_message == fix(*)* ]]; then
+elif [[ $commit_message =~ ^fix[[:space:]]*(\([^)]+\))?:[[:space:]].*$ ]]; then
     version_type="patch"
-elif [[ $commit_message == BREAKING* ]] || [[ $commit_message == *"!"* ]]; then
+elif [[ $commit_message =~ ^BREAKING[[:space:]].*$ ]] || [[ $commit_message =~ .*!:.* ]]; then
     version_type="major"
 else
     version_type="patch"
