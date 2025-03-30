@@ -9,13 +9,13 @@
 [![Git Flow](https://img.shields.io/badge/Git%20Flow-F05032?style=for-the-badge&logo=git&logoColor=white)](https://nvie.com/posts/a-successful-git-branching-model/)
 [![Semantic Versioning](https://img.shields.io/badge/Semantic%20Versioning-2.0.0-3B82F6?style=for-the-badge&logo=semver&logoColor=white)](https://semver.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Coverage Status](https://coveralls.io/repos/github/seu-usuario/nimage/badge.svg?branch=main)](https://coveralls.io/github/seu-usuario/nimage?branch=main)
-[![Build Status](https://github.com/seu-usuario/nimage/workflows/CI/badge.svg)](https://github.com/seu-usuario/nimage/actions)
-[![Code Quality](https://img.shields.io/badge/code%20quality-A-green)](https://codeclimate.com/github/seu-usuario/nimage)
-[![Last Commit](https://img.shields.io/github/last-commit/seu-usuario/nimage)](https://github.com/seu-usuario/nimage/commits/main)
-[![Contributors](https://img.shields.io/github/contributors/seu-usuario/nimage)](https://github.com/seu-usuario/nimage/graphs/contributors)
-[![Issues](https://img.shields.io/github/issues/seu-usuario/nimage)](https://github.com/seu-usuario/nimage/issues)
-[![Pull Requests](https://img.shields.io/github/issues-pr/seu-usuario/nimage)](https://github.com/seu-usuario/nimage/pulls)
+[![Coverage Status](https://coveralls.io/repos/github/amarorn/Nimage/badge.svg?branch=main)](https://coveralls.io/github/amarorn/Nimage?branch=main)
+[![Build Status](https://github.com/amarorn/Nimage/workflows/CI/badge.svg)](https://github.com/amarorn/Nimage/actions)
+[![Code Quality](https://img.shields.io/badge/code%20quality-A-green)](https://codeclimate.com/github/amarorn/Nimage)
+[![Last Commit](https://img.shields.io/github/last-commit/amarorn/Nimage)](https://github.com/amarorn/Nimage/commits/main)
+[![Contributors](https://img.shields.io/github/contributors/amarorn/Nimage)](https://github.com/amarorn/Nimage/graphs/contributors)
+[![Issues](https://img.shields.io/github/issues/amarorn/Nimage)](https://github.com/amarorn/Nimage/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/amarorn/Nimage)](https://github.com/amarorn/Nimage/pulls)
 
 API para análise de imagens usando IA, construída com Node.js, TypeScript e Clean Architecture.
 
