@@ -49,9 +49,25 @@ else
     fast_restart
 fi
 
-# Liberar porta 3001 se estiver em uso
-echo -e "${YELLOW}🔓 Liberando porta 3001...${NC}"
+# Liberar portas
+echo -e "${YELLOW}🔓 Liberando portas...${NC}"
 lsof -ti:3001 | xargs kill -9 2>/dev/null || true
+lsof -ti:3002 | xargs kill -9 2>/dev/null || true
+lsof -ti:9090 | xargs kill -9 2>/dev/null || true
+lsof -ti:6379 | xargs kill -9 2>/dev/null || true
+lsof -ti:27017 | xargs kill -9 2>/dev/null || true
+lsof -ti:11434 | xargs kill -9 2>/dev/null || true
+echo -e "${GREEN}✅ Portas liberadas!${NC}"
+
+# Parar e remover containers existentes de forma mais agressiva
+echo -e "${YELLOW}🛑 Parando e removendo containers existentes...${NC}"
+docker-compose down --remove-orphans --volumes
+docker-compose rm -f -s -v
+docker system prune -f
+
+# Remover containers antigos
+echo -e "${YELLOW}🧹 Removendo containers antigos...${NC}"
+docker-compose rm -f
 
 # Criar rede para os containers
 echo -e "${YELLOW}🌐 Criando rede para os containers...${NC}"
@@ -101,6 +117,14 @@ wait
 echo -e "${YELLOW}⏳ Aguardando Redis inicializar completamente...${NC}"
 sleep 5
 
+# Aguardar Redis estar pronto
+echo -e "${YELLOW}⏳ Aguardando Redis estar pronto...${NC}"
+until docker-compose exec -T redis redis-cli ping; do
+    echo -e "${YELLOW}🔄 Redis ainda não está pronto, tentando novamente em 2 segundos...${NC}"
+    sleep 2
+done
+echo -e "${GREEN}✅ Redis está pronto!${NC}"
+
 # Verificar status dos containers
 echo -e "${YELLOW}🔍 Status dos containers:${NC}"
 docker ps
@@ -110,5 +134,17 @@ echo -e "${YELLOW}📝 Logs dos containers:${NC}"
 docker logs -f mongodb redis ollama &
 
 # Iniciar a aplicação em modo desenvolvimento
-echo -e "${YELLOW}🚀 Iniciando modo desenvolvimento...${NC}"
+echo -e "${YELLOW}🚀 Iniciando aplicação em modo desenvolvimento...${NC}"
 ts-node-dev --respawn --transpile-only src/server.ts
+
+# Função para limpar ao sair
+cleanup() {
+    echo -e "${YELLOW}🛑 Parando containers...${NC}"
+    docker-compose down --remove-orphans --volumes
+    docker-compose rm -f -s -v
+    docker system prune -f
+    exit 0
+}
+
+# Registrar a função de limpeza
+trap cleanup SIGINT SIGTERM

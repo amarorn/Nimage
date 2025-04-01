@@ -54,6 +54,18 @@ router.post("/vendedores", async (req, res) => {
     return vendedorController.criar(req, res);
 });
 
+router.get("/vendedores", async (req, res) => {
+    try {
+        const resultado = await vendedorController.obterTodos(req, res);
+        return resultado;
+    } catch (erro) {
+        return res.status(500).json({
+            erro: 'Erro interno ao obter vendedores',
+            mensagem: (erro as Error).message
+        });
+    }
+});
+
 router.get("/vendedores/all", async (req, res) => {
     try {
         const resultado = await vendedorController.obterTodos(req, res);
