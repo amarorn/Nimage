@@ -5,6 +5,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
 [![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
+[![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)](https://prometheus.io/)
+[![Grafana](https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white)](https://grafana.com/)
 [![Clean Architecture](https://img.shields.io/badge/Clean%20Architecture-6B7280?style=for-the-badge&logo=architecture&logoColor=white)](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 [![Git Flow](https://img.shields.io/badge/Git%20Flow-F05032?style=for-the-badge&logo=git&logoColor=white)](https://nvie.com/posts/a-successful-git-branching-model/)
 [![Semantic Versioning](https://img.shields.io/badge/Semantic%20Versioning-1.5.4-3B82F6?style=for-the-badge&logo=semver&logoColor=white)](https://semver.org/)
@@ -26,6 +28,7 @@ API para análise de imagens usando IA, construída com Node.js, TypeScript e Cl
 - [Desenvolvimento](docs/development/README.md)
 - [Deployment](docs/deployment/README.md)
 - [API](docs/api/README.md)
+- [Monitoramento](docs/monitoring/README.md)
 
 ## ✨ Funcionalidades
 
@@ -37,6 +40,43 @@ API para análise de imagens usando IA, construída com Node.js, TypeScript e Cl
 - Monitoramento com Prometheus e Grafana
 - CI/CD com GitHub Actions
 - Versionamento semântico automático
+
+## 📊 Monitoramento
+
+O projeto utiliza Prometheus e Grafana para monitoramento e visualização de métricas. As principais métricas coletadas incluem:
+
+### Métricas da Aplicação
+- Total de requisições HTTP
+- Taxa de requisições por segundo
+- Tempo médio de resposta
+- Requisições por rota
+- Requisições por status HTTP
+- Erros do servidor (5xx)
+
+### Métricas do MongoDB
+- Tamanho das collections
+- Número de documentos
+- Operações de leitura/escrita
+- Tempo médio de operações
+
+### Métricas do Redis
+- Uso de memória
+- Hit/miss ratio do cache
+- Latência de operações
+- Conexões ativas
+
+### Acesso ao Grafana
+1. Inicie os serviços com Docker Compose
+2. Acesse o Grafana em `http://localhost:3000`
+3. Credenciais padrão:
+   - Usuário: `admin`
+   - Senha: `admin`
+
+### Dashboards Disponíveis
+- Visão geral da aplicação
+- Métricas do MongoDB
+- Métricas do Redis
+- Performance da API
 
 ## 🛠️ Tecnologias
 
@@ -51,6 +91,8 @@ API para análise de imagens usando IA, construída com Node.js, TypeScript e Cl
 - Clean Architecture
 - Git Flow
 - Semantic Versioning
+- Prometheus
+- Grafana
 
 ## 📋 Pré-requisitos
 
