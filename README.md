@@ -7,7 +7,7 @@
 [![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Clean Architecture](https://img.shields.io/badge/Clean%20Architecture-6B7280?style=for-the-badge&logo=architecture&logoColor=white)](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 [![Git Flow](https://img.shields.io/badge/Git%20Flow-F05032?style=for-the-badge&logo=git&logoColor=white)](https://nvie.com/posts/a-successful-git-branching-model/)
-[![Semantic Versioning](https://img.shields.io/badge/Semantic%20Versioning-2.0.0-3B82F6?style=for-the-badge&logo=semver&logoColor=white)](https://semver.org/)
+[![Semantic Versioning](https://img.shields.io/badge/Semantic%20Versioning-1.5.4-3B82F6?style=for-the-badge&logo=semver&logoColor=white)](https://semver.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Coverage Status](https://coveralls.io/repos/github/amarorn/Nimage/badge.svg?branch=main)](https://coveralls.io/github/amarorn/Nimage?branch=main)
 [![Build Status](https://github.com/amarorn/Nimage/workflows/CI/badge.svg)](https://github.com/amarorn/Nimage/actions)
