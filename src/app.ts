@@ -8,14 +8,16 @@ import desempenhoIdealRoutes from "./interfaces/routes/desempenhoIdealRoutes";
 import temaRoutes from './interfaces/routes/temaRoutes';
 import cargoRoutes from './interfaces/routes/cargoRoutes';
 import { Request, Response } from 'express';
-import { Container } from 'inversify';
-import { MetricsMiddleware } from './infrastructure/middleware/MetricsMiddleware';
-import { MetricsService } from './infrastructure/monitoring/MetricsService';
+import { metricsMiddleware, metricsEndpoint } from './infrastructure/middleware/metricsMiddleware';
+import healthRoutes from './interfaces/routes/healthRoutes';
+import metricsRoutes from './interfaces/routes/metricsRoutes';
 
 console.log('📦 Iniciando configuração do app...');
 
 const app = express();
 app.use(express.json());
+app.use(cors());
+app.use(metricsMiddleware);
 
 console.log('🔧 Configurando CORS...');
 // Use o middleware CORS
@@ -24,18 +26,6 @@ app.use(cors({
     //methods: ['GET', 'POST', 'PUT', 'DELETE'],
     //allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
-console.log('📊 Configurando métricas...');
-const container = new Container();
-container.bind(MetricsService).toSelf().inSingletonScope();
-const metricsService = container.get(MetricsService);
-const metricsMiddleware = new MetricsMiddleware(metricsService);
-
-// Middleware para coletar métricas de todas as requisições
-app.use(metricsMiddleware.collectMetrics);
-
-// Rota para expor métricas do Prometheus
-app.get('/metrics', metricsMiddleware.exposeMetrics);
 
 console.log('🛣️ Configurando rotas...');
 
@@ -67,6 +57,10 @@ app.use("/api", metaRoutes);
 app.use("/api", desempenhoIdealRoutes);
 app.use("/api", temaRoutes);
 app.use("/api", cargoRoutes);
+app.use('/api', healthRoutes);
+app.use('/', metricsRoutes);
+
+app.get('/metrics', metricsEndpoint);
 
 console.log('✅ App configurado com sucesso!');
 
