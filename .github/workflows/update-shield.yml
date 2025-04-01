@@ -1,0 +1,39 @@
+name: Update Version Shield
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'package.json'
+      - 'README.md'
+
+jobs:
+  update-shield:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get package version
+        id: get_version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update README shield
+        run: |
+          sed -i "s/Semantic%20Versioning-[0-9.]*-3B82F6/Semantic%20Versioning-${{ steps.get_version.outputs.version }}-3B82F6/" README.md
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add README.md
+          git commit -m "docs: atualiza shield de versão para ${{ steps.get_version.outputs.version }}" || exit 0
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }} 
