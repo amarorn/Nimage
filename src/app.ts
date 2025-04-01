@@ -8,6 +8,9 @@ import desempenhoIdealRoutes from "./interfaces/routes/desempenhoIdealRoutes";
 import temaRoutes from './interfaces/routes/temaRoutes';
 import cargoRoutes from './interfaces/routes/cargoRoutes';
 import { Request, Response } from 'express';
+import { Container } from 'inversify';
+import { MetricsMiddleware } from './infrastructure/middleware/MetricsMiddleware';
+import { MetricsService } from './infrastructure/monitoring/MetricsService';
 
 console.log('📦 Iniciando configuração do app...');
 
@@ -21,6 +24,18 @@ app.use(cors({
     //methods: ['GET', 'POST', 'PUT', 'DELETE'],
     //allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+console.log('📊 Configurando métricas...');
+const container = new Container();
+container.bind(MetricsService).toSelf().inSingletonScope();
+const metricsService = container.get(MetricsService);
+const metricsMiddleware = new MetricsMiddleware(metricsService);
+
+// Middleware para coletar métricas de todas as requisições
+app.use(metricsMiddleware.collectMetrics);
+
+// Rota para expor métricas do Prometheus
+app.get('/metrics', metricsMiddleware.exposeMetrics);
 
 console.log('🛣️ Configurando rotas...');
 
