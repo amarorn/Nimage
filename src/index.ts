@@ -1,27 +1,10 @@
-import express from "express";
-import vendedorRoutes from "./interfaces/routes/vendedorRoutes";
+import app from "./app";
 import { MongoDB } from './infrastructure/database/MongoDB';
 import { CacheInitializer } from './infrastructure/cache/CacheInitializer';
 import { EquipeRepositoryImpl } from './infrastructure/repositories/EquipeRepositoryImpl';
 import { VendedorRepositoryImpl } from './infrastructure/repositories/VendedorRepositoryImpl';
 import { MetaRepositoryImpl } from './infrastructure/repositories/MetaRepositoryImpl';
 import { AtividadeRepositoryImpl } from './infrastructure/repositories/AtividadeRepositoryImpl';
-
-const app = express();
-
-// Middleware de logging
-app.use((req, res, next) => {
-    //console.log(`📝 ${req.method} ${req.url}`);
-    const start = Date.now();
-    res.on('finish', () => {
-        const duration = Date.now() - start;
-        //console.log(`🕒 ${req.method} ${req.url} - ${res.statusCode} - ${duration}ms`);
-    });
-    next();
-});
-
-app.use(express.json());
-app.use("/api", vendedorRoutes);
 
 const PORT = process.env.PORT || 3001;
 

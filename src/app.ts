@@ -8,57 +8,26 @@ import desempenhoIdealRoutes from "./interfaces/routes/desempenhoIdealRoutes";
 import temaRoutes from './interfaces/routes/temaRoutes';
 import cargoRoutes from './interfaces/routes/cargoRoutes';
 import { Request, Response } from 'express';
-import { Container } from 'inversify';
-import { MetricsMiddleware } from './infrastructure/middleware/MetricsMiddleware';
-import { MetricsService } from './infrastructure/monitoring/MetricsService';
+import { metricsMiddleware, metricsEndpoint } from './infrastructure/middleware/metricsMiddleware';
+import healthRoutes from './interfaces/routes/healthRoutes';
+import metricsRoutes from './interfaces/routes/metricsRoutes';
 
 console.log('📦 Iniciando configuração do app...');
 
 const app = express();
+
+// Middlewares
 app.use(express.json());
+app.use(metricsMiddleware);
 
 console.log('🔧 Configurando CORS...');
-// Use o middleware CORS
 app.use(cors({
     origin: '*'
-    //methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    //allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
-console.log('📊 Configurando métricas...');
-const container = new Container();
-container.bind(MetricsService).toSelf().inSingletonScope();
-const metricsService = container.get(MetricsService);
-const metricsMiddleware = new MetricsMiddleware(metricsService);
-
-// Middleware para coletar métricas de todas as requisições
-app.use(metricsMiddleware.collectMetrics);
-
-// Rota para expor métricas do Prometheus
-app.get('/metrics', metricsMiddleware.exposeMetrics);
 
 console.log('🛣️ Configurando rotas...');
 
-// Adicionando o endpoint de health check com o prefixo /api
-app.get("/api/health", (req, res) => {
-    console.log('📡 Health check solicitado');
-    res.status(200).json({
-        status: "UP",
-        timestamp: new Date().toISOString(),
-        services: {
-            api: "running",
-            database: "connected",
-            ollama: process.env.OLLAMA_URL || 'http://localhost:11434/api'
-        },
-        version: process.env.npm_package_version || '1.0.0'
-    });
-});
-
-// Health check endpoint
-app.get('/health', (req: Request, res: Response) => {
-    res.status(200).json({ status: 'ok' });
-});
-
+// Rotas da API
 console.log('🔄 Registrando rotas...');
 app.use("/api", vendedorRoutes);
 app.use("/api", atividadeRoutes);
@@ -67,6 +36,10 @@ app.use("/api", metaRoutes);
 app.use("/api", desempenhoIdealRoutes);
 app.use("/api", temaRoutes);
 app.use("/api", cargoRoutes);
+app.use("/api", healthRoutes);
+
+// Rotas de monitoramento
+app.use("/", metricsRoutes);
 
 console.log('✅ App configurado com sucesso!');
 
