@@ -1,0 +1,58 @@
+{
+  "version": "1.0",
+  "components": [
+    {
+      "id": "C1",
+      "name": "API Data Compass",
+      "type": "Application",
+      "description": "Aplicação principal que gerencia e processa dados",
+      "tags": ["backend", "api", "typescript"],
+      "properties": {
+        "technology": "Node.js",
+        "framework": "Express",
+        "language": "TypeScript"
+      },
+      "containers": [
+        {
+          "id": "C2",
+          "name": "UserController",
+          "type": "Component",
+          "description": "Controlador responsável por gerenciar operações relacionadas a usuários",
+          "tags": ["controller", "rest", "api"],
+          "properties": {
+            "endpoints": [
+              "POST /users",
+              "GET /users",
+              "GET /users/:id",
+              "PUT /users/:id",
+              "DELETE /users/:id"
+            ]
+          }
+        },
+        {
+          "id": "C3",
+          "name": "UserService",
+          "type": "Component",
+          "description": "Serviço que implementa a lógica de negócios para usuários",
+          "tags": ["service", "business-logic"],
+          "properties": {
+            "responsibilities": [
+              "Validação de dados",
+              "Processamento de regras de negócio",
+              "Integração com repositórios"
+            ]
+          }
+        }
+      ],
+      "connections": [
+        {
+          "source": "C2",
+          "target": "C3",
+          "description": "UserController utiliza UserService para processamento de regras de negócio",
+          "technology": "TypeScript",
+          "tags": ["internal", "service-call"]
+        }
+      ]
+    }
+  ]
+} 

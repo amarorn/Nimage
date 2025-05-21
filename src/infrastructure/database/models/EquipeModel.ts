@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Document, Model } from 'mongoose';
 
 export interface IEquipe extends Document {
     id: string;
@@ -6,24 +6,68 @@ export interface IEquipe extends Document {
     pdv: string;
     cidade: string;
     estado: string;
-    gerenteNome: string;
-    gerenteTelefone: string;
-    capitaoNome: string;
-    capitaoTelefone: string;
+    gerenteNome?: string;
+    gerenteTelefone?: string;
+    capitaoNome?: string;
+    capitaoTelefone?: string;
     temaId?: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
-const EquipeSchema: Schema = new Schema({
-    id: { type: String, required: true, unique: true },
-    nome: { type: String, required: true },
-    pdv: { type: String, required: true },
-    cidade: { type: String, required: true },
-    estado: { type: String, required: true },
-    gerenteNome: { type: String, required: true },
-    gerenteTelefone: { type: String, required: true },
-    capitaoNome: { type: String, required: true },
-    capitaoTelefone: { type: String, required: true },
-    temaId: { type: String, required: false }
+interface IEquipeModel extends Model<IEquipe> {
+    findWithPagination(skip: number, limit: number): Promise<IEquipe[]>;
+}
+
+const equipeSchema = new mongoose.Schema({
+    id: { type: String, required: true, unique: true, trim: true },
+    nome: { type: String, required: true, trim: true },
+    pdv: { type: String, required: true, trim: true },
+    cidade: { type: String, required: true, trim: true },
+    estado: { type: String, required: true, trim: true },
+    gerenteNome: { type: String, trim: true },
+    gerenteTelefone: { type: String, trim: true },
+    capitaoNome: { type: String, trim: true },
+    capitaoTelefone: { type: String, trim: true },
+    temaId: { type: String, trim: true }
+}, {
+    timestamps: true
 });
 
-export const EquipeModel = mongoose.model<IEquipe>("Equipe", EquipeSchema);
+// Índices para consultas comuns
+equipeSchema.index({ cidade: 1, estado: 1 });
+equipeSchema.index({ nome: 1, pdv: 1 });
+equipeSchema.index({ nome: 'text', cidade: 'text', estado: 'text' });
+
+// Validações e transformações
+equipeSchema.pre('save', function(next) {
+    if (this.isModified('nome')) {
+        this.nome = this.nome.trim();
+    }
+    if (this.isModified('cidade')) {
+        this.cidade = this.cidade.trim();
+    }
+    if (this.isModified('estado')) {
+        this.estado = this.estado.trim();
+    }
+    next();
+});
+
+// Método estático para consulta paginada
+equipeSchema.statics.findWithPagination = async function(skip: number, limit: number): Promise<IEquipe[]> {
+    try {
+        console.log(`🔍 Executando consulta paginada - Skip: ${skip}, Limit: ${limit}`);
+        const equipes = await this.find()
+            .skip(skip)
+            .limit(limit)
+            .sort({ nome: 1 });
+        
+        console.log(`✅ ${equipes.length} equipes encontradas`);
+        return equipes;
+    } catch (erro) {
+        console.error('❌ Erro na consulta paginada:', erro);
+        throw erro;
+    }
+};
+
+export const EquipeModel = mongoose.model<IEquipe, IEquipeModel>('Equipe', equipeSchema);

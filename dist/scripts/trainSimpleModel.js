@@ -16,7 +16,8 @@ async function trainSimpleModel() {
     try {
         console.log('🚀 Iniciando treinamento do modelo...');
         // Conectar ao MongoDB
-        await MongoDB_1.MongoDB.conectar();
+        const mongoDB = MongoDB_1.MongoDB.getInstance();
+        await mongoDB.connect();
         // Inicializar repositórios
         const atividadeRepo = new AtividadeRepositoryImpl_1.AtividadeRepositoryImpl();
         const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();

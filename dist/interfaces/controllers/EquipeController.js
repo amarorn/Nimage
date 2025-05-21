@@ -16,26 +16,20 @@ class EquipeController {
             if (!req.body) {
                 return res.status(400).json({ erro: 'Body da requisição está vazio' });
             }
-            const { id, nome, pdv, cidade, estado, gerenteNome, gerenteTelefone, capitaoNome, capitaoTelefone, temaId } = req.body;
+            const { nome, pdv, cidade, estado, gerenteNome, gerenteTelefone, capitaoNome, capitaoTelefone, temaId } = req.body;
             // Validação dos campos obrigatórios
-            if (!id || !nome || !pdv || !cidade || !estado || !gerenteNome || !gerenteTelefone || !capitaoNome || !capitaoTelefone) {
+            if (!nome || !pdv || !cidade || !estado) {
                 return res.status(400).json({
                     erro: 'Dados inválidos',
                     detalhes: {
-                        id: id ? 'presente' : 'ausente',
                         nome: nome ? 'presente' : 'ausente',
                         pdv: pdv ? 'presente' : 'ausente',
                         cidade: cidade ? 'presente' : 'ausente',
-                        estado: estado ? 'presente' : 'ausente',
-                        gerenteNome: gerenteNome ? 'presente' : 'ausente',
-                        gerenteTelefone: gerenteTelefone ? 'presente' : 'ausente',
-                        capitaoNome: capitaoNome ? 'presente' : 'ausente',
-                        capitaoTelefone: capitaoTelefone ? 'presente' : 'ausente'
+                        estado: estado ? 'presente' : 'ausente'
                     }
                 });
             }
             const equipe = await this.criarEquipe.executar({
-                id,
                 nome,
                 pdv,
                 cidade,
@@ -60,8 +54,8 @@ class EquipeController {
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 10;
             const skip = (page - 1) * limit;
+            console.log('🔍 Buscando equipes - Página:', page, 'Limite:', limit);
             // Tenta obter do cache primeiro
-            const cacheKey = `list:${page}:${limit}`;
             const cachedEquipes = await this.equipeCache.getEquipes();
             if (cachedEquipes) {
                 console.log('📦 Cache hit: Equipes encontradas no cache');
@@ -85,6 +79,16 @@ class EquipeController {
             }
             console.log('🔄 Cache miss: Buscando equipes do banco');
             const equipes = await this.obterEquipe.executar(skip, limit);
+            if (!equipes || equipes.length === 0) {
+                console.log('⚠️ Nenhuma equipe encontrada no banco');
+                return res.status(200).json({
+                    pagina: page,
+                    limite: limit,
+                    total: 0,
+                    equipes: []
+                });
+            }
+            console.log(`✅ ${equipes.length} equipes encontradas no banco`);
             // Salva no cache
             await this.equipeCache.setEquipes(equipes);
             console.log('💾 Cache: Equipes salvas no cache');
@@ -107,6 +111,7 @@ class EquipeController {
             });
         }
         catch (erro) {
+            console.error('❌ Erro ao obter equipes:', erro);
             return res.status(500).json({
                 erro: 'Erro interno ao obter equipes',
                 mensagem: erro.message

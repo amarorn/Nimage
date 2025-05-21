@@ -59,7 +59,8 @@ async function generateData() {
         console.log('🚀 Iniciando geração de dados realistas...');
         
         // Conecta ao MongoDB
-        await MongoDB.conectar();
+        const mongoDB = MongoDB.getInstance();
+        await mongoDB.connect();
         console.log('✅ Conectado ao MongoDB');
 
         const equipeRepo = new EquipeRepositoryImpl();

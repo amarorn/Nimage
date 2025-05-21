@@ -3,32 +3,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const vendedorRoutes_1 = __importDefault(require("./interfaces/routes/vendedorRoutes"));
+const app_1 = __importDefault(require("./app"));
 const MongoDB_1 = require("./infrastructure/database/MongoDB");
 const CacheInitializer_1 = require("./infrastructure/cache/CacheInitializer");
 const EquipeRepositoryImpl_1 = require("./infrastructure/repositories/EquipeRepositoryImpl");
 const VendedorRepositoryImpl_1 = require("./infrastructure/repositories/VendedorRepositoryImpl");
 const MetaRepositoryImpl_1 = require("./infrastructure/repositories/MetaRepositoryImpl");
 const AtividadeRepositoryImpl_1 = require("./infrastructure/repositories/AtividadeRepositoryImpl");
-const app = (0, express_1.default)();
-// Middleware de logging
-app.use((req, res, next) => {
-    //console.log(`📝 ${req.method} ${req.url}`);
-    const start = Date.now();
-    res.on('finish', () => {
-        const duration = Date.now() - start;
-        //console.log(`🕒 ${req.method} ${req.url} - ${res.statusCode} - ${duration}ms`);
-    });
-    next();
-});
-app.use(express_1.default.json());
-app.use("/api", vendedorRoutes_1.default);
 const PORT = process.env.PORT || 3001;
 async function bootstrap() {
     try {
         // Conecta ao MongoDB
-        await MongoDB_1.MongoDB.conectar();
+        const mongoDB = MongoDB_1.MongoDB.getInstance();
+        await mongoDB.connect();
         console.log('✅ Conectado ao MongoDB');
         // Inicializa os repositórios
         const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
@@ -39,7 +26,7 @@ async function bootstrap() {
         const cacheInitializer = CacheInitializer_1.CacheInitializer.getInstance(equipeRepo, vendedorRepo, metaRepo, atividadeRepo);
         await cacheInitializer.initialize();
         // Inicia o servidor
-        app.listen(PORT, () => {
+        app_1.default.listen(PORT, () => {
             console.log(`🚀 Servidor rodando na porta ${PORT}`);
         });
     }

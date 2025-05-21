@@ -86,7 +86,8 @@ export class ModelTrainer {
         try {
             // Conectar ao MongoDB
             console.log('Conectando ao MongoDB...');
-            await MongoDB.conectar();
+            const mongoDB = MongoDB.getInstance();
+            await mongoDB.connect();
             console.log('Conectado ao MongoDB com sucesso!');
 
             console.log('Preparando dados de treinamento...');

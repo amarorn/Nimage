@@ -33,7 +33,8 @@ app_1.default.use("/api", cargoRoutes_1.default);
 const startServer = async () => {
     try {
         // Conecta ao banco de dados
-        await MongoDB_1.MongoDB.conectar();
+        const mongoDB = MongoDB_1.MongoDB.getInstance();
+        await mongoDB.connect();
         // Inicializa o cache da aplicação
         const initialCacheService = new InitialCacheService_1.InitialCacheService();
         await initialCacheService.initializeCache();

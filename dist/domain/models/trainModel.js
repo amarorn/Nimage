@@ -100,7 +100,8 @@ class ModelTrainer {
         try {
             // Conectar ao MongoDB
             console.log('Conectando ao MongoDB...');
-            await MongoDB_1.MongoDB.conectar();
+            const mongoDB = MongoDB_1.MongoDB.getInstance();
+            await mongoDB.connect();
             console.log('Conectado ao MongoDB com sucesso!');
             console.log('Preparando dados de treinamento...');
             const { features, labels } = await this.prepareTrainingData();

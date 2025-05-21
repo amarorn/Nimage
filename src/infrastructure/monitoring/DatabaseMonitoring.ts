@@ -1,4 +1,4 @@
-import { metrics } from '../middleware/metricsMiddleware';
+import { metrics } from '../middleware/MetricsMiddleware';
 
 export class DatabaseMonitoring {
   static async trackRedisOperation<T>(

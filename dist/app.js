@@ -12,35 +12,21 @@ const metaRoutes_1 = __importDefault(require("./interfaces/routes/metaRoutes"));
 const desempenhoIdealRoutes_1 = __importDefault(require("./interfaces/routes/desempenhoIdealRoutes"));
 const temaRoutes_1 = __importDefault(require("./interfaces/routes/temaRoutes"));
 const cargoRoutes_1 = __importDefault(require("./interfaces/routes/cargoRoutes"));
+const clienteRoutes_1 = __importDefault(require("./interfaces/routes/clienteRoutes"));
+const MetricsMiddleware_1 = require("./infrastructure/middleware/MetricsMiddleware");
+const healthRoutes_1 = __importDefault(require("./interfaces/routes/healthRoutes"));
+const metricsRoutes_1 = __importDefault(require("./interfaces/routes/metricsRoutes"));
 console.log('📦 Iniciando configuração do app...');
 const app = (0, express_1.default)();
+// Middlewares
 app.use(express_1.default.json());
+app.use(MetricsMiddleware_1.metricsMiddleware);
 console.log('🔧 Configurando CORS...');
-// Use o middleware CORS
 app.use((0, cors_1.default)({
     origin: '*'
-    //methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    //allowedHeaders: ['Content-Type', 'Authorization']
 }));
 console.log('🛣️ Configurando rotas...');
-// Adicionando o endpoint de health check com o prefixo /api
-app.get("/api/health", (req, res) => {
-    console.log('📡 Health check solicitado');
-    res.status(200).json({
-        status: "UP",
-        timestamp: new Date().toISOString(),
-        services: {
-            api: "running",
-            database: "connected",
-            ollama: process.env.OLLAMA_URL || 'http://localhost:11434/api'
-        },
-        version: process.env.npm_package_version || '1.0.0'
-    });
-});
-// Health check endpoint
-app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'ok' });
-});
+// Rotas da API
 console.log('🔄 Registrando rotas...');
 app.use("/api", vendedorRoutes_1.default);
 app.use("/api", atividadeRoutes_1.default);
@@ -49,6 +35,12 @@ app.use("/api", metaRoutes_1.default);
 app.use("/api", desempenhoIdealRoutes_1.default);
 app.use("/api", temaRoutes_1.default);
 app.use("/api", cargoRoutes_1.default);
+app.use("/api", clienteRoutes_1.default);
+app.use("/api", healthRoutes_1.default);
+// Rotas de monitoramento
+app.use("/", metricsRoutes_1.default);
+// Rota de métricas
+app.get('/metrics', MetricsMiddleware_1.metricsEndpoint);
 console.log('✅ App configurado com sucesso!');
 exports.default = app;
 //# sourceMappingURL=app.js.map

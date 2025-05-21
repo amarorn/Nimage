@@ -14,13 +14,12 @@ export class TemaController {
 
     async criar(req: Request, res: Response) {
         try {
-            const { id, nome, descricao, cor } = req.body;
+            const { nome, descricao, cor } = req.body;
 
-            if (!id || !nome || !descricao || !cor) {
+            if (!nome || !descricao || !cor) {
                 return res.status(400).json({
                     erro: 'Dados inválidos',
                     detalhes: {
-                        id: id ? 'presente' : 'ausente',
                         nome: nome ? 'presente' : 'ausente',
                         descricao: descricao ? 'presente' : 'ausente',
                         cor: cor ? 'presente' : 'ausente'
@@ -28,7 +27,7 @@ export class TemaController {
                 });
             }
 
-            const tema = await this.criarTema.executar({ id, nome, descricao, cor });
+            const tema = await this.criarTema.executar({ nome, descricao, cor });
             return res.status(201).json(tema);
         } catch (erro) {
             return res.status(500).json({

@@ -36,16 +36,53 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EquipeModel = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const EquipeSchema = new mongoose_1.Schema({
-    id: { type: String, required: true, unique: true },
-    nome: { type: String, required: true },
-    pdv: { type: String, required: true },
-    cidade: { type: String, required: true },
-    estado: { type: String, required: true },
-    gerenteNome: { type: String, required: true },
-    gerenteTelefone: { type: String, required: true },
-    capitaoNome: { type: String, required: true },
-    capitaoTelefone: { type: String, required: true },
-    temaId: { type: String, required: false }
+    id: {
+        type: String,
+        required: true,
+        unique: true,
+        index: true
+    },
+    nome: {
+        type: String,
+        required: true,
+        index: true
+    },
+    pdv: {
+        type: String,
+        required: true
+    },
+    cidade: {
+        type: String,
+        required: true,
+        index: true
+    },
+    estado: {
+        type: String,
+        required: true,
+        index: true
+    },
+    gerenteNome: {
+        type: String
+    },
+    gerenteTelefone: {
+        type: String
+    },
+    capitaoNome: {
+        type: String
+    },
+    capitaoTelefone: {
+        type: String
+    },
+    temaId: {
+        type: String,
+        index: true
+    }
+}, {
+    timestamps: true,
+    versionKey: false
 });
+// Índices compostos para consultas comuns
+EquipeSchema.index({ cidade: 1, estado: 1 });
+EquipeSchema.index({ nome: 1, pdv: 1 });
 exports.EquipeModel = mongoose_1.default.model("Equipe", EquipeSchema);
 //# sourceMappingURL=EquipeModel.js.map
