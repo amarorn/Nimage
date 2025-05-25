@@ -4,10 +4,10 @@ import { AtividadeRepository } from "../../domain/repositories/AtividadeReposito
 export class CriarAtividade {
     constructor(private atividadeRepo: AtividadeRepository) {}
 
-    async executar(dados: { id: string; vendedorId: string; data: Date; docinhosCoco: number; follow_up: number }) {
+    async executar(dados: { id: string; vendedorId: string; data: Date; docinhosCoco: number; follow_up: number; clienteId: string }) {
         //console.log("📝 Iniciando criação de atividade com dados:", dados);
 
-        if (!dados.id || !dados.vendedorId || !dados.data || dados.docinhosCoco === undefined || dados.follow_up === undefined) {
+        if (!dados.id || !dados.vendedorId || !dados.data || dados.docinhosCoco === undefined || dados.follow_up === undefined || !dados.clienteId) {
             throw new Error('Dados inválidos para criar atividade');
         }
 
@@ -24,7 +24,8 @@ export class CriarAtividade {
             dados.vendedorId, 
             dados.data, 
             dados.docinhosCoco,
-            dados.follow_up
+            dados.follow_up,
+            dados.clienteId
         );
         
         //console.log("🏗️ Atividade instanciada:", atividade);

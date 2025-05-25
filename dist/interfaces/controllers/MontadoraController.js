@@ -41,6 +41,16 @@ class MontadoraController {
             res.status(500).json({ error: error instanceof Error ? error.message : 'Erro ao obter montadoras' });
         }
     }
+    async obterTodosCompleto(req, res) {
+        try {
+            // Usa um limite bem alto para retornar todos os registros
+            const montadoras = await this.obterMontadora.executar(0, 9999);
+            res.json(montadoras);
+        }
+        catch (error) {
+            res.status(500).json({ error: error instanceof Error ? error.message : 'Erro ao obter todas as montadoras' });
+        }
+    }
     async obterPorId(req, res) {
         try {
             const { id } = req.params;

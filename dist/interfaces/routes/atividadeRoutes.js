@@ -38,9 +38,9 @@ router.post("/atividades", async (req, res) => {
 router.get("/atividades", async (req, res) => {
     return atividadeController.obterTodos(req, res);
 });
-// Nova rota /all que faz a mesma coisa que /atividades
+// Nova rota /all que retorna todas as atividades sem paginação
 router.get("/atividades/all", async (req, res) => {
-    return atividadeController.obterTodos(req, res);
+    return atividadeController.obterTodosCompleto(req, res);
 });
 router.get("/atividades/:id", async (req, res) => {
     return atividadeController.obterPorId(req, res);

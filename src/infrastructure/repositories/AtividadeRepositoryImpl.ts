@@ -21,6 +21,7 @@ export class AtividadeRepositoryImpl implements AtividadeRepository {
                     atividade.data,
                     atividade.docinhosCoco,
                     atividade.follow_up,
+                    atividade.clienteId,
                     atividade.total_docinhos
                 );
             }
@@ -37,6 +38,7 @@ export class AtividadeRepositoryImpl implements AtividadeRepository {
                 atividade.data,
                 atividade.docinhosCoco,
                 atividade.follow_up,
+                atividade.clienteId,
                 atividade.total_docinhos
             ));
         });
@@ -57,6 +59,7 @@ export class AtividadeRepositoryImpl implements AtividadeRepository {
                 atividade.data,
                 atividade.docinhosCoco,
                 atividade.follow_up,
+                atividade.clienteId,
                 atividade.total_docinhos
             ));
         });
@@ -77,6 +80,7 @@ export class AtividadeRepositoryImpl implements AtividadeRepository {
                     atividadeAtualizada.data,
                     atividadeAtualizada.docinhosCoco,
                     atividadeAtualizada.follow_up,
+                    atividadeAtualizada.clienteId,
                     atividadeAtualizada.total_docinhos
                 );
             }
@@ -112,6 +116,7 @@ export class AtividadeRepositoryImpl implements AtividadeRepository {
                 atividade.data,
                 atividade.docinhosCoco,
                 atividade.follow_up,
+                atividade.clienteId,
                 atividade.total_docinhos
             ));
         });

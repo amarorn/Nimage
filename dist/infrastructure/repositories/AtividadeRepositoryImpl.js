@@ -14,7 +14,7 @@ class AtividadeRepositoryImpl {
         return MongoDB_1.MongoDB.trackOperation('findById', 'atividades', async () => {
             const atividade = await AtividadeModel_1.AtividadeModel.findById(id).lean();
             if (atividade) {
-                return new Atividade_1.Atividade(atividade.id, atividade.vendedorId, atividade.data, atividade.docinhosCoco, atividade.follow_up, atividade.total_docinhos);
+                return new Atividade_1.Atividade(atividade.id, atividade.vendedorId, atividade.data, atividade.docinhosCoco, atividade.follow_up, atividade.clienteId, atividade.total_docinhos);
             }
             return null;
         });
@@ -22,7 +22,7 @@ class AtividadeRepositoryImpl {
     async obterTodos(skip, limit) {
         return MongoDB_1.MongoDB.trackOperation('find', 'atividades', async () => {
             const atividades = await AtividadeModel_1.AtividadeModel.find().skip(skip).limit(limit).lean();
-            return atividades.map(atividade => new Atividade_1.Atividade(atividade.id, atividade.vendedorId, atividade.data, atividade.docinhosCoco, atividade.follow_up, atividade.total_docinhos));
+            return atividades.map(atividade => new Atividade_1.Atividade(atividade.id, atividade.vendedorId, atividade.data, atividade.docinhosCoco, atividade.follow_up, atividade.clienteId, atividade.total_docinhos));
         });
     }
     async obterTotal() {
@@ -33,14 +33,14 @@ class AtividadeRepositoryImpl {
     async obterPorVendedorId(vendedorId) {
         return MongoDB_1.MongoDB.trackOperation('find', 'atividades', async () => {
             const atividades = await AtividadeModel_1.AtividadeModel.find({ vendedorId }).lean();
-            return atividades.map(atividade => new Atividade_1.Atividade(atividade.id, atividade.vendedorId, atividade.data, atividade.docinhosCoco, atividade.follow_up, atividade.total_docinhos));
+            return atividades.map(atividade => new Atividade_1.Atividade(atividade.id, atividade.vendedorId, atividade.data, atividade.docinhosCoco, atividade.follow_up, atividade.clienteId, atividade.total_docinhos));
         });
     }
     async atualizar(id, dados) {
         return MongoDB_1.MongoDB.trackOperation('findByIdAndUpdate', 'atividades', async () => {
             const atividadeAtualizada = await AtividadeModel_1.AtividadeModel.findByIdAndUpdate(id, dados, { new: true }).lean();
             if (atividadeAtualizada) {
-                return new Atividade_1.Atividade(atividadeAtualizada.id, atividadeAtualizada.vendedorId, atividadeAtualizada.data, atividadeAtualizada.docinhosCoco, atividadeAtualizada.follow_up, atividadeAtualizada.total_docinhos);
+                return new Atividade_1.Atividade(atividadeAtualizada.id, atividadeAtualizada.vendedorId, atividadeAtualizada.data, atividadeAtualizada.docinhosCoco, atividadeAtualizada.follow_up, atividadeAtualizada.clienteId, atividadeAtualizada.total_docinhos);
             }
             return null;
         });
@@ -62,7 +62,7 @@ class AtividadeRepositoryImpl {
             console.log('Debug - Repository - MongoDB query:', query);
             const resultado = await AtividadeModel_1.AtividadeModel.find(query).lean();
             console.log('Debug - Repository - Resultado encontrado:', resultado);
-            return resultado.map(atividade => new Atividade_1.Atividade(atividade.id, atividade.vendedorId, atividade.data, atividade.docinhosCoco, atividade.follow_up, atividade.total_docinhos));
+            return resultado.map(atividade => new Atividade_1.Atividade(atividade.id, atividade.vendedorId, atividade.data, atividade.docinhosCoco, atividade.follow_up, atividade.clienteId, atividade.total_docinhos));
         });
     }
     async deletar(id) {

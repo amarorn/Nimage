@@ -7,7 +7,7 @@ class AtualizarAtividade {
     }
     async executar(id, dados) {
         //console.log("📝 Iniciando atualização de atividade com dados:", dados);
-        if (!dados.vendedorId || !dados.data || dados.docinhosCoco === undefined || dados.follow_up === undefined) {
+        if (!dados.vendedorId || !dados.data || dados.docinhosCoco === undefined || dados.follow_up === undefined || !dados.clienteId) {
             throw new Error('Dados inválidos para atualizar atividade');
         }
         const atividadeAtualizada = await this.atividadeRepo.atualizar(id, dados);

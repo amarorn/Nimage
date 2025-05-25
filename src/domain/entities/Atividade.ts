@@ -5,6 +5,7 @@ export class Atividade {
         public data: Date,
         public docinhosCoco: number,
         public follow_up: number,
+        public clienteId: string,
         public total_docinhos?: number
     ) {}
 }

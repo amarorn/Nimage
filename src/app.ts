@@ -14,6 +14,7 @@ import healthRoutes from './interfaces/routes/healthRoutes';
 import metricsRoutes from './interfaces/routes/metricsRoutes';
 import montadoraRoutes from './interfaces/routes/montadoraRoutes';
 import lojaRoutes from './interfaces/routes/lojaRoutes';
+import relatorioRoutes from './interfaces/routes/relatorioRoutes';
 
 console.log('📦 Iniciando configuração do app...');
 
@@ -43,6 +44,7 @@ app.use("/api", clienteRoutes);
 app.use("/api", healthRoutes);
 app.use("/api", montadoraRoutes);
 app.use("/api", lojaRoutes);
+app.use("/api", relatorioRoutes);
 
 // Rotas de monitoramento
 app.use("/", metricsRoutes);

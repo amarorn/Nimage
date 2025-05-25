@@ -8,19 +8,20 @@ const ObterLoja_1 = require("../../application/use-cases/ObterLoja");
 const DeletarLoja_1 = require("../../application/use-cases/DeletarLoja");
 const LojaRepositoryImpl_1 = require("../../infrastructure/repositories/LojaRepositoryImpl");
 const router = (0, express_1.Router)();
-// Inicializa as dependências
+// Repositories
 const lojaRepository = new LojaRepositoryImpl_1.LojaRepositoryImpl();
+// Use Cases
 const criarLoja = new CriarLoja_1.CriarLoja(lojaRepository);
 const atualizarLoja = new AtualizarLoja_1.AtualizarLoja(lojaRepository);
 const obterLoja = new ObterLoja_1.ObterLoja(lojaRepository);
 const deletarLoja = new DeletarLoja_1.DeletarLoja(lojaRepository);
-// Inicializa o controller
+// Controller
 const lojaController = new LojaController_1.LojaController(criarLoja, atualizarLoja, obterLoja, deletarLoja);
-// Define as rotas
-router.post('/', (req, res) => lojaController.criar(req, res));
-router.get('/', (req, res) => lojaController.obterTodos(req, res));
-router.get('/:id', (req, res) => lojaController.obterPorId(req, res));
-router.put('/:id', (req, res) => lojaController.atualizar(req, res));
-router.delete('/:id', (req, res) => lojaController.deletar(req, res));
+// Routes
+router.post('/lojas', (req, res) => lojaController.criar(req, res));
+router.get('/lojas/all', (req, res) => lojaController.obterTodosCompleto(req, res));
+router.get('/lojas/:id', (req, res) => lojaController.obterPorId(req, res));
+router.put('/lojas/:id', (req, res) => lojaController.atualizar(req, res));
+router.delete('/lojas/:id', (req, res) => lojaController.deletar(req, res));
 exports.default = router;
 //# sourceMappingURL=lojaRoutes.js.map
