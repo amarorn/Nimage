@@ -1,88 +1,56 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EquipeModel = void 0;
-const mongoose_1 = __importStar(require("mongoose"));
-const EquipeSchema = new mongoose_1.Schema({
-    id: {
-        type: String,
-        required: true,
-        unique: true,
-        index: true
-    },
-    nome: {
-        type: String,
-        required: true,
-        index: true
-    },
-    pdv: {
-        type: String,
-        required: true
-    },
-    cidade: {
-        type: String,
-        required: true,
-        index: true
-    },
-    estado: {
-        type: String,
-        required: true,
-        index: true
-    },
-    gerenteNome: {
-        type: String
-    },
-    gerenteTelefone: {
-        type: String
-    },
-    capitaoNome: {
-        type: String
-    },
-    capitaoTelefone: {
-        type: String
-    },
-    temaId: {
-        type: String,
-        index: true
-    }
+const mongoose_1 = __importDefault(require("mongoose"));
+const equipeSchema = new mongoose_1.default.Schema({
+    id: { type: String, required: true, unique: true, trim: true },
+    nome: { type: String, required: true, trim: true },
+    pdv: { type: String, required: true, trim: true },
+    cidade: { type: String, required: true, trim: true },
+    estado: { type: String, required: true, trim: true },
+    gerenteNome: { type: String, trim: true },
+    gerenteTelefone: { type: String, trim: true },
+    capitaoNome: { type: String, trim: true },
+    capitaoTelefone: { type: String, trim: true },
+    temaId: { type: String, trim: true }
 }, {
-    timestamps: true,
-    versionKey: false
+    timestamps: true
 });
-// Índices compostos para consultas comuns
-EquipeSchema.index({ cidade: 1, estado: 1 });
-EquipeSchema.index({ nome: 1, pdv: 1 });
-exports.EquipeModel = mongoose_1.default.model("Equipe", EquipeSchema);
+// Índices para consultas comuns
+equipeSchema.index({ cidade: 1, estado: 1 });
+equipeSchema.index({ nome: 1, pdv: 1 });
+equipeSchema.index({ nome: 'text', cidade: 'text', estado: 'text' });
+// Validações e transformações
+equipeSchema.pre('save', function (next) {
+    if (this.isModified('nome')) {
+        this.nome = this.nome.trim();
+    }
+    if (this.isModified('cidade')) {
+        this.cidade = this.cidade.trim();
+    }
+    if (this.isModified('estado')) {
+        this.estado = this.estado.trim();
+    }
+    next();
+});
+// Método estático para consulta paginada
+equipeSchema.statics.findWithPagination = async function (skip, limit) {
+    try {
+        console.log(`🔍 Executando consulta paginada - Skip: ${skip}, Limit: ${limit}`);
+        const equipes = await this.find()
+            .skip(skip)
+            .limit(limit)
+            .sort({ nome: 1 });
+        console.log(`✅ ${equipes.length} equipes encontradas`);
+        return equipes;
+    }
+    catch (erro) {
+        console.error('❌ Erro na consulta paginada:', erro);
+        throw erro;
+    }
+};
+exports.EquipeModel = mongoose_1.default.model('Equipe', equipeSchema);
 //# sourceMappingURL=EquipeModel.js.map

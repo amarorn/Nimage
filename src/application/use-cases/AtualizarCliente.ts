@@ -5,7 +5,6 @@ interface AtualizarClienteDTO {
     nome?: string;
     email?: string;
     telefone?: string;
-    vendedorId?: string;
 }
 
 export class AtualizarCliente {

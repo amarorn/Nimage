@@ -7,10 +7,11 @@ class CriarCliente {
         this.clienteRepo = clienteRepo;
     }
     async executar(dados) {
+        var _a;
         if (!dados.id || !dados.nome || !dados.email || !dados.telefone) {
             throw new Error('Dados inválidos para criar cliente');
         }
-        const cliente = new Cliente_1.Cliente(dados.id, dados.nome, dados.email, dados.telefone, dados.vendedorId);
+        const cliente = new Cliente_1.Cliente(dados.id, dados.nome, dados.email, dados.telefone, (_a = dados.vendedorId) !== null && _a !== void 0 ? _a : '');
         await this.clienteRepo.criar(cliente);
         return cliente;
     }

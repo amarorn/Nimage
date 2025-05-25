@@ -16,6 +16,7 @@ const atividadeRoutes_1 = __importDefault(require("./interfaces/routes/atividade
 const metaRoutes_1 = __importDefault(require("./interfaces/routes/metaRoutes"));
 const temaRoutes_1 = __importDefault(require("./interfaces/routes/temaRoutes"));
 const cargoRoutes_1 = __importDefault(require("./interfaces/routes/cargoRoutes"));
+const clienteRoutes_1 = __importDefault(require("./interfaces/routes/clienteRoutes"));
 // Configuração do dotenv
 (0, dotenv_1.config)();
 const port = process.env.PORT || 3001;
@@ -29,6 +30,7 @@ app_1.default.use("/api", atividadeRoutes_1.default);
 app_1.default.use("/api", metaRoutes_1.default);
 app_1.default.use("/api", temaRoutes_1.default);
 app_1.default.use("/api", cargoRoutes_1.default);
+app_1.default.use("/api", clienteRoutes_1.default);
 // Inicialização do servidor
 const startServer = async () => {
     try {

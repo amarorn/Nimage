@@ -22,7 +22,7 @@ export class CriarCliente {
             dados.nome,
             dados.email,
             dados.telefone,
-            dados.vendedorId
+            dados.vendedorId ?? ''
         );
 
         await this.clienteRepo.criar(cliente);

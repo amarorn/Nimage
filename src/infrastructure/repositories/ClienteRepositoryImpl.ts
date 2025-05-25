@@ -1,6 +1,5 @@
-import { Cliente } from '../../domain/entities/Cliente';
 import { ClienteRepository } from '../../domain/repositories/ClienteRepository';
-import { ClienteModel, ICliente } from '../database/models/ClienteModel';
+import { ClienteModel, Cliente } from '../database/models/ClienteModel';
 import { MongoDB } from '../database/MongoDB';
 
 export class ClienteRepositoryImpl implements ClienteRepository {
@@ -85,13 +84,13 @@ export class ClienteRepositoryImpl implements ClienteRepository {
         });
     }
 
-    private toDomain(cliente: ICliente): Cliente {
+    private toDomain(cliente: any): Cliente {
         return new Cliente(
             cliente.id,
             cliente.nome,
             cliente.email,
             cliente.telefone,
-            cliente.vendedorId
+            cliente.vendedorId ?? ''
         );
     }
 } 

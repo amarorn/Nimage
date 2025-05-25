@@ -16,6 +16,8 @@ const clienteRoutes_1 = __importDefault(require("./interfaces/routes/clienteRout
 const MetricsMiddleware_1 = require("./infrastructure/middleware/MetricsMiddleware");
 const healthRoutes_1 = __importDefault(require("./interfaces/routes/healthRoutes"));
 const metricsRoutes_1 = __importDefault(require("./interfaces/routes/metricsRoutes"));
+const montadoraRoutes_1 = __importDefault(require("./interfaces/routes/montadoraRoutes"));
+const lojaRoutes_1 = __importDefault(require("./interfaces/routes/lojaRoutes"));
 console.log('📦 Iniciando configuração do app...');
 const app = (0, express_1.default)();
 // Middlewares
@@ -37,6 +39,8 @@ app.use("/api", temaRoutes_1.default);
 app.use("/api", cargoRoutes_1.default);
 app.use("/api", clienteRoutes_1.default);
 app.use("/api", healthRoutes_1.default);
+app.use("/api", montadoraRoutes_1.default);
+app.use("/api", lojaRoutes_1.default);
 // Rotas de monitoramento
 app.use("/", metricsRoutes_1.default);
 // Rota de métricas

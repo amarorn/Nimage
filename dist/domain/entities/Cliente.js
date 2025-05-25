@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Cliente = void 0;
 class Cliente {
-    constructor(id, nome, email, telefone, vendedorId) {
+    constructor(id, nome, email, telefone, vendedorId = '') {
         this.id = id;
         this.nome = nome;
         this.email = email;

@@ -36,12 +36,19 @@ class EquipeRepositoryImpl {
     async obterTodos(skip, limit) {
         console.log(`🔍 Buscando todas as equipes - Skip: ${skip}, Limit: ${limit}`);
         return await MongoDB_1.MongoDB.trackOperation('obterTodos', 'equipes', async () => {
-            const equipes = await EquipeModel_1.EquipeModel.find()
-                .skip(skip)
-                .limit(limit)
-                .sort({ nome: 1 });
-            console.log(`✅ ${equipes.length} equipes encontradas`);
-            return equipes.map(equipe => this.toDomain(equipe));
+            try {
+                console.log('📝 Executando consulta no MongoDB...');
+                const equipes = await EquipeModel_1.EquipeModel.findWithPagination(skip, limit);
+                console.log(`✅ ${equipes.length} equipes encontradas`);
+                console.log('📊 Dados das equipes:', JSON.stringify(equipes, null, 2));
+                const equipesConvertidas = equipes.map((equipe) => this.toDomain(equipe));
+                console.log('🔄 Equipes convertidas para o domínio:', JSON.stringify(equipesConvertidas, null, 2));
+                return equipesConvertidas;
+            }
+            catch (erro) {
+                console.error('❌ Erro ao buscar equipes:', erro);
+                throw erro;
+            }
         });
     }
     async atualizar(id, dados) {

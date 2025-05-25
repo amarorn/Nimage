@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClienteRepositoryImpl = void 0;
-const Cliente_1 = require("../../domain/entities/Cliente");
 const ClienteModel_1 = require("../database/models/ClienteModel");
 const MongoDB_1 = require("../database/MongoDB");
 class ClienteRepositoryImpl {
@@ -75,7 +74,8 @@ class ClienteRepositoryImpl {
         });
     }
     toDomain(cliente) {
-        return new Cliente_1.Cliente(cliente.id, cliente.nome, cliente.email, cliente.telefone, cliente.vendedorId);
+        var _a;
+        return new ClienteModel_1.Cliente(cliente.id, cliente.nome, cliente.email, cliente.telefone, (_a = cliente.vendedorId) !== null && _a !== void 0 ? _a : '');
     }
 }
 exports.ClienteRepositoryImpl = ClienteRepositoryImpl;

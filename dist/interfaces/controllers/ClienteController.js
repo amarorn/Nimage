@@ -1,8 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClienteController = void 0;
 const ClienteCacheService_1 = require("../../infrastructure/cache/ClienteCacheService");
 const uuid_1 = require("uuid");
+const fs_1 = __importDefault(require("fs"));
+const csv_parse_1 = require("csv-parse");
 class ClienteController {
     constructor(criarCliente, atualizarCliente, obterCliente, deletarCliente) {
         this.criarCliente = criarCliente;
@@ -11,10 +16,30 @@ class ClienteController {
         this.deletarCliente = deletarCliente;
         this.cacheService = ClienteCacheService_1.ClienteCacheService.getInstance();
     }
+    /**
+     * Cria um novo cliente.
+     * Campos aceitos:
+     * - nome (obrigatório)
+     * - email (obrigatório)
+     * - telefone (obrigatório)
+     */
     async criar(req, res) {
         try {
             const id = (0, uuid_1.v4)();
-            const cliente = await this.criarCliente.executar(Object.assign({ id }, req.body));
+            const { nome, email, telefone, vendedorId } = req.body;
+            if (!nome || !email || !telefone) {
+                return res.status(400).json({
+                    error: 'Campos obrigatórios ausentes',
+                    detalhes: { nome, email, telefone }
+                });
+            }
+            const cliente = await this.criarCliente.executar({
+                id,
+                nome,
+                email,
+                telefone,
+                vendedorId
+            });
             await this.cacheService.invalidateAll();
             res.status(201).json(cliente);
         }
@@ -103,6 +128,39 @@ class ClienteController {
             console.error('Erro ao deletar cliente:', error);
             res.status(400).json({ error: error instanceof Error ? error.message : 'Erro ao deletar cliente' });
         }
+    }
+    async importarCSV(req, res) {
+        if (!req.file) {
+            return res.status(400).json({ error: 'Arquivo CSV não enviado' });
+        }
+        const clientes = [];
+        const filePath = req.file.path;
+        fs_1.default.createReadStream(filePath)
+            .pipe((0, csv_parse_1.parse)({ columns: true, delimiter: ',' }))
+            .on('data', (row) => {
+            clientes.push(row);
+        })
+            .on('end', async () => {
+            try {
+                for (const dados of clientes) {
+                    await this.criarCliente.executar({
+                        id: dados.id || (0, uuid_1.v4)(),
+                        nome: dados.nome,
+                        email: dados.email,
+                        telefone: dados.telefone,
+                        vendedorId: dados.vendedorId
+                    });
+                }
+                fs_1.default.unlinkSync(filePath);
+                res.status(201).json({ message: 'Clientes importados com sucesso', total: clientes.length });
+            }
+            catch (error) {
+                res.status(500).json({ error: error instanceof Error ? error.message : 'Erro ao importar clientes' });
+            }
+        })
+            .on('error', (error) => {
+            res.status(500).json({ error: error.message });
+        });
     }
 }
 exports.ClienteController = ClienteController;

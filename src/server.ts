@@ -12,6 +12,7 @@ import atividadeRoutes from "./interfaces/routes/atividadeRoutes";
 import metaRoutes from "./interfaces/routes/metaRoutes";
 import temaRoutes from "./interfaces/routes/temaRoutes";
 import cargoRoutes from "./interfaces/routes/cargoRoutes";
+import clienteRoutes from "./interfaces/routes/clienteRoutes";
 // Configuração do dotenv
 config();
 
@@ -28,6 +29,7 @@ app.use("/api", atividadeRoutes);
 app.use("/api", metaRoutes);
 app.use("/api", temaRoutes);
 app.use("/api", cargoRoutes);
+app.use("/api", clienteRoutes);
 
 // Inicialização do servidor
 const startServer = async () => {

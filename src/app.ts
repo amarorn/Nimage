@@ -12,6 +12,8 @@ import { Request, Response } from 'express';
 import { metricsMiddleware, metricsEndpoint } from './infrastructure/middleware/MetricsMiddleware';
 import healthRoutes from './interfaces/routes/healthRoutes';
 import metricsRoutes from './interfaces/routes/metricsRoutes';
+import montadoraRoutes from './interfaces/routes/montadoraRoutes';
+import lojaRoutes from './interfaces/routes/lojaRoutes';
 
 console.log('📦 Iniciando configuração do app...');
 
@@ -39,6 +41,8 @@ app.use("/api", temaRoutes);
 app.use("/api", cargoRoutes);
 app.use("/api", clienteRoutes);
 app.use("/api", healthRoutes);
+app.use("/api", montadoraRoutes);
+app.use("/api", lojaRoutes);
 
 // Rotas de monitoramento
 app.use("/", metricsRoutes);
