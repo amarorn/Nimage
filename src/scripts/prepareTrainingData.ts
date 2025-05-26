@@ -21,7 +21,8 @@ interface TrainingData {
 async function prepareTrainingData() {
     try {
         // Conectar ao MongoDB
-        await MongoDB.conectar();
+        const mongoDB = MongoDB.getInstance();
+        await mongoDB.connect();
         console.log('Conectado ao MongoDB');
 
         const vendedorRepo = new VendedorRepositoryImpl();

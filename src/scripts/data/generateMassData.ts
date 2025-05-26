@@ -179,7 +179,7 @@ async function generateVendedores() {
                 nome: `Vendedor ${i}-${j}`,
                 email: `vendedor${i}-${j}@nimage.com.br`,
                 telefone: `(11) 9${i}${j}${j}${j}-${i}${j}${j}${j}`,
-                meta: 10000 + (i * 1000) + (j * 100),
+                meta: 1000 + (i * 100) + (j * 10), // Meta em quantidade de docinhos
                 cargo: "cargo-3", // Vendedor padrão
                 equipeId: `equipe-${i}`
             };

@@ -42,7 +42,8 @@ class OllamaTrainer {
         try {
             // Conectar ao MongoDB
             console.log('Conectando ao MongoDB...');
-            await MongoDB_1.MongoDB.conectar();
+            const mongoDB = MongoDB_1.MongoDB.getInstance();
+            await mongoDB.connect();
             console.log('Conectado ao MongoDB com sucesso!');
             // Buscar todas as atividades
             const atividades = await this.atividadeRepo.obterTodos(0, 1000);

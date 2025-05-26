@@ -11,7 +11,8 @@ const PORT = process.env.PORT || 3001;
 async function bootstrap() {
     try {
         // Conecta ao MongoDB
-        await MongoDB.conectar();
+        const mongoDB = MongoDB.getInstance();
+        await mongoDB.connect();
         console.log('✅ Conectado ao MongoDB');
 
         // Inicializa os repositórios

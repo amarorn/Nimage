@@ -59,7 +59,8 @@ async function generateData() {
         console.log('🚀 Iniciando geração de dados realistas...');
         
         // Conecta ao MongoDB
-        await MongoDB.conectar();
+        const mongoDB = MongoDB.getInstance();
+        await mongoDB.connect();
         console.log('✅ Conectado ao MongoDB');
 
         const equipeRepo = new EquipeRepositoryImpl();
@@ -200,7 +201,7 @@ async function generateData() {
 
         const atividades = [];
         for (const vendedor of vendedores) {
-            console.log(`\n�� Processando vendedor: ${vendedor.nome}`);
+            console.log(`\n Processando vendedor: ${vendedor.nome}`);
             
             // Encontra o perfil do vendedor
             const perfil = perfisVendedores.find(p => p.nome === vendedor.nome);
@@ -252,7 +253,8 @@ async function generateData() {
                     vendedor.id,
                     data,
                     docinhosCoco,
-                    Math.floor(docinhosCoco * 0.1) // 10% do valor em follow-ups
+                    Math.floor(docinhosCoco * 0.1), // 10% do valor em follow-ups
+                    uuidv4() // clienteId fictício
                 ));
                 totalAtividades++;
             }

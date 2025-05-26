@@ -19,11 +19,10 @@ export class VendedorController {
 
     async criar(req: Request, res: Response) {
         try {
-            const { id, nome, equipeId, email, telefone, meta, cargo } = req.body;
+            const { nome, equipeId, email, telefone, meta, cargo } = req.body;
 
             // Validação dos campos obrigatórios
             const camposObrigatorios = {
-                id: id,
                 nome: nome,
                 equipeId: equipeId,
                 email: email,
@@ -50,8 +49,7 @@ export class VendedorController {
                 });
             }
 
-            await this.criarVendedor.executar({
-                id,
+            const vendedor = await this.criarVendedor.executar({
                 nome,
                 equipeId,
                 email,
@@ -63,7 +61,18 @@ export class VendedorController {
             // Invalida o cache após criar um novo vendedor
             await this.vendedorCache.invalidateAll();
 
-            return res.status(201).json({ mensagem: 'Vendedor criado com sucesso' });
+            return res.status(201).json({ 
+                mensagem: 'Vendedor criado com sucesso',
+                vendedor: {
+                    id: vendedor.id,
+                    nome: vendedor.nome,
+                    equipeId: vendedor.equipeId,
+                    email: vendedor.email,
+                    telefone: vendedor.telefone,
+                    meta: vendedor.meta,
+                    cargo: vendedor.cargo
+                }
+            });
         } catch (erro) {
             return res.status(500).json({
                 erro: 'Erro interno ao criar vendedor',

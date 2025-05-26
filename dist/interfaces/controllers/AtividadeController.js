@@ -21,9 +21,9 @@ class AtividadeController {
             if (!req.body) {
                 return res.status(400).json({ erro: 'Body da requisição está vazio' });
             }
-            const { id, vendedorId, data, docinhosCoco, follow_up } = req.body;
+            const { id, vendedorId, data, docinhosCoco, follow_up, clienteId } = req.body;
             // Validação dos campos obrigatórios
-            if (!id || !vendedorId || !data || docinhosCoco === undefined || follow_up === undefined) {
+            if (!id || !vendedorId || !data || docinhosCoco === undefined || follow_up === undefined || !clienteId) {
                 return res.status(400).json({
                     erro: 'Dados inválidos',
                     detalhes: {
@@ -31,7 +31,8 @@ class AtividadeController {
                         vendedorId: vendedorId ? 'presente' : 'ausente',
                         data: data ? 'presente' : 'ausente',
                         docinhosCoco: docinhosCoco !== undefined ? 'presente' : 'ausente',
-                        follow_up: follow_up !== undefined ? 'presente' : 'ausente'
+                        follow_up: follow_up !== undefined ? 'presente' : 'ausente',
+                        clienteId: clienteId ? 'presente' : 'ausente'
                     }
                 });
             }
@@ -41,7 +42,8 @@ class AtividadeController {
                 vendedorId,
                 data: new Date(data),
                 docinhosCoco,
-                follow_up
+                follow_up,
+                clienteId
             });
             // //console.log("✅ Atividade criada com sucesso:", atividade);
             return res.status(201).json(atividade);
@@ -59,27 +61,29 @@ class AtividadeController {
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 10;
             const skip = (page - 1) * limit;
-            // Tenta obter do cache primeiro
-            const cacheKey = `list:${page}:${limit}`;
-            const cachedAtividades = await this.atividadeCache.getAtividades();
-            if (cachedAtividades) {
+            // Usa cache paginado
+            const cachedResult = await this.atividadeCache.getAtividadesPaginadas(skip, limit);
+            if (cachedResult) {
                 console.log('📦 Cache hit: Atividades encontradas no cache');
                 return res.status(200).json({
                     pagina: page,
                     limite: limit,
-                    total: cachedAtividades.length,
-                    atividades: cachedAtividades.map((atividade) => ({
+                    total: cachedResult.total,
+                    totalPaginas: Math.ceil(cachedResult.total / limit),
+                    atividades: cachedResult.atividades.map((atividade) => ({
                         id: atividade.id,
                         vendedorId: atividade.vendedorId,
                         data: atividade.data,
-                        docinhosCoco: atividade.docinhosCoco
+                        docinhosCoco: atividade.docinhosCoco,
+                        follow_up: atividade.follow_up,
+                        clienteId: atividade.clienteId
                     }))
                 });
             }
             console.log('🔄 Cache miss: Buscando atividades do banco');
             const { atividades, total } = await this.obterAtividades.executar(skip, limit);
-            // Salva no cache
-            await this.atividadeCache.setAtividades(atividades);
+            // Salva no cache paginado
+            await this.atividadeCache.setAtividadesPaginadas(skip, limit, { atividades, total });
             console.log('💾 Cache: Atividades salvas no cache');
             return res.status(200).json({
                 pagina: page,
@@ -90,7 +94,9 @@ class AtividadeController {
                     id: atividade.id,
                     vendedorId: atividade.vendedorId,
                     data: atividade.data,
-                    docinhosCoco: atividade.docinhosCoco
+                    docinhosCoco: atividade.docinhosCoco,
+                    follow_up: atividade.follow_up,
+                    clienteId: atividade.clienteId
                 }))
             });
         }
@@ -179,16 +185,17 @@ class AtividadeController {
         try {
             // //console.log("📥 Dados recebidos para atualização:", req.body);
             const { id } = req.params;
-            const { vendedorId, data, docinhosCoco, follow_up } = req.body;
+            const { vendedorId, data, docinhosCoco, follow_up, clienteId } = req.body;
             // Validação dos campos obrigatórios
-            if (!vendedorId || !data || docinhosCoco === undefined || follow_up === undefined) {
+            if (!vendedorId || !data || docinhosCoco === undefined || follow_up === undefined || !clienteId) {
                 return res.status(400).json({
                     erro: 'Dados inválidos',
                     detalhes: {
                         vendedorId: vendedorId ? 'presente' : 'ausente',
                         data: data ? 'presente' : 'ausente',
                         docinhosCoco: docinhosCoco !== undefined ? 'presente' : 'ausente',
-                        follow_up: follow_up !== undefined ? 'presente' : 'ausente'
+                        follow_up: follow_up !== undefined ? 'presente' : 'ausente',
+                        clienteId: clienteId ? 'presente' : 'ausente'
                     }
                 });
             }
@@ -196,7 +203,8 @@ class AtividadeController {
                 vendedorId,
                 data: new Date(data),
                 docinhosCoco,
-                follow_up
+                follow_up,
+                clienteId
             });
             // //console.log("✅ Atividade atualizada com sucesso:", atividadeAtualizada);
             return res.status(200).json(atividadeAtualizada);
@@ -258,6 +266,30 @@ class AtividadeController {
         catch (erro) {
             return res.status(500).json({
                 erro: 'Erro interno ao calcular frequência de vendas',
+                mensagem: erro.message
+            });
+        }
+    }
+    async obterTodosCompleto(req, res) {
+        try {
+            // Busca todas as atividades sem paginação (limite alto) diretamente do banco
+            const atividades = await this.obterAtividades.atividadeRepo.obterTodos(0, 99999);
+            const total = atividades.length;
+            return res.status(200).json({
+                atividades: atividades.map((atividade) => ({
+                    id: atividade.id,
+                    vendedorId: atividade.vendedorId,
+                    data: atividade.data,
+                    docinhosCoco: atividade.docinhosCoco,
+                    follow_up: atividade.follow_up,
+                    clienteId: atividade.clienteId
+                })),
+                total
+            });
+        }
+        catch (erro) {
+            return res.status(500).json({
+                erro: 'Erro interno ao obter atividades (completo)',
                 mensagem: erro.message
             });
         }

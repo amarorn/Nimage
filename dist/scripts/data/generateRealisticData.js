@@ -47,7 +47,8 @@ async function generateData() {
     try {
         console.log('🚀 Iniciando geração de dados realistas...');
         // Conecta ao MongoDB
-        await MongoDB_1.MongoDB.conectar();
+        const mongoDB = MongoDB_1.MongoDB.getInstance();
+        await mongoDB.connect();
         console.log('✅ Conectado ao MongoDB');
         const equipeRepo = new EquipeRepositoryImpl_1.EquipeRepositoryImpl();
         const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
@@ -147,7 +148,7 @@ async function generateData() {
         }
         const atividades = [];
         for (const vendedor of vendedores) {
-            console.log(`\n�� Processando vendedor: ${vendedor.nome}`);
+            console.log(`\n Processando vendedor: ${vendedor.nome}`);
             // Encontra o perfil do vendedor
             const perfil = perfisVendedores.find(p => p.nome === vendedor.nome);
             if (!perfil)
@@ -183,7 +184,8 @@ async function generateData() {
                     fatorDiaSemana *
                     fatorVariavel *
                     fatorEvolucao);
-                atividades.push(new Atividade_1.Atividade((0, uuid_1.v4)(), vendedor.id, data, docinhosCoco, Math.floor(docinhosCoco * 0.1) // 10% do valor em follow-ups
+                atividades.push(new Atividade_1.Atividade((0, uuid_1.v4)(), vendedor.id, data, docinhosCoco, Math.floor(docinhosCoco * 0.1), // 10% do valor em follow-ups
+                (0, uuid_1.v4)() // clienteId fictício
                 ));
                 totalAtividades++;
             }

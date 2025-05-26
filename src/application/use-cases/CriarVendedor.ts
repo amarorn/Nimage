@@ -1,8 +1,8 @@
 import { Vendedor } from "../../domain/entities/Vendedor";
 import { VendedorRepository } from "../../domain/repositories/VendedorRepository";
+import { v4 as uuidv4 } from 'uuid';
 
 interface CriarVendedorDTO {
-    id: string;
     nome: string;
     equipeId: string;
     email: string;
@@ -17,12 +17,12 @@ export class CriarVendedor {
     async executar(dados: CriarVendedorDTO): Promise<Vendedor> {
         //console.log("📝 Iniciando criação de vendedor com dados:", dados);
 
-        if (!dados.id || !dados.nome || !dados.equipeId || !dados.email || !dados.telefone || !dados.meta || !dados.cargo) {
+        if (!dados.nome || !dados.equipeId || !dados.email || !dados.telefone || !dados.meta || !dados.cargo) {
             throw new Error('Dados inválidos para criar vendedor');
         }
 
         const vendedor = new Vendedor(
-            dados.id,
+            uuidv4(),
             dados.nome,
             dados.equipeId,
             dados.email,

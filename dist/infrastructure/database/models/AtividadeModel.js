@@ -41,6 +41,7 @@ const AtividadeSchema = new mongoose_1.Schema({
     data: { type: Date, required: true },
     docinhosCoco: { type: Number, required: true },
     follow_up: { type: Number, required: true, default: 0 },
+    clienteId: { type: String, required: true },
     total_docinhos: { type: Number }
 });
 // Índices para otimizar as queries mais comuns

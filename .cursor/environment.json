@@ -1,0 +1,6 @@
+{
+  "snapshot": "snapshot-20250521-344547ae-0cd3-4c53-949f-54cfd48b075b",
+  "install": "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && . \"$NVM_DIR/nvm.sh\" && nvm install --lts && npm install && sudo apt-get update && sudo apt-get install -y docker.io docker-compose && sudo usermod -aG docker $USER",
+  "start": "sudo service docker start && npm start",
+  "terminals": []
+}

@@ -2,12 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Atividade = void 0;
 class Atividade {
-    constructor(id, vendedorId, data, docinhosCoco, follow_up, total_docinhos) {
+    constructor(id, vendedorId, data, docinhosCoco, follow_up, clienteId, total_docinhos) {
         this.id = id;
         this.vendedorId = vendedorId;
         this.data = data;
         this.docinhosCoco = docinhosCoco;
         this.follow_up = follow_up;
+        this.clienteId = clienteId;
         this.total_docinhos = total_docinhos;
     }
 }

@@ -19,7 +19,7 @@ const metaController = new MetaController_1.MetaController(criarMeta, obterMeta,
 router.post("/metas", async (req, res) => {
     return metaController.criar(req, res);
 });
-router.get("/metas/all", async (req, res) => {
+router.get("/metas", async (req, res) => {
     try {
         // Validação dos parâmetros de paginação
         const page = parseInt(req.query.page) || 1;
@@ -33,6 +33,19 @@ router.get("/metas/all", async (req, res) => {
                 }
             });
         }
+        const resultado = await metaController.obterTodos(req, res);
+        return res.status(200).json(resultado);
+    }
+    catch (erro) {
+        console.error('Erro ao obter metas:', erro);
+        return res.status(500).json({
+            erro: 'Erro interno ao obter metas',
+            mensagem: erro.message
+        });
+    }
+});
+router.get("/metas/all", async (req, res) => {
+    try {
         const resultado = await metaController.obterTodos(req, res);
         return res.status(200).json(resultado);
     }

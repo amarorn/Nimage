@@ -7,7 +7,8 @@ async function testOllamaServiceAdvanced() {
     try {
         console.log('🚀 Iniciando teste avançado do OllamaService...');
         // Conectar ao MongoDB
-        await MongoDB_1.MongoDB.conectar();
+        const mongoDB = MongoDB_1.MongoDB.getInstance();
+        await mongoDB.connect();
         // Inicializar o serviço
         const ollamaService = new OllamaService_1.OllamaService();
         // Dados de exemplo mais completos

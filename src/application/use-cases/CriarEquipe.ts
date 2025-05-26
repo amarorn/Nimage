@@ -1,16 +1,16 @@
 import { Equipe } from "../../domain/entities/Equipe";
 import { EquipeRepository } from "../../domain/repositories/EquipeRepository";
+import { v4 as uuidv4 } from 'uuid';
 
 interface CriarEquipeDTO {
-    id: string;
     nome: string;
     pdv: string;
     cidade: string;
     estado: string;
-    gerenteNome: string;
-    gerenteTelefone: string;
-    capitaoNome: string;
-    capitaoTelefone: string;
+    gerenteNome?: string;
+    gerenteTelefone?: string;
+    capitaoNome?: string;
+    capitaoTelefone?: string;
     temaId?: string;
 }
 
@@ -20,8 +20,7 @@ export class CriarEquipe {
     async executar(dados: CriarEquipeDTO) {
         //console.log("📝 Iniciando criação de equipe com dados:", dados);
 
-        if (!dados.id || !dados.nome || !dados.pdv || !dados.cidade || !dados.estado || 
-            !dados.gerenteNome || !dados.gerenteTelefone || !dados.capitaoNome || !dados.capitaoTelefone) {
+        if (!dados.nome || !dados.pdv || !dados.cidade || !dados.estado) {
             throw new Error('Dados inválidos para criar equipe');
         }
 
@@ -30,7 +29,7 @@ export class CriarEquipe {
         }
 
         const equipe = new Equipe(
-            dados.id,
+            uuidv4(),
             dados.nome,
             dados.pdv,
             dados.cidade,

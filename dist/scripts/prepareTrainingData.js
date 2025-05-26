@@ -43,7 +43,8 @@ const path = __importStar(require("path"));
 async function prepareTrainingData() {
     try {
         // Conectar ao MongoDB
-        await MongoDB_1.MongoDB.conectar();
+        const mongoDB = MongoDB_1.MongoDB.getInstance();
+        await mongoDB.connect();
         console.log('Conectado ao MongoDB');
         const vendedorRepo = new VendedorRepositoryImpl_1.VendedorRepositoryImpl();
         const atividadeRepo = new AtividadeRepositoryImpl_1.AtividadeRepositoryImpl();

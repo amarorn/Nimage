@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { metricsEndpoint } from '../../infrastructure/middleware/metricsMiddleware';
+import { metricsEndpoint } from '../../infrastructure/middleware/MetricsMiddleware';
 
 const router = Router();
 

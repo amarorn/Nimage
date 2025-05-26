@@ -5,10 +5,10 @@ export class Equipe {
         public pdv: string,
         public cidade: string,
         public estado: string,
-        public gerenteNome: string,
-        public gerenteTelefone: string,
-        public capitaoNome: string,
-        public capitaoTelefone: string,
+        public gerenteNome?: string,
+        public gerenteTelefone?: string,
+        public capitaoNome?: string,
+        public capitaoTelefone?: string,
         public temaId?: string
     ) {}
 }
