@@ -17,6 +17,7 @@ export class EquipeController {
 
     async criar(req: Request, res: Response) {
         try {
+            console.log('Body recebido:', req.body);
             if (!req.body) {
                 return res.status(400).json({ erro: 'Body da requisição está vazio' });
             }
@@ -26,6 +27,7 @@ export class EquipeController {
                 pdv, 
                 cidade, 
                 estado, 
+                lojaId,
                 gerenteNome, 
                 gerenteTelefone, 
                 capitaoNome, 
@@ -34,14 +36,15 @@ export class EquipeController {
             } = req.body;
 
             // Validação dos campos obrigatórios
-            if (!nome || !pdv || !cidade || !estado) {
+            if (!nome || !pdv || !cidade || !estado || !lojaId) {
                 return res.status(400).json({
                     erro: 'Dados inválidos',
                     detalhes: {
                         nome: nome ? 'presente' : 'ausente',
                         pdv: pdv ? 'presente' : 'ausente',
                         cidade: cidade ? 'presente' : 'ausente',
-                        estado: estado ? 'presente' : 'ausente'
+                        estado: estado ? 'presente' : 'ausente',
+                        lojaId: lojaId ? 'presente' : 'ausente'
                     }
                 });
             }
@@ -51,6 +54,7 @@ export class EquipeController {
                 pdv, 
                 cidade, 
                 estado, 
+                lojaId,
                 gerenteNome, 
                 gerenteTelefone, 
                 capitaoNome, 

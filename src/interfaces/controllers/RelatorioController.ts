@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import { RelatorioService } from '../../application/services/RelatorioService';
+import { ObterRelatorio } from '../../application/use-cases/ObterRelatorio';
 
 export class RelatorioController {
-    constructor(private relatorioService: RelatorioService) {}
+    constructor(private obterRelatorio: ObterRelatorio) {}
 
     async atividadesPorMontadora(req: Request, res: Response) {
         try {
-            const resultado = await this.relatorioService.atividadesPorMontadora();
+            const resultado = await this.obterRelatorio.atividadesPorMontadora();
             res.json(resultado);
         } catch (error) {
             res.status(500).json({ error: error instanceof Error ? error.message : 'Erro ao gerar relatório por montadora' });
@@ -15,7 +15,7 @@ export class RelatorioController {
 
     async atividadesPorVendedor(req: Request, res: Response) {
         try {
-            const resultado = await this.relatorioService.atividadesPorVendedor();
+            const resultado = await this.obterRelatorio.atividadesPorVendedor();
             res.json(resultado);
         } catch (error) {
             res.status(500).json({ error: error instanceof Error ? error.message : 'Erro ao gerar relatório por vendedor' });
@@ -24,7 +24,7 @@ export class RelatorioController {
 
     async atividadesPorLoja(req: Request, res: Response) {
         try {
-            const resultado = await this.relatorioService.atividadesPorLoja();
+            const resultado = await this.obterRelatorio.atividadesPorLoja();
             res.json(resultado);
         } catch (error) {
             res.status(500).json({ error: error instanceof Error ? error.message : 'Erro ao gerar relatório por loja' });
@@ -33,10 +33,19 @@ export class RelatorioController {
 
     async atividadesPorEquipe(req: Request, res: Response) {
         try {
-            const resultado = await this.relatorioService.atividadesPorEquipe();
+            const resultado = await this.obterRelatorio.atividadesPorEquipe();
             res.json(resultado);
         } catch (error) {
             res.status(500).json({ error: error instanceof Error ? error.message : 'Erro ao gerar relatório por equipe' });
+        }
+    }
+
+    async relatorioDocinhosCoco(req: Request, res: Response) {
+        try {
+            const resultado = await this.obterRelatorio.relatorioDocinhosCoco();
+            res.json(resultado);
+        } catch (error) {
+            res.status(500).json({ error: error instanceof Error ? error.message : 'Erro ao gerar relatório de docinhos de coco' });
         }
     }
 } 

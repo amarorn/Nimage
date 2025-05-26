@@ -11,6 +11,7 @@ export class AtualizarEquipe {
         estado?: string; 
         gerenteNome?: string; 
         gerenteTelefone?: string; 
+        lojaId?: string;
         capitaoNome?: string; 
         capitaoTelefone?: string;
         temaId?: string;

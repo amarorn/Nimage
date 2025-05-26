@@ -12,6 +12,7 @@ export class EquipeRepositoryImpl implements EquipeRepository {
                 pdv: equipe.pdv,
                 cidade: equipe.cidade,
                 estado: equipe.estado,
+                lojaId: equipe.lojaId,
                 gerenteNome: equipe.gerenteNome,
                 gerenteTelefone: equipe.gerenteTelefone,
                 capitaoNome: equipe.capitaoNome,
@@ -116,11 +117,12 @@ export class EquipeRepositoryImpl implements EquipeRepository {
             equipe.pdv,
             equipe.cidade,
             equipe.estado,
-            equipe.gerenteNome,
-            equipe.gerenteTelefone,
-            equipe.capitaoNome,
-            equipe.capitaoTelefone,
-            equipe.temaId
+            equipe.lojaId,
+            equipe.gerenteNome ?? "",
+            equipe.gerenteTelefone ?? "",
+            equipe.capitaoNome ?? "",
+            equipe.capitaoTelefone ?? "",
+            equipe.temaId ?? ""
         );
     }
 }

@@ -9,6 +9,7 @@ export interface EquipeRepository {
         estado?: string;
         gerenteNome?: string;
         gerenteTelefone?: string;
+        lojaId: string;
         capitaoNome?: string;
         capitaoTelefone?: string;
         temaId?: string;

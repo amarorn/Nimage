@@ -88,4 +88,93 @@ export class RelatorioService {
             }
         ]);
     }
+
+    async relatorioDocinhosCoco() {
+        // Soma total
+        const total = await AtividadeModel.aggregate([
+            { $group: { _id: null, somaDocinhos: { $sum: "$docinhosCoco" } } }
+        ]);
+
+        // Por vendedor
+        const porVendedor = await AtividadeModel.aggregate([
+            { $group: { _id: "$vendedorId", somaDocinhos: { $sum: "$docinhosCoco" } } }
+        ]);
+
+        // Por equipe
+        const porEquipe = await AtividadeModel.aggregate([
+            {
+                $lookup: {
+                    from: "vendedors",
+                    localField: "vendedorId",
+                    foreignField: "id",
+                    as: "vendedor"
+                }
+            },
+            { $unwind: "$vendedor" },
+            { $group: { _id: "$vendedor.equipeId", somaDocinhos: { $sum: "$docinhosCoco" } } }
+        ]);
+
+        // Por loja
+        const porLoja = await AtividadeModel.aggregate([
+            {
+                $lookup: {
+                    from: "vendedors",
+                    localField: "vendedorId",
+                    foreignField: "id",
+                    as: "vendedor"
+                }
+            },
+            { $unwind: "$vendedor" },
+            {
+                $lookup: {
+                    from: "equipes",
+                    localField: "vendedor.equipeId",
+                    foreignField: "id",
+                    as: "equipe"
+                }
+            },
+            { $unwind: "$equipe" },
+            { $group: { _id: "$equipe.lojaId", somaDocinhos: { $sum: "$docinhosCoco" } } }
+        ]);
+
+        // Por montadora
+        const porMontadora = await AtividadeModel.aggregate([
+            {
+                $lookup: {
+                    from: "vendedors",
+                    localField: "vendedorId",
+                    foreignField: "id",
+                    as: "vendedor"
+                }
+            },
+            { $unwind: "$vendedor" },
+            {
+                $lookup: {
+                    from: "equipes",
+                    localField: "vendedor.equipeId",
+                    foreignField: "id",
+                    as: "equipe"
+                }
+            },
+            { $unwind: "$equipe" },
+            {
+                $lookup: {
+                    from: "lojas",
+                    localField: "equipe.lojaId",
+                    foreignField: "id",
+                    as: "loja"
+                }
+            },
+            { $unwind: "$loja" },
+            { $group: { _id: "$loja.montadoraId", somaDocinhos: { $sum: "$docinhosCoco" } } }
+        ]);
+
+        return {
+            total: total[0]?.somaDocinhos || 0,
+            porVendedor,
+            porEquipe,
+            porLoja,
+            porMontadora
+        };
+    }
 } 

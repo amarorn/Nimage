@@ -5,6 +5,7 @@ export class Equipe {
         public pdv: string,
         public cidade: string,
         public estado: string,
+        public lojaId: string,
         public gerenteNome?: string,
         public gerenteTelefone?: string,
         public capitaoNome?: string,

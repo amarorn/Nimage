@@ -7,6 +7,7 @@ interface CriarEquipeDTO {
     pdv: string;
     cidade: string;
     estado: string;
+    lojaId: string;
     gerenteNome?: string;
     gerenteTelefone?: string;
     capitaoNome?: string;
@@ -20,7 +21,7 @@ export class CriarEquipe {
     async executar(dados: CriarEquipeDTO) {
         //console.log("📝 Iniciando criação de equipe com dados:", dados);
 
-        if (!dados.nome || !dados.pdv || !dados.cidade || !dados.estado) {
+        if (!dados.nome || !dados.pdv || !dados.cidade || !dados.estado || !dados.lojaId) {
             throw new Error('Dados inválidos para criar equipe');
         }
 
@@ -34,6 +35,7 @@ export class CriarEquipe {
             dados.pdv,
             dados.cidade,
             dados.estado,
+            dados.lojaId,
             dados.gerenteNome,
             dados.gerenteTelefone,
             dados.capitaoNome,
